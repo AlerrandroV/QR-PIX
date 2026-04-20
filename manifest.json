@@ -52,8 +52,8 @@
 		"description": "Cadastrar uma nova chave PIX",
 		"url": "./new-key.html",
 		"icons": [{
-			"src": "icon-192.png",
-			"sizes": "192x192",
+			"src": "new-key-icon.png",
+			"sizes": "24x24",
 			"type": "image/png"
 		}]
 	},
@@ -63,8 +63,8 @@
 			"description": "Abrir a tela de personalização do QR Code",
 			"url": "./qr-customize.html",
 			"icons": [{
-				"src": "icon-192.png",
-				"sizes": "192x192",
+				"src": "qr-customize-icon.png",
+				"sizes": "24x24",
 				"type": "image/png"
 			}]
 		},
@@ -74,8 +74,19 @@
 			"description": "Abrir as configurações do app",
 			"url": "./settings.html",
 			"icons": [{
-				"src": "icon-192.png",
-				"sizes": "192x192",
+				"src": "settings-icon.png",
+				"sizes": "24x24",
+				"type": "image/png"
+			}]
+		}],
+		{
+			"name": "Doe p/ o criador",
+			"short_name": "Doe ",
+			"description": "Doar para o desenvolvedor",
+			"url": "./generate-qr-pix.html?bank=Mercado+Pago&name=Victor+Alerrandro+Tavares&keyType=email&key=v.alerrandro.t%40hotmail.com&value=0",
+			"icons": [{
+				"src": "settings-icon.png",
+				"sizes": "24x24",
 				"type": "image/png"
 			}]
 		}],
@@ -93,5 +104,5 @@
 			"form_factor": "narrow",
 			"label": "Criação e personalização de QR PIX"
 		}],
-	"version": "1.0.38"
+	"version": "1.0.39"
 }
