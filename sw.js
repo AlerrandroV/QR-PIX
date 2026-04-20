@@ -1,5 +1,5 @@
 // ===== QR PIX — Service Worker =====
-const APP_VERSION   = "1.0.37";
+const APP_VERSION   = "1.0.38";
 const APP_CACHE     = `qrpix-app-${APP_VERSION}`;
 const FONT_CACHE    = "qrpix-fonts-v1";
 const EXTERN_CACHE  = "qrpix-extern-v1";

@@ -88,7 +88,7 @@ function readJsonStorage(key, fallback) {
 function createBackupPayload() {
   return {
     format: "pixkey-backup",
-    version: 37,
+    version: 38,
     exportedAt: new Date().toISOString(),
     data: {
       settings: readJsonStorage(BACKUP_STORAGE_KEYS.settings, {}),
