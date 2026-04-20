@@ -1,12 +1,18 @@
 {
+  "id": "/",
   "name": "QR PIX",
   "short_name": "QR PIX",
-  "description": "Gere QR Codes PIX personalizados",
+  "description": "Crie, personalize e compartilhe QR Codes PIX com visual moderno e funcionamento offline.",
+  "lang": "pt-BR",
+  "dir": "ltr",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
   "background_color": "#f6fafe",
   "theme_color": "#006493",
   "orientation": "portrait",
+  "categories": ["finance", "productivity", "utilities"],
   "icons": [
     {
       "src": "icon-192.png",
@@ -20,6 +26,74 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
+    {
+      "src": "icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+    {
+      "src": "icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ],
-  "version": "1.0.37"
+  "shortcuts": [
+    {
+      "name": "Nova chave PIX",
+      "short_name": "Nova chave",
+      "description": "Cadastrar uma nova chave PIX",
+      "url": "./new-key.html",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Personalizar QR",
+      "short_name": "QR custom",
+      "description": "Abrir a tela de personalização do QR Code",
+      "url": "./qr-customize.html",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Configurações",
+      "short_name": "Config",
+      "description": "Abrir as configurações do app",
+      "url": "./settings.html",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-wide.png",
+      "sizes": "1080x2400",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Tela inicial do QR PIX"
+    },
+    {
+      "src": "screenshot-mobile.png",
+      "sizes": "1080x2400",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Criação e personalização de QR PIX"
+    }
+  ]
 }
