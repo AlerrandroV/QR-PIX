@@ -1,108 +1,122 @@
 {
-	"id": "/",
-	"name": "QR PIX",
-	"short_name": "QR PIX",
-	"description": "Crie, personalize e compartilhe QR Codes PIX com visual moderno e funcionamento offline.",
-	"lang": "pt-BR",
-	"dir": "ltr",
-	"start_url": "./index.html",
-	"scope": "./",
-	"display": "standalone",
-	"display_override": [
-		"window-controls-overlay",
-		"standalone"
-	],
-	"background_color": "#f6fafe",
-	"theme_color": "#006493",
-	"orientation": "portrait",
-	"categories": [
-		"business",
-		"education",
-		"finance",
-		"productivity",
-		"utilities"
-	],
-	"icons": [{
-		"src": "icon-192.png",
-		"sizes": "192x192",
-		"type": "image/png",
-		"purpose": "any"
-	},
-		{
-			"src": "icon-192-maskable.png",
-			"sizes": "192x192",
-			"type": "image/png",
-			"purpose": "maskable"
-		},
-		{
-			"src": "icon-512.png",
-			"sizes": "512x512",
-			"type": "image/png",
-			"purpose": "any"
-		},
-		{
-			"src": "icon-512-maskable.png",
-			"sizes": "512x512",
-			"type": "image/png",
-			"purpose": "maskable"
-		}],
-	"shortcuts": [{
-		"name": "Nova chave PIX",
-		"short_name": "Nova chave",
-		"description": "Cadastrar uma nova chave PIX",
-		"url": "./new-key.html",
-		"icons": [{
-			"src": "new-key-icon.png",
-			"sizes": "24x24",
-			"type": "image/png"
-		}]
-	},
-		{
-			"name": "Personalizar QR",
-			"short_name": "QR custom",
-			"description": "Abrir a tela de personalização do QR Code",
-			"url": "./qr-customize.html",
-			"icons": [{
-				"src": "qr-customize-icon.png",
-				"sizes": "24x24",
-				"type": "image/png"
-			}]
-		},
-		{
-			"name": "Configurações",
-			"short_name": "Config",
-			"description": "Abrir as configurações do app",
-			"url": "./settings.html",
-			"icons": [{
-				"src": "settings-icon.png",
-				"sizes": "24x24",
-				"type": "image/png"
-			}]
-		}],
-		{
-			"name": "Doe p/ o criador",
-			"short_name": "Doe ",
-			"description": "Doar para o desenvolvedor",
-			"url": "./generate-qr-pix.html?bank=Mercado+Pago&name=Victor+Alerrandro+Tavares&keyType=email&key=v.alerrandro.t%40hotmail.com&value=0",
-			"icons": [{
-				"src": "settings-icon.png",
-				"sizes": "24x24",
-				"type": "image/png"
-			}]
-		}],
-	"screenshots": [{
-		"src": "screenshot-wide.png",
-		"sizes": "1080x2400",
-		"type": "image/png",
-		"form_factor": "wide",
-		"label": "Tela inicial do QR PIX"
-	},
-		{
-			"src": "screenshot-mobile.png",
-			"sizes": "1080x2400",
-			"type": "image/png",
-			"form_factor": "narrow",
-			"label": "Criação e personalização de QR PIX"
-		}],
-	"version": "1.0.39"
+  "id": "/",
+  "name": "QR PIX",
+  "short_name": "QR PIX",
+  "description": "Crie, personalize e compartilhe QR Codes PIX com visual moderno e funcionamento offline.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone"
+  ],
+  "background_color": "#f6fafe",
+  "theme_color": "#006493",
+  "orientation": "portrait",
+  "categories": [
+    "business",
+    "education",
+    "finance",
+    "productivity",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nova chave PIX",
+      "short_name": "Nova chave",
+      "description": "Cadastrar uma nova chave PIX",
+      "url": "./new-key.html",
+      "icons": [
+        {
+          "src": "new-key-icon.png",
+          "sizes": "24x24",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Personalizar QR",
+      "short_name": "QR custom",
+      "description": "Abrir a tela de personalização do QR Code",
+      "url": "./qr-customize.html",
+      "icons": [
+        {
+          "src": "qr-customize-icon.png",
+          "sizes": "24x24",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Configurações",
+      "short_name": "Config",
+      "description": "Abrir as configurações do app",
+      "url": "./settings.html",
+      "icons": [
+        {
+          "src": "settings-icon.png",
+          "sizes": "24x24",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Doe p/ o criador",
+      "short_name": "Doe",
+      "description": "Doar para o desenvolvedor",
+      "url": "./generate-qr-pix.html?bank=Mercado+Pago&name=Victor+Alerrandro+Tavares&keyType=email&key=v.alerrandro.t%40hotmail.com&value=0",
+      "icons": [
+        {
+          "src": "settings-icon.png",
+          "sizes": "24x24",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-wide.png",
+      "sizes": "1080x2400",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Tela inicial do QR PIX"
+    },
+    {
+      "src": "screenshot-mobile.png",
+      "sizes": "1080x2400",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Criação e personalização de QR PIX"
+    }
+  ],
+  "version": "1.0.39"
 }
