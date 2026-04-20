@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "AlerrandroV.QRPIX",
+        "sha256_cert_fingerprints": ["B1:C0:7E:F5:A0:24:54:59:69:27:B6:58:6D:04:59:B7:7C:1E:FB:26:D4:D5:1F:27:99:E4:3A:AA:DF:A9:56:8F"]
+      }
+    }]
