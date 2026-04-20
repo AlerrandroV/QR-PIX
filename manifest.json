@@ -16,6 +16,8 @@
   "theme_color": "#006493",
   "orientation": "portrait",
   "categories": [
+    "business",
+    "education",
     "finance",
     "productivity",
     "utilities"
