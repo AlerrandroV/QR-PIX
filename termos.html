@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#006493" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Termos — QR PIX</title>
+  <script src="ui.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="info-page.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <script type="importmap">{"imports":{"@material/web/":"https://esm.run/@material/web/"}}</script>
+  <script type="module">
+    import "@material/web/all.js";
+    import { styles as typescaleStyles } from "@material/web/typography/md-typescale-styles.js";
+    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+  </script>
+</head>
+<body>
+  <header class="top-app-bar">
+    <div class="top-app-bar__start">
+      <md-icon-button id="btn-back" aria-label="Voltar">
+        <md-icon>arrow_back</md-icon>
+      </md-icon-button>
+      <span class="app-title">Termos</span>
+    </div>
+  </header>
+
+  <main class="info-content">
+    <section class="info-term">
+      <div class="info-term__number">01</div>
+      <div class="info-term__title">Uso local do aplicativo</div>
+      <div class="info-term__body">O QR PIX funciona prioritariamente no seu próprio dispositivo, armazenando chaves, preferências e personalizações localmente para facilitar o uso contínuo.</div>
+    </section>
+
+    <section class="info-term">
+      <div class="info-term__number">02</div>
+      <div class="info-term__title">Responsabilidade sobre os dados</div>
+      <div class="info-term__body">O usuário é responsável por conferir nome, instituição, chave Pix e valor antes de compartilhar ou utilizar um QR Code gerado pelo aplicativo.</div>
+    </section>
+
+    <section class="info-term">
+      <div class="info-term__number">03</div>
+      <div class="info-term__title">Disponibilidade e compatibilidade</div>
+      <div class="info-term__body">O aplicativo foi projetado para funcionar como PWA e pode variar ligeiramente conforme o navegador, sistema operacional e suporte a recursos modernos da web.</div>
+    </section>
+
+    <section class="info-term">
+      <div class="info-term__number">04</div>
+      <div class="info-term__title">Privacidade</div>
+      <div class="info-term__body">As informações utilizadas pelo app não são destinadas a processamento em servidor próprio. Sempre que possível, o funcionamento ocorre localmente no navegador do usuário.</div>
+    </section>
+
+    <section class="info-term">
+      <div class="info-term__number">05</div>
+      <div class="info-term__title">Atualizações</div>
+      <div class="info-term__body">O aplicativo pode receber melhorias visuais, correções e novos recursos para aprimorar a experiência de uso, mantendo a proposta de simplicidade e praticidade.</div>
+    </section>
+  </main>
+
+  <script>
+    document.getElementById("btn-back").addEventListener("click", () => history.back());
+  </script>
+</body>
+</html>

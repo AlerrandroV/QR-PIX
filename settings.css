@@ -1,0 +1,210 @@
+.settings-content {
+  display: block;
+  width: 100%;
+  height: calc(var(--app-height, 100dvh) - var(--topbar-height, 64px));
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 18px 16px 28px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .settings-content {
+    padding-bottom: calc(28px + env(safe-area-inset-bottom));
+  }
+}
+
+.settings-content > .settings-group + .settings-group {
+  margin-top: 12px;
+}
+
+.top-app-bar__start {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.settings-group {
+  display: block;
+  width: 100%;
+  background-color: var(--md-sys-color-surface-container-low);
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--md-sys-color-outline-variant) 62%, transparent);
+}
+
+.settings-group__label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--md-sys-color-primary);
+  padding: 16px 18px 8px;
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 72px;
+  padding: 14px 18px;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 150ms ease;
+}
+
+.settings-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--md-sys-color-on-surface);
+  opacity: 0;
+  transition: opacity 150ms ease;
+  pointer-events: none;
+}
+
+.settings-item:active::after {
+  opacity: 0.08;
+}
+
+.settings-item__leading {
+  width: 44px;
+  height: 44px;
+  border-radius: 16px;
+  background-color: var(--md-sys-color-secondary-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 44px;
+}
+
+.settings-item__icon {
+  font-size: 22px;
+  color: var(--md-sys-color-on-secondary-container);
+}
+
+.settings-item__content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.settings-item__title {
+  display: block;
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface);
+}
+
+.settings-item__subtitle {
+  display: block;
+  margin-top: 3px;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.settings-item__chevron {
+  font-size: 20px;
+  color: var(--md-sys-color-on-surface-variant);
+  transition: transform 260ms cubic-bezier(0.2, 0, 0, 1);
+  flex: 0 0 auto;
+}
+
+.settings-item__chevron.rotated {
+  transform: rotate(180deg);
+}
+
+.settings-expand-panel {
+  display: none;
+  background-color: color-mix(in srgb, var(--md-sys-color-surface-container) 84%, var(--md-sys-color-surface-container-low));
+}
+
+.settings-expand-panel.open {
+  display: block;
+}
+
+.settings-expand-inner {
+  display: block;
+  padding: 4px 0 10px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 58px;
+  padding: 12px 18px 12px 78px;
+  cursor: pointer;
+  position: relative;
+}
+
+.radio-option::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--md-sys-color-on-surface);
+  opacity: 0;
+  transition: opacity 150ms ease;
+  pointer-events: none;
+}
+
+.radio-option:active::after {
+  opacity: 0.08;
+}
+
+.radio-option__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--md-sys-color-on-surface);
+}
+
+.radio-option__hint {
+  font-size: 12px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.settings-divider {
+  height: 1px;
+  background-color: var(--md-sys-color-outline-variant);
+  margin: 0 18px;
+  opacity: 0.5;
+}
+
+@media (max-width: 420px) {
+  .settings-content {
+    padding: 16px 12px 24px;
+  }
+
+  .settings-content > .settings-group + .settings-group {
+    margin-top: 10px;
+  }
+
+  .settings-group {
+    border-radius: 20px;
+  }
+
+  .settings-item {
+    min-height: 70px;
+    padding: 14px 16px;
+  }
+
+  .settings-item__leading {
+    width: 42px;
+    height: 42px;
+    border-radius: 15px;
+    flex-basis: 42px;
+  }
+
+  .radio-option {
+    padding: 12px 16px 12px 74px;
+  }
+}

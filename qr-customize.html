@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#006493" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+
+  <title>Personalizar QR Code — QR PIX</title>
+  <script src="ui.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="qr-customize.css" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+  <script type="importmap">
+  {
+    "imports": {
+      "@material/web/": "https://esm.run/@material/web/"
+    }
+  }
+  </script>
+  <script type="module">
+    import "@material/web/all.js";
+    import { styles as typescaleStyles } from "@material/web/typography/md-typescale-styles.js";
+    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+  </script>
+
+  <script src="qr-code-styling.js"></script>
+</head>
+<body>
+
+  <!-- TOP APP BAR -->
+  <header class="top-app-bar">
+    <div class="top-app-bar__start">
+      <md-icon-button id="btn-back" aria-label="Voltar">
+        <md-icon>arrow_back</md-icon>
+      </md-icon-button>
+      <span class="app-title md-typescale-title-large">Personalizar QR Code</span>
+    </div>
+  </header>
+
+  <!-- LAYOUT PRINCIPAL -->
+  <div class="qr-layout">
+
+    <!-- PREVIEW (fixo) -->
+    <div class="qr-preview-panel">
+      <div id="qr-canvas" class="qr-canvas"></div>
+      <p class="qr-preview-label md-typescale-label-medium">Pré-visualização</p>
+    </div>
+
+    <!-- OPÇÕES (scroll interno) -->
+    <div class="qr-options-panel">
+      <div class="qr-options-scroll">
+
+        <!-- DOTS -->
+        <section class="opt-group">
+          <h3 class="opt-group__title">Pontos do QR</h3>
+          <div class="opt-row">
+            <span class="opt-label">Estilo</span>
+            <div class="chip-group" id="dots-type-group">
+              <button class="chip chip--active" data-value="square">Quadrado</button>
+              <button class="chip" data-value="rounded">Arredondado</button>
+              <button class="chip" data-value="dots">Círculos</button>
+              <button class="chip" data-value="classy">Classy</button>
+              <button class="chip" data-value="classy-rounded">Classy +</button>
+              <button class="chip" data-value="extra-rounded">Extra Round</button>
+            </div>
+          </div>
+          <div class="opt-row opt-row--inline">
+            <span class="opt-label">Cor dos pontos</span>
+            <div class="color-pick-wrapper">
+              <input type="color" id="dots-color" value="#000000" class="color-input" />
+              <span class="color-preview" id="dots-color-preview" style="background:#000000"></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- CANTOS (squares) -->
+        <section class="opt-group">
+          <h3 class="opt-group__title">Quadrados dos cantos</h3>
+          <div class="opt-row">
+            <span class="opt-label">Estilo</span>
+            <div class="chip-group" id="corner-sq-type-group">
+              <button class="chip chip--active" data-value="">Padrão</button>
+              <button class="chip" data-value="square">Quadrado</button>
+              <button class="chip" data-value="dot">Círculo</button>
+              <button class="chip" data-value="extra-rounded">Extra Round</button>
+            </div>
+          </div>
+          <div class="opt-row opt-row--inline">
+            <span class="opt-label">Cor</span>
+            <div class="color-pick-wrapper">
+              <input type="color" id="corner-sq-color" value="#000000" class="color-input" />
+              <span class="color-preview" id="corner-sq-color-preview" style="background:#000000"></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- CANTOS (dots) -->
+        <section class="opt-group">
+          <h3 class="opt-group__title">Pontos dos cantos</h3>
+          <div class="opt-row">
+            <span class="opt-label">Estilo</span>
+            <div class="chip-group" id="corner-dot-type-group">
+              <button class="chip chip--active" data-value="">Padrão</button>
+              <button class="chip" data-value="dot">Círculo</button>
+              <button class="chip" data-value="square">Quadrado</button>
+            </div>
+          </div>
+          <div class="opt-row opt-row--inline">
+            <span class="opt-label">Cor</span>
+            <div class="color-pick-wrapper">
+              <input type="color" id="corner-dot-color" value="#000000" class="color-input" />
+              <span class="color-preview" id="corner-dot-color-preview" style="background:#000000"></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- FUNDO -->
+        <section class="opt-group">
+          <h3 class="opt-group__title">Fundo</h3>
+          <div class="opt-row opt-row--inline">
+            <span class="opt-label">Cor de fundo</span>
+            <div class="color-pick-wrapper">
+              <input type="color" id="bg-color" value="#ffffff" class="color-input" />
+              <span class="color-preview" id="bg-color-preview" style="background:#ffffff"></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- LOGO -->
+        <section class="opt-group">
+          <h3 class="opt-group__title">Logo central</h3>
+          <div class="opt-row opt-row--inline">
+            <span class="opt-label">Imagem</span>
+            <md-filled-tonal-button id="btn-upload-logo" class="upload-btn">
+              <md-icon slot="icon">upload</md-icon>
+              Escolher
+            </md-filled-tonal-button>
+            <input type="file" id="logo-input" accept="image/*" style="display:none" />
+          </div>
+          <div class="opt-row opt-row--inline" id="logo-clear-row" style="display:none;">
+            <span class="opt-label" id="logo-filename">nenhum arquivo</span>
+            <md-text-button id="btn-clear-logo">
+              <md-icon slot="icon">close</md-icon>
+              Remover
+            </md-text-button>
+          </div>
+          <div class="opt-row opt-row--inline">
+            <span class="opt-label">Tamanho</span>
+            <div class="slider-wrapper">
+              <input type="range" id="logo-size" min="0.1" max="0.5" step="0.05" value="0.3" class="md-slider" />
+              <span class="slider-value" id="logo-size-value">30%</span>
+            </div>
+          </div>
+          <div class="opt-row opt-row--inline">
+            <span class="opt-label">Margem</span>
+            <div class="slider-wrapper">
+              <input type="range" id="logo-margin" min="0" max="20" step="1" value="5" class="md-slider" />
+              <span class="slider-value" id="logo-margin-value">5px</span>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- CORREÇÃO DE ERRO -->
+        <section class="opt-group">
+          <h3 class="opt-group__title">Correção de erro</h3>
+          <div class="opt-row">
+            <div class="ecc-slider-wrapper">
+              <input type="range" id="ecc-level" min="0" max="3" step="1" value="0" class="md-slider ecc-slider" />
+              <div class="ecc-ticks">
+                <span class="ecc-tick" data-active="true">L</span>
+                <span class="ecc-tick">M</span>
+                <span class="ecc-tick">Q</span>
+                <span class="ecc-tick">H</span>
+              </div>
+            </div>
+            <div class="ecc-desc-wrapper">
+              <span class="ecc-badge" id="ecc-badge">L</span>
+              <span class="ecc-desc" id="ecc-desc">Baixa — 7% de recuperação</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- MARGEM GERAL -->
+        <section class="opt-group">
+          <h3 class="opt-group__title">Margem geral</h3>
+          <div class="opt-row opt-row--inline">
+            <span class="opt-label">Margem</span>
+            <div class="slider-wrapper">
+              <input type="range" id="qr-margin" min="0" max="40" step="2" value="10" class="md-slider" />
+              <span class="slider-value" id="qr-margin-value">10px</span>
+            </div>
+          </div>
+        </section>
+
+        <div class="opt-bottom-spacer"></div>
+      </div>
+
+      <!-- BOTÃO SALVAR FIXO NO RODAPÉ -->
+      <div class="qr-save-bar">
+        <md-filled-button id="btn-save" class="save-btn">
+          <md-icon slot="icon">save</md-icon>
+          Salvar configurações
+        </md-filled-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIALOG: Sair sem salvar -->
+  <div class="dialog-scrim" id="dialog-scrim" aria-hidden="true">
+    <div class="dialog-container" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+      <h2 class="dialog-title" id="dialog-title">Descartar alterações?</h2>
+      <p class="dialog-body">Você fez alterações que ainda não foram salvas. O que deseja fazer?</p>
+      <div class="dialog-actions">
+        <md-text-button id="dialog-discard">Sair sem salvar</md-text-button>
+        <md-filled-button id="dialog-save-exit">Salvar e sair</md-filled-button>
+      </div>
+    </div>
+  </div>
+
+  <script src="qr-customize.js"></script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#006493" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Licenças — QR PIX</title>
+  <script src="ui.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="info-page.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <script type="importmap">{"imports":{"@material/web/":"https://esm.run/@material/web/"}}</script>
+  <script type="module">
+    import "@material/web/all.js";
+    import { styles as typescaleStyles } from "@material/web/typography/md-typescale-styles.js";
+    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+  </script>
+</head>
+<body>
+  <header class="top-app-bar">
+    <div class="top-app-bar__start">
+      <md-icon-button id="btn-back" aria-label="Voltar">
+        <md-icon>arrow_back</md-icon>
+      </md-icon-button>
+      <span class="app-title">Licenças</span>
+    </div>
+  </header>
+
+  <main class="info-content">
+    <div class="license-card">
+      <div class="license-card__header">
+        <span class="license-card__name">Material Web (@material/web)</span>
+        <span class="license-card__badge">Apache 2.0</span>
+      </div>
+      <div class="license-card__desc">Componentes de interface Material Design 3 para web, desenvolvidos pelo Google.</div>
+      <div class="license-card__url">github.com/material-components/material-web</div>
+    </div>
+
+    <div class="license-card">
+      <div class="license-card__header">
+        <span class="license-card__name">Material Symbols Rounded</span>
+        <span class="license-card__badge">Apache 2.0</span>
+      </div>
+      <div class="license-card__desc">Fonte de ícones vetoriais variáveis do Google, utilizados em toda a interface do aplicativo.</div>
+      <div class="license-card__url">fonts.google.com/icons</div>
+    </div>
+
+    <div class="license-card">
+      <div class="license-card__header">
+        <span class="license-card__name">Roboto</span>
+        <span class="license-card__badge">Apache 2.0</span>
+      </div>
+      <div class="license-card__desc">Família tipográfica padrão do Material Design, utilizada como fonte principal do aplicativo.</div>
+      <div class="license-card__url">fonts.google.com/specimen/Roboto</div>
+    </div>
+
+    <div class="license-card">
+      <div class="license-card__header">
+        <span class="license-card__name">qr-code-styling</span>
+        <span class="license-card__badge">MIT</span>
+      </div>
+      <div class="license-card__desc">Biblioteca JavaScript para geração de QR Codes estilizados com suporte a logos, cores e formatos personalizados.</div>
+      <div class="license-card__url">github.com/kozakdenys/qr-code-styling</div>
+    </div>
+
+    <div class="license-card">
+      <div class="license-card__header">
+        <span class="license-card__name">esm.run (jsDelivr)</span>
+        <span class="license-card__badge">MIT</span>
+      </div>
+      <div class="license-card__desc">CDN de módulos ES para carregamento dos componentes Material Web diretamente no navegador.</div>
+      <div class="license-card__url">esm.run / jsdelivr.com</div>
+    </div>
+
+    <div class="license-card">
+      <div class="license-card__header">
+        <span class="license-card__name">Especificação PIX EMV</span>
+        <span class="license-card__badge">Público</span>
+      </div>
+      <div class="license-card__desc">Padrão de payload para QR Code PIX, definido pelo Banco Central do Brasil (BACEN). Implementação própria baseada na documentação oficial.</div>
+      <div class="license-card__url">bcb.gov.br/estabilidadefinanceira/pix</div>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById("btn-back").addEventListener("click", () => history.back());
+    
+  </script>
+</body>
+</html>

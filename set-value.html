@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#006493" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+
+  <title>Definir Valor — QR PIX</title>
+  <script src="ui.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="set-value.css" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+  <script type="importmap">
+  {
+    "imports": {
+      "@material/web/": "https://esm.run/@material/web/"
+    }
+  }
+  </script>
+  <script type="module">
+    import "@material/web/all.js";
+    import { styles as typescaleStyles } from "@material/web/typography/md-typescale-styles.js";
+    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+  </script>
+</head>
+<body>
+
+  <header class="top-app-bar">
+    <div class="top-app-bar__start">
+      <md-icon-button id="btn-back" aria-label="Voltar">
+        <md-icon>arrow_back</md-icon>
+      </md-icon-button>
+      <span class="app-title md-typescale-title-large">Definir Valor</span>
+    </div>
+  </header>
+
+  <div class="value-layout">
+
+    <!-- CARD DE TRANSAÇÃO -->
+    <div class="transaction-card">
+      <div class="transaction-card__row">
+        <span class="material-symbols-rounded tc-icon">account_balance</span>
+        <div class="tc-info">
+          <span class="tc-label">Instituição</span>
+          <span class="tc-value" id="tc-bank">—</span>
+        </div>
+      </div>
+      <div class="tc-divider"></div>
+      <div class="transaction-card__row">
+        <span class="material-symbols-rounded tc-icon">person</span>
+        <div class="tc-info">
+          <span class="tc-label">Beneficiário</span>
+          <span class="tc-value" id="tc-name">—</span>
+        </div>
+      </div>
+      <div class="tc-divider"></div>
+      <div class="transaction-card__row">
+        <span class="material-symbols-rounded tc-icon">key</span>
+        <div class="tc-info">
+          <span class="tc-label">Chave PIX</span>
+          <span class="tc-value tc-value--mono" id="tc-key">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DISPLAY DO VALOR -->
+    <div class="value-display-wrapper">
+      <span class="value-currency">R$</span>
+      <span class="value-display" id="value-display">0,00</span>
+    </div>
+
+    <!-- TECLADO NUMÉRICO PRÓPRIO -->
+    <div class="numpad">
+      <button class="numpad-key" data-key="1">1</button>
+      <button class="numpad-key" data-key="2">2</button>
+      <button class="numpad-key" data-key="3">3</button>
+      <button class="numpad-key" data-key="4">4</button>
+      <button class="numpad-key" data-key="5">5</button>
+      <button class="numpad-key" data-key="6">6</button>
+      <button class="numpad-key" data-key="7">7</button>
+      <button class="numpad-key" data-key="8">8</button>
+      <button class="numpad-key" data-key="9">9</button>
+      <button class="numpad-key" data-key="00">00</button>
+      <button class="numpad-key" data-key="0">0</button>
+      <button class="numpad-key numpad-key--delete" data-key="del">
+        <span class="material-symbols-rounded">backspace</span>
+      </button>
+    </div>
+
+    <!-- BOTÃO CONFIRMAR -->
+    <div class="value-bottom-bar">
+      <md-filled-button id="btn-confirm" class="confirm-btn">
+        <md-icon slot="icon">qr_code_2</md-icon>
+        Confirmar valor
+      </md-filled-button>
+    </div>
+
+  </div>
+
+  <script src="set-value.js"></script>
+</body>
+</html>

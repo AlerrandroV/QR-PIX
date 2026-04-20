@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#006493" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+
+  <title>Configurações — QR PIX</title>
+  <script src="ui.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="settings.css" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+  <script type="importmap">
+  {
+    "imports": {
+      "@material/web/": "https://esm.run/@material/web/"
+    }
+  }
+  </script>
+  <script type="module">
+    import "@material/web/all.js";
+    import { styles as typescaleStyles } from "@material/web/typography/md-typescale-styles.js";
+    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+  </script>
+</head>
+<body>
+  <header class="top-app-bar">
+    <div class="top-app-bar__start">
+      <md-icon-button id="btn-back" aria-label="Voltar">
+        <md-icon>arrow_back</md-icon>
+      </md-icon-button>
+      <span class="app-title md-typescale-title-large">Configurações</span>
+    </div>
+  </header>
+
+  <main class="main-content settings-content">
+    <section class="settings-group">
+      <h2 class="settings-group__label">Aparência</h2>
+
+      <div class="settings-item" id="item-tema">
+        <div class="settings-item__leading">
+          <span class="material-symbols-rounded settings-item__icon">contrast</span>
+        </div>
+        <div class="settings-item__content">
+          <span class="settings-item__title">Tema</span>
+          <span class="settings-item__subtitle" id="tema-subtitle">Sistema</span>
+        </div>
+        <span class="material-symbols-rounded settings-item__chevron" id="tema-chevron">expand_more</span>
+      </div>
+      <div class="settings-expand-panel" id="panel-tema" aria-hidden="true">
+        <div class="settings-expand-inner">
+          <label class="radio-option">
+            <span class="radio-option__label">Claro</span>
+            <md-radio name="tema" value="light" touch-target="wrapper"></md-radio>
+          </label>
+          <label class="radio-option">
+            <span class="radio-option__label">Escuro</span>
+            <md-radio name="tema" value="dark" touch-target="wrapper"></md-radio>
+          </label>
+          <label class="radio-option">
+            <span class="radio-option__label">Sistema</span>
+            <md-radio name="tema" value="system" touch-target="wrapper"></md-radio>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-divider"></div>
+
+      <div class="settings-item" id="item-eyecare">
+        <div class="settings-item__leading">
+          <span class="material-symbols-rounded settings-item__icon">eye_tracking</span>
+        </div>
+        <div class="settings-item__content">
+          <span class="settings-item__title">Proteção ocular</span>
+          <span class="settings-item__subtitle" id="eyecare-subtitle">Desativado</span>
+        </div>
+        <span class="material-symbols-rounded settings-item__chevron" id="eyecare-chevron">expand_more</span>
+      </div>
+      <div class="settings-expand-panel" id="panel-eyecare" aria-hidden="true">
+        <div class="settings-expand-inner">
+          <label class="radio-option">
+            <span class="radio-option__label">Desativado</span>
+            <md-radio name="eyecare" value="off" touch-target="wrapper"></md-radio>
+          </label>
+          <label class="radio-option">
+            <span class="radio-option__label">Ativado</span>
+            <md-radio name="eyecare" value="on" touch-target="wrapper"></md-radio>
+          </label>
+          <label class="radio-option">
+            <span class="radio-option__label">Somente à noite <span class="radio-option__hint">(18h – 6h)</span></span>
+            <md-radio name="eyecare" value="night" touch-target="wrapper"></md-radio>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="settings-group">
+      <h2 class="settings-group__label">QR Code</h2>
+
+      <div class="settings-item settings-item--nav" id="item-qr">
+        <div class="settings-item__leading">
+          <span class="material-symbols-rounded settings-item__icon">qr_code_2</span>
+        </div>
+        <div class="settings-item__content">
+          <span class="settings-item__title">Personalizar QR Code</span>
+          <span class="settings-item__subtitle">Cores, logo e estilo</span>
+        </div>
+        <span class="material-symbols-rounded settings-item__chevron">chevron_right</span>
+      </div>
+    </section>
+
+    <section class="settings-group">
+  <h2 class="settings-group__label">Backup</h2>
+
+  <div class="settings-item" id="item-export-backup" role="button" tabindex="0" aria-label="Exportar backup">
+    <div class="settings-item__leading">
+      <span class="material-symbols-rounded settings-item__icon">upload_file</span>
+    </div>
+    <div class="settings-item__content">
+      <span class="settings-item__title">Exportar configurações</span>
+      <span class="settings-item__subtitle">Aparência, QR Code e chaves salvas</span>
+    </div>
+    <span class="material-symbols-rounded settings-item__chevron">download</span>
+  </div>
+
+  <div class="settings-divider"></div>
+
+  <div class="settings-item" id="item-import-backup" role="button" tabindex="0" aria-label="Importar backup">
+    <div class="settings-item__leading">
+      <span class="material-symbols-rounded settings-item__icon">download</span>
+    </div>
+    <div class="settings-item__content">
+      <span class="settings-item__title">Importar configurações</span>
+      <span class="settings-item__subtitle">Restaurar backup em arquivo JSON</span>
+    </div>
+    <span class="material-symbols-rounded settings-item__chevron">chevron_right</span>
+  </div>
+
+  <input type="file" id="backup-file-input" accept="application/json,.json" hidden>
+</section>
+
+
+    <section class="settings-group">
+      <h2 class="settings-group__label">Apoio</h2>
+
+      <div class="settings-item settings-item--nav" id="item-donate-dev">
+        <div class="settings-item__leading">
+          <span class="material-symbols-rounded settings-item__icon">volunteer_activism</span>
+        </div>
+        <div class="settings-item__content">
+          <span class="settings-item__title">Doar para o desenvolvedor</span>
+          <span class="settings-item__subtitle">Contribua via Pix com valor livre</span>
+        </div>
+        <span class="material-symbols-rounded settings-item__chevron">chevron_right</span>
+      </div>
+    </section>
+
+    <section class="settings-group">
+      <h2 class="settings-group__label">Informações</h2>
+
+      <div class="settings-item settings-item--nav" data-href="termos.html">
+        <div class="settings-item__leading">
+          <span class="material-symbols-rounded settings-item__icon">gavel</span>
+        </div>
+        <div class="settings-item__content">
+          <span class="settings-item__title">Termos de uso</span>
+        </div>
+        <span class="material-symbols-rounded settings-item__chevron">chevron_right</span>
+      </div>
+
+      <div class="settings-divider"></div>
+
+      <div class="settings-item settings-item--nav" data-href="licencas.html">
+        <div class="settings-item__leading">
+          <span class="material-symbols-rounded settings-item__icon">description</span>
+        </div>
+        <div class="settings-item__content">
+          <span class="settings-item__title">Licenças</span>
+        </div>
+        <span class="material-symbols-rounded settings-item__chevron">chevron_right</span>
+      </div>
+
+      <div class="settings-divider"></div>
+
+      <div class="settings-item settings-item--nav" data-href="sobre.html">
+        <div class="settings-item__leading">
+          <span class="material-symbols-rounded settings-item__icon">info</span>
+        </div>
+        <div class="settings-item__content">
+          <span class="settings-item__title">Sobre</span>
+          <span class="settings-item__subtitle" id="app-version">Versão 1.0.0</span>
+        </div>
+        <span class="material-symbols-rounded settings-item__chevron">chevron_right</span>
+      </div>
+    </section>
+  </main>
+
+  <script src="settings.js"></script>
+</body>
+</html>

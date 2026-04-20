@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#006493" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+
+  <title>QR Code PIX — QR PIX</title>
+  <script src="ui.js"></script>
+  <script src="pix-payload.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="generate-qr-pix.css" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+  <script type="importmap">
+  {
+    "imports": {
+      "@material/web/": "https://esm.run/@material/web/"
+    }
+  }
+  </script>
+  <script type="module">
+    import "@material/web/all.js";
+    import { styles as typescaleStyles } from "@material/web/typography/md-typescale-styles.js";
+    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+  </script>
+
+  <script src="qr-code-styling.js"></script>
+</head>
+<body>
+
+  <!-- TOP APP BAR -->
+  <header class="top-app-bar">
+    <div class="top-app-bar__start">
+      <md-icon-button id="btn-back" aria-label="Voltar">
+        <md-icon>arrow_back</md-icon>
+      </md-icon-button>
+      <span class="app-title md-typescale-title-large">QR Code PIX</span>
+    </div>
+    <div class="top-app-bar__actions">
+      <md-icon-button id="btn-download" aria-label="Baixar QR Code">
+        <md-icon>download</md-icon>
+      </md-icon-button>
+      <md-icon-button id="btn-share" aria-label="Compartilhar">
+        <md-icon>share</md-icon>
+      </md-icon-button>
+    </div>
+  </header>
+
+  <!-- LAYOUT -->
+  <div class="qr-gen-layout">
+
+    <!-- QR CODE (o maior possível) -->
+    <div class="qr-gen-preview">
+      <div id="qr-output"></div>
+    </div>
+
+    <!-- DADOS + COPIA E COLA -->
+    <div class="qr-gen-info">
+
+      <!-- Dados da transação -->
+      <div class="tx-card">
+        <div class="tx-row">
+          <span class="material-symbols-rounded tx-icon">account_balance</span>
+          <div class="tx-col">
+            <span class="tx-label">Instituição</span>
+            <span class="tx-val" id="info-bank">—</span>
+          </div>
+        </div>
+        <div class="tx-divider"></div>
+        <div class="tx-row">
+          <span class="material-symbols-rounded tx-icon">person</span>
+          <div class="tx-col">
+            <span class="tx-label">Beneficiário</span>
+            <span class="tx-val" id="info-name">—</span>
+          </div>
+        </div>
+        <div class="tx-divider"></div>
+        <div class="tx-row">
+          <span class="material-symbols-rounded tx-icon">key</span>
+          <div class="tx-col">
+            <span class="tx-label">Chave PIX</span>
+            <span class="tx-val tx-val--mono" id="info-key">—</span>
+          </div>
+        </div>
+        <div class="tx-divider"></div>
+        <div class="tx-row">
+          <span class="material-symbols-rounded tx-icon">payments</span>
+          <div class="tx-col">
+            <span class="tx-label">Valor</span>
+            <span class="tx-val tx-val--value" id="info-value">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Copia e Cola -->
+      <div class="copypaste-card" id="copypaste-card" role="button" aria-label="Copiar código Pix" tabindex="0">
+        <div class="copypaste-card__header">
+          <span class="material-symbols-rounded copypaste-card__icon">content_copy</span>
+          <span class="copypaste-card__title">Pix Copia e Cola</span>
+          <span class="copypaste-card__hint" id="copy-hint">Toque para copiar</span>
+        </div>
+        <p class="copypaste-card__code" id="copypaste-code"></p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RODAPÉ -->
+  <div class="gen-bottom-bar">
+    <md-filled-button id="btn-home" class="home-btn">
+      <md-icon slot="icon">home</md-icon>
+      Voltar ao início
+    </md-filled-button>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script src="generate-qr-pix.js"></script>
+</body>
+</html>

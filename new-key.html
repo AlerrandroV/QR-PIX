@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#006493" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+
+  <title>Nova Chave PIX — QR PIX</title>
+  <script src="ui.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="new-key.css" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+  <script type="importmap">
+  {
+    "imports": {
+      "@material/web/": "https://esm.run/@material/web/"
+    }
+  }
+  </script>
+  <script type="module">
+    import "@material/web/all.js";
+    import { styles as typescaleStyles } from "@material/web/typography/md-typescale-styles.js";
+    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+  </script>
+</head>
+<body>
+
+  <header class="top-app-bar">
+    <div class="top-app-bar__start">
+      <md-icon-button id="btn-back" aria-label="Voltar">
+        <md-icon>arrow_back</md-icon>
+      </md-icon-button>
+      <span class="app-title md-typescale-title-large">Nova Chave PIX</span>
+    </div>
+  </header>
+
+  <main class="main-content new-key-content">
+
+    <section class="form-group">
+      <h2 class="form-group__label">Beneficiário</h2>
+
+      <!-- Instituição -->
+      <div class="field-wrapper">
+        <md-outlined-text-field
+          id="field-bank"
+          label="Instituição"
+          type="text"
+          autocomplete="off"
+        >
+          <md-icon slot="leading-icon">account_balance</md-icon>
+        </md-outlined-text-field>
+        <!-- dropdown de sugestões -->
+        <div class="bank-suggestions" id="bank-suggestions" style="display:none;"></div>
+      </div>
+
+      <!-- Nome do beneficiário -->
+      <md-outlined-text-field
+        id="field-name"
+        label="Nome do beneficiário"
+        type="text"
+        autocomplete="off"
+      >
+        <md-icon slot="leading-icon">person</md-icon>
+      </md-outlined-text-field>
+    </section>
+
+    <section class="form-group">
+      <h2 class="form-group__label">Chave PIX</h2>
+
+      <!-- Tipo da chave -->
+      <div class="key-type-group" id="key-type-group">
+        <button class="key-type-chip" data-type="cpf">CPF</button>
+        <button class="key-type-chip" data-type="cnpj">CNPJ</button>
+        <button class="key-type-chip" data-type="phone">Telefone</button>
+        <button class="key-type-chip" data-type="email">E-mail</button>
+        <button class="key-type-chip" data-type="random">Aleatória</button>
+      </div>
+
+      <!-- Campo da chave -->
+      <div class="field-wrapper">
+        <md-outlined-text-field
+          id="field-key"
+          label="Chave PIX"
+          type="text"
+          autocomplete="off"
+          supporting-text=" "
+        >
+          <md-icon slot="leading-icon">key</md-icon>
+        </md-outlined-text-field>
+        <div class="key-validation-icon" id="key-validation-icon" style="display:none;">
+          <span class="material-symbols-rounded" id="key-validation-symbol">check_circle</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- RODAPÉ FIXO -->
+  <div class="bottom-bar">
+    <md-filled-button id="btn-confirm" class="confirm-btn" disabled>
+      <md-icon slot="icon">arrow_forward</md-icon>
+      Confirmar
+    </md-filled-button>
+  </div>
+
+  <script src="new-key.js"></script>
+</body>
+</html>

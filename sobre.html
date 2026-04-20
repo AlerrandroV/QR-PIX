@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#006493" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Sobre — QR PIX</title>
+  <script src="ui.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="info-page.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <script type="importmap">{"imports":{"@material/web/":"https://esm.run/@material/web/"}}</script>
+  <script type="module">
+    import "@material/web/all.js";
+    import { styles as typescaleStyles } from "@material/web/typography/md-typescale-styles.js";
+    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+  </script>
+</head>
+<body>
+  <header class="top-app-bar">
+    <div class="top-app-bar__start">
+      <md-icon-button id="btn-back" aria-label="Voltar">
+        <md-icon>arrow_back</md-icon>
+      </md-icon-button>
+      <span class="app-title">Sobre</span>
+    </div>
+  </header>
+
+  <main class="info-content">
+    <div class="about-hero">
+      <img class="about-hero__logo" src="icon-192.png" alt="Logo QR PIX"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+      <div class="about-hero__logo-fallback" style="display:none;">
+        <span class="material-symbols-rounded">qr_code_2</span>
+      </div>
+      <div class="about-hero__name">QR PIX</div>
+      <div class="about-hero__version" id="about-version">Versão 1.0.0</div>
+    </div>
+
+    <div class="info-block">
+      <div class="info-block__title">O que é</div>
+      <div class="info-block__body">
+        Gerador de QR Code e código Copia e Cola para pagamentos PIX.
+        Funciona completamente offline após a primeira abertura e pode ser instalado como aplicativo no seu celular.
+      </div>
+    </div>
+
+    <div class="info-block">
+      <div class="info-block__title">Como usar</div>
+      <ol class="info-block__steps">
+        <li><span class="info-block__step-num">1</span>Cadastre uma chave PIX com os dados do beneficiário.</li>
+        <li><span class="info-block__step-num">2</span>Toque na chave salva para gerar o QR Code.</li>
+        <li><span class="info-block__step-num">3</span>Defina um valor (opcional) e confirme.</li>
+        <li><span class="info-block__step-num">4</span>Compartilhe o código ou salve a imagem do QR.</li>
+      </ol>
+    </div>
+
+    <div class="info-block">
+      <div class="info-block__title">Privacidade</div>
+      <div class="info-block__body">
+        Nenhum dado é enviado a servidores externos. Todas as informações ficam armazenadas apenas no seu dispositivo (localStorage).
+      </div>
+    </div>
+
+    <div class="info-block">
+      <div class="info-block__title">Desenvolvedor</div>
+      <div class="info-block__body">
+        Desenvolvido com fins educacionais. Código aberto e gratuito.
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById("btn-back").addEventListener("click", () => history.back());
+    
+  // Lê versão do manifest
+  fetch('./manifest.json')
+    .then(r => r.json())
+    .then(m => {
+      if (m.version) document.getElementById('about-version').textContent = 'Versão ' + m.version;
+    }).catch(() => {});
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#006493" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>QR PIX</title>
+  <script src="ui.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <script type="importmap">{"imports":{"@material/web/":"https://esm.run/@material/web/"}}</script>
+  <script type="module">
+    import "@material/web/all.js";
+    import { styles as typescaleStyles } from "@material/web/typography/md-typescale-styles.js";
+    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+  </script>
+</head>
+<body>
+  <header class="top-app-bar">
+    <span class="app-title">QR PIX</span>
+    <div class="top-app-bar__actions">
+      <!-- Botão instalar: HTML nativo para garantir consistência cross-browser -->
+      <button id="btn-install" class="install-topbar-btn" style="display:none;" aria-label="Instalar App">
+        <span class="material-symbols-rounded">download</span>
+        <span class="install-topbar-btn__label">Baixar App</span>
+      </button>
+      <md-icon-button id="btn-settings" aria-label="Configurações">
+        <md-icon>settings</md-icon>
+      </md-icon-button>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="search-bar-wrapper">
+      <md-outlined-text-field id="search-input" label="Pesquisar chaves PIX" type="search">
+        <md-icon slot="leading-icon">search</md-icon>
+      </md-outlined-text-field>
+    </div>
+
+    <section class="keys-section">
+      <h2 class="section-label">Chaves salvas</h2>
+      <div id="keys-list" class="keys-list"></div>
+      <div id="empty-state" class="empty-state" style="display:none;">
+        <span class="material-symbols-rounded empty-icon">key_off</span>
+        <p>Nenhuma chave encontrada</p>
+        <p class="empty-state__sub">Adicione sua primeira chave PIX</p>
+      </div>
+    </section>
+  </main>
+
+  <md-fab id="btn-new-key" class="fab-new-key" label="Nova Chave PIX" aria-label="Nova Chave PIX">
+    <md-icon slot="icon">add</md-icon>
+  </md-fab>
+
+  <div class="dialog-scrim" id="delete-scrim" aria-hidden="true">
+    <div class="dialog-container" role="dialog" aria-modal="true" aria-labelledby="delete-dialog-title">
+      <h2 class="dialog-title" id="delete-dialog-title">Excluir chave?</h2>
+      <p class="dialog-body">
+        Deseja excluir a chave de <strong id="delete-dialog-name"></strong>?<br/>
+        <span class="dialog-key-preview" id="delete-dialog-key"></span>
+      </p>
+      <div class="dialog-actions">
+        <md-text-button id="delete-cancel">Cancelar</md-text-button>
+        <md-filled-button id="delete-confirm" class="delete-confirm-btn">Excluir</md-filled-button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
