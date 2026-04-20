@@ -76,23 +76,23 @@
       ]
     },
     {
-      "name": "Configurações",
-      "short_name": "Config",
-      "description": "Abrir as configurações do app",
-      "url": "./settings.html",
+      "name": "Doe p/ o criador",
+      "short_name": "Doe",
+      "description": "Doar para o desenvolvedor",
+      "url": "./generate-qr-pix.html?bank=Mercado+Pago&amp;name=Victor+Alerrandro+Tavares&amp;keyType=email&amp;key=v.alerrandro.t%40hotmail.com&amp;value=0",
       "icons": [
         {
-          "src": "settings-icon.svg",
+          "src": "donate-icon.svg",
           "sizes": "128x128",
           "type": "image/svg"
         }
       ]
     },
     {
-      "name": "Doe p/ o criador",
-      "short_name": "Doe",
-      "description": "Doar para o desenvolvedor",
-      "url": "./generate-qr-pix.html?bank=Mercado+Pago&amp;name=Victor+Alerrandro+Tavares&amp;keyType=email&amp;key=v.alerrandro.t%40hotmail.com&amp;value=0",
+      "name": "Configurações",
+      "short_name": "Config",
+      "description": "Abrir as configurações do app",
+      "url": "./settings.html",
       "icons": [
         {
           "src": "settings-icon.svg",
@@ -118,5 +118,5 @@
       "label": "Criação e personalização de QR PIX"
     }
   ],
-  "version": "1.0.39"
+  "version": "1.0.40"
 }
