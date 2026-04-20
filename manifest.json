@@ -56,9 +56,9 @@
       "url": "./new-key.html",
       "icons": [
         {
-          "src": "new-key-icon.png",
-          "sizes": "24x24",
-          "type": "image/png"
+          "src": "new-key-icon.svg",
+          "sizes": "128x128",
+          "type": "image/svg"
         }
       ]
     },
@@ -69,9 +69,9 @@
       "url": "./qr-customize.html",
       "icons": [
         {
-          "src": "qr-customize-icon.png",
-          "sizes": "24x24",
-          "type": "image/png"
+          "src": "qr-customize-icon.svg",
+          "sizes": "128x128",
+          "type": "image/svg"
         }
       ]
     },
@@ -82,9 +82,9 @@
       "url": "./settings.html",
       "icons": [
         {
-          "src": "settings-icon.png",
-          "sizes": "24x24",
-          "type": "image/png"
+          "src": "settings-icon.svg",
+          "sizes": "128x128",
+          "type": "image/svg"
         }
       ]
     },
@@ -95,9 +95,9 @@
       "url": "./generate-qr-pix.html?bank=Mercado+Pago&amp;name=Victor+Alerrandro+Tavares&amp;keyType=email&amp;key=v.alerrandro.t%40hotmail.com&amp;value=0",
       "icons": [
         {
-          "src": "settings-icon.png",
-          "sizes": "24x24",
-          "type": "image/png"
+          "src": "settings-icon.svg",
+          "sizes": "128x128",
+          "type": "image/svg"
         }
       ]
     }
