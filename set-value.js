@@ -1,21 +1,26 @@
-// ===== PARAMS DA URL + FALLBACK =====
+// ===== LÊ PARAMS DA URL (query string) + FALLBACK sessionStorage =====
+function getParam(name) {
+  return new URLSearchParams(window.location.search).get(name) || "";
+}
 function readStoredTx() {
   try { return JSON.parse(sessionStorage.getItem("pixkey_current_tx") || "null") || {}; }
   catch { return {}; }
 }
 
-const storedTx = readStoredTx();
-const txBank    = storedTx.bank    || "";
-const txName    = storedTx.name    || "";
-const txKeyType = storedTx.keyType || "";
-const txKey     = storedTx.key     || "";
+// Prioriza query string; cai para sessionStorage se não vier na URL
+const qp      = new URLSearchParams(window.location.search);
+const hasQp   = qp.has("key");
+const stored  = hasQp ? {} : readStoredTx();
 
+const txBank    = (hasQp ? qp.get("bank")    : stored.bank)    || "";
+const txName    = (hasQp ? qp.get("name")    : stored.name)    || "";
+const txKeyType = (hasQp ? qp.get("keyType") : stored.keyType) || "";
+const txKey     = (hasQp ? qp.get("key")     : stored.key)     || "";
+
+// Persiste no sessionStorage para compatibilidade com outros fluxos
 try {
   sessionStorage.setItem("pixkey_current_tx", JSON.stringify({
-    bank: txBank,
-    name: txName,
-    keyType: txKeyType,
-    key: txKey,
+    bank: txBank, name: txName, keyType: txKeyType, key: txKey,
   }));
 } catch {}
 
@@ -59,15 +64,24 @@ document.querySelectorAll(".numpad-key").forEach((key) => {
 
 document.getElementById("btn-confirm").addEventListener("click", () => {
   const valueInCents = parseInt(digits || "0", 10);
-  const payload = {
-    bank: txBank,
-    name: txName,
+
+  // Monta query string para a próxima tela
+  const params = new URLSearchParams({
+    bank:    txBank,
+    name:    txName,
     keyType: txKeyType,
-    key: txKey,
-    value: valueInCents,
-  };
-  try { sessionStorage.setItem("pixkey_current_tx", JSON.stringify(payload)); } catch {}
-  window.location.href = "generate-qr-pix.html";
+    key:     txKey,
+    value:   String(valueInCents),
+  });
+
+  // Persiste também no sessionStorage (fallback offline / PWA)
+  try {
+    sessionStorage.setItem("pixkey_current_tx", JSON.stringify({
+      bank: txBank, name: txName, keyType: txKeyType, key: txKey, value: valueInCents,
+    }));
+  } catch {}
+
+  window.location.href = "generate-qr-pix.html?" + params.toString();
 });
 
 document.getElementById("btn-back").addEventListener("click", () => history.back());

@@ -1,23 +1,35 @@
-// ===== DADOS DA TRANSAÇÃO =====
+// ===== LÊ DADOS: query string com fallback para sessionStorage =====
 function readStoredTx() {
   try { return JSON.parse(sessionStorage.getItem("pixkey_current_tx") || "null") || {}; }
   catch { return {}; }
 }
 
-const storedTx = readStoredTx();
-const txBank   = storedTx.bank || "";
-const txName   = storedTx.name || "";
-const txType   = storedTx.keyType || "";
-const txKey    = storedTx.key || "";
-const txCents  = parseInt(String(storedTx.value || "0"), 10);
+const qp      = new URLSearchParams(window.location.search);
+const hasQp   = qp.has("key");
+const stored  = hasQp ? {} : readStoredTx();
+
+const txBank  = (hasQp ? qp.get("bank")    : stored.bank)    || "";
+const txName  = (hasQp ? qp.get("name")    : stored.name)    || "";
+const txType  = (hasQp ? qp.get("keyType") : stored.keyType) || "";
+const txKey   = (hasQp ? qp.get("key")     : stored.key)     || "";
+const txCents = parseInt(
+  (hasQp ? qp.get("value") : String(stored.value || "0")) || "0", 10
+);
+
+// Persiste no sessionStorage (garante que btn-back e outros fluxos funcionem)
+try {
+  sessionStorage.setItem("pixkey_current_tx", JSON.stringify({
+    bank: txBank, name: txName, keyType: txType, key: txKey, value: txCents,
+  }));
+} catch {}
 
 // ===== GERAR PAYLOAD =====
 const payload = PixPayload.generatePixPayload({
-  keyType:     txType,
-  key:         txKey,
-  name:        txName,
-  city:        "BRASILIA",
-  value:       txCents,
+  keyType: txType,
+  key:     txKey,
+  name:    txName,
+  city:    "BRASILIA",
+  value:   txCents,
 });
 
 // ===== FORMATAR VALOR =====
@@ -37,9 +49,9 @@ document.getElementById("info-value").textContent = formatCurrency(txCents);
 document.getElementById("copypaste-code").textContent = payload;
 
 // ===== TAMANHO DO QR (responsivo) =====
-const availH  = window.innerHeight - 64;   // desconta topbar
-const qrMaxH  = Math.floor(availH * 0.45); // máx 45% da altura disponível
-const qrMaxW  = window.innerWidth - 32;    // padding lateral
+const availH  = window.innerHeight - 64;
+const qrMaxH  = Math.floor(availH * 0.45);
+const qrMaxW  = window.innerWidth - 32;
 const qrSize  = Math.min(qrMaxH, qrMaxW, 400);
 document.documentElement.style.setProperty("--qr-size", qrSize + "px");
 
@@ -116,7 +128,6 @@ copyCard.addEventListener("click", () => {
     showToast("Código copiado para a área de transferência");
     setTimeout(() => { copyHint.textContent = "Toque para copiar"; }, 3000);
   }).catch(() => {
-    // Fallback para browsers sem Clipboard API
     const ta = document.createElement("textarea");
     ta.value = payload;
     ta.style.cssText = "position:fixed;opacity:0";
@@ -133,34 +144,15 @@ copyCard.addEventListener("click", () => {
 // ===== DOWNLOAD 1024x1024 PNG =====
 document.getElementById("btn-download").addEventListener("click", () => {
   const dlQr = new QRCodeStyling({
-    width:  1024,
-    height: 1024,
-    type:   "canvas",
-    data:   payload,
+    width:  1024, height: 1024, type: "canvas", data: payload,
     margin: qrCfg.margin ?? 10,
-    qrOptions: {
-      errorCorrectionLevel: ECC_LEVELS[qrCfg.eccLevel ?? 0],
-    },
-    dotsOptions: {
-      type:  qrCfg.dotsType  || "square",
-      color: qrCfg.dotsColor || "#000000",
-    },
-    cornersSquareOptions: {
-      type:  qrCfg.cornerSqType  || undefined,
-      color: qrCfg.cornerSqColor || "#000000",
-    },
-    cornersDotOptions: {
-      type:  qrCfg.cornerDotType  || undefined,
-      color: qrCfg.cornerDotColor || "#000000",
-    },
-    backgroundOptions: { color: qrCfg.bgColor || "#ffffff" },
+    qrOptions: { errorCorrectionLevel: ECC_LEVELS[qrCfg.eccLevel ?? 0] },
+    dotsOptions:          { type: qrCfg.dotsType  || "square", color: qrCfg.dotsColor  || "#000000" },
+    cornersSquareOptions: { type: qrCfg.cornerSqType  || undefined, color: qrCfg.cornerSqColor  || "#000000" },
+    cornersDotOptions:    { type: qrCfg.cornerDotType || undefined, color: qrCfg.cornerDotColor || "#000000" },
+    backgroundOptions:    { color: qrCfg.bgColor || "#ffffff" },
     image: qrCfg.logoDataUrl || undefined,
-    imageOptions: {
-      crossOrigin:        "anonymous",
-      imageSize:          qrCfg.logoSize  ?? 0.3,
-      margin:             qrCfg.logoMargin ?? 5,
-      hideBackgroundDots: true,
-    },
+    imageOptions: { crossOrigin: "anonymous", imageSize: qrCfg.logoSize ?? 0.3, margin: qrCfg.logoMargin ?? 5, hideBackgroundDots: true },
   });
   dlQr.download({ name: "pixkey-qrcode", extension: "png" });
   showToast("Download iniciado…");
@@ -172,25 +164,20 @@ document.getElementById("btn-share").addEventListener("click", async () => {
     title: "QR Code PIX — " + txName,
     text:  "Pix Copia e Cola:\n\n" + payload,
   };
-
-  // Tentar compartilhar com imagem (canvas → blob → File)
   try {
     const dlQr = new QRCodeStyling({
       width: 512, height: 512, type: "canvas", data: payload,
       margin: qrCfg.margin ?? 10,
       qrOptions: { errorCorrectionLevel: ECC_LEVELS[qrCfg.eccLevel ?? 0] },
-      dotsOptions:         { type: qrCfg.dotsType || "square", color: qrCfg.dotsColor || "#000000" },
-      cornersSquareOptions:{ type: qrCfg.cornerSqType || undefined, color: qrCfg.cornerSqColor || "#000000" },
-      cornersDotOptions:   { type: qrCfg.cornerDotType || undefined, color: qrCfg.cornerDotColor || "#000000" },
-      backgroundOptions:   { color: qrCfg.bgColor || "#ffffff" },
+      dotsOptions:          { type: qrCfg.dotsType || "square", color: qrCfg.dotsColor || "#000000" },
+      cornersSquareOptions: { type: qrCfg.cornerSqType || undefined, color: qrCfg.cornerSqColor || "#000000" },
+      cornersDotOptions:    { type: qrCfg.cornerDotType || undefined, color: qrCfg.cornerDotColor || "#000000" },
+      backgroundOptions:    { color: qrCfg.bgColor || "#ffffff" },
       image: qrCfg.logoDataUrl || undefined,
       imageOptions: { crossOrigin: "anonymous", imageSize: qrCfg.logoSize ?? 0.3, margin: qrCfg.logoMargin ?? 5, hideBackgroundDots: true },
     });
-
-    // getRawData retorna um Blob
     const blob = await dlQr.getRawData("png");
     const file = new File([blob], "pixkey-qrcode.png", { type: "image/png" });
-
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({ ...shareData, files: [file] });
     } else {
@@ -198,7 +185,6 @@ document.getElementById("btn-share").addEventListener("click", async () => {
     }
   } catch (err) {
     if (err.name !== "AbortError") {
-      // Fallback: só texto
       try { await navigator.share(shareData); } catch {}
     }
   }
