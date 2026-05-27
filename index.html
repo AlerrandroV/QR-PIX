@@ -19,10 +19,26 @@
     import { styles as typescaleStyles } from "@material/web/typography/md-typescale-styles.js";
     document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
   </script>
+  <style>
+    .app-logo {
+      display: flex;
+      align-items: center;
+      height: 32px;
+    }
+    .app-logo svg {
+      height: 32px;
+      width: auto;
+      fill: currentColor;
+      color: var(--md-sys-color-on-surface);
+    }
+  </style>
 </head>
 <body>
   <header class="top-app-bar">
-    <span class="app-title">QR PIX</span>
+    <span class="app-logo" aria-label="QR PIX">
+      <img src="qr-pix-monochromd.svg" alt="QR PIX" height="32" width="32"
+           style="height:32px;width:auto;filter:var(--logo-filter,none);" />
+    </span>
     <div class="top-app-bar__actions">
       <!-- Botão instalar: HTML nativo para garantir consistência cross-browser -->
       <button id="btn-install" class="install-topbar-btn" style="display:none;" aria-label="Instalar App">
