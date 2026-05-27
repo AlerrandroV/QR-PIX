@@ -1,4 +1,5 @@
 (function () {
+  // ── Configurações / tema ────────────────────────────────────────
   const SETTINGS_KEY = 'pixkey_settings';
   const defaults = { tema: 'system', eyecare: 'off' };
 
@@ -50,24 +51,17 @@
     const next = { ...loadSettings(), ...partial };
     saveSettings(next);
     applyAppearance();
-    // Notifica outras páginas abertas via storage event
     try {
       localStorage.setItem('pixkey_settings_ts', Date.now().toString());
     } catch {}
     return next;
   }
 
-  // ── Reaplicar ao voltar (bfcache / history.back) ──
   window.addEventListener('pageshow', () => applyAppearance());
-
-  // ── Reaplicar quando outra aba/página muda as configurações ──
   window.addEventListener('storage', (e) => {
-    if (e.key === SETTINGS_KEY || e.key === 'pixkey_settings_ts') {
-      applyAppearance();
-    }
+    if (e.key === SETTINGS_KEY || e.key === 'pixkey_settings_ts') applyAppearance();
   });
 
-  // ── Mudança de tema do sistema ──
   const media = window.matchMedia('(prefers-color-scheme: dark)');
   const onSystem = () => { if (loadSettings().tema === 'system') applyAppearance(); };
   typeof media.addEventListener === 'function'
@@ -76,13 +70,198 @@
 
   applyAppearance();
 
-  // Viewport real para PWA
   function setAppHeight() {
     document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
   }
   window.addEventListener('resize', setAppHeight);
   window.addEventListener('orientationchange', setAppHeight);
   setAppHeight();
+
+  // ── Service Worker + sistema de atualização ─────────────────────
+  // O snackbar só é injetado uma vez no DOM (lazy)
+  let _snackbarEl = null;
+  let _swReg = null;
+  let _updatePending = false;
+
+  function getSnackbar() {
+    if (_snackbarEl) return _snackbarEl;
+
+    // Estilos inline para não depender de CSS externo
+    const style = document.createElement('style');
+    style.textContent = `
+      #sw-update-snackbar {
+        position: fixed;
+        bottom: 88px;
+        left: 50%;
+        transform: translateX(-50%) translateY(24px);
+        opacity: 0;
+        transition: opacity 220ms ease, transform 220ms cubic-bezier(0.34,1.56,0.64,1);
+        z-index: 9999;
+        background: var(--md-sys-color-inverse-surface, #2d3135);
+        color: var(--md-sys-color-inverse-on-surface, #f0f4f8);
+        border-radius: 12px;
+        padding: 12px 8px 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: Roboto, sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        max-width: calc(100vw - 32px);
+        width: max-content;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.28);
+        pointer-events: none;
+      }
+      #sw-update-snackbar.visible {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+        pointer-events: all;
+      }
+      #sw-update-snackbar .snack-msg {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      #sw-update-snackbar .snack-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-family: Roboto, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--md-sys-color-primary-container, #90caf9);
+        padding: 8px 12px;
+        border-radius: 8px;
+        white-space: nowrap;
+        transition: background 150ms;
+        flex-shrink: 0;
+      }
+      #sw-update-snackbar .snack-btn:active {
+        background: rgba(255,255,255,0.12);
+      }
+      #sw-update-snackbar .snack-dismiss {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--md-sys-color-inverse-on-surface, #f0f4f8);
+        opacity: 0.7;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-family: 'Material Symbols Rounded', sans-serif;
+        font-size: 20px;
+        flex-shrink: 0;
+        transition: background 150ms;
+      }
+      #sw-update-snackbar .snack-dismiss:active {
+        background: rgba(255,255,255,0.12);
+      }
+    `;
+    document.head.appendChild(style);
+
+    const el = document.createElement('div');
+    el.id = 'sw-update-snackbar';
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'polite');
+    el.innerHTML = `
+      <span class="snack-msg">Nova vers&atilde;o dispon&iacute;vel</span>
+      <button class="snack-btn" id="snack-update-btn">Atualizar</button>
+      <button class="snack-dismiss" id="snack-dismiss-btn" aria-label="Fechar">close</button>
+    `;
+    document.body.appendChild(el);
+
+    el.querySelector('#snack-update-btn').addEventListener('click', () => {
+      hideSnackbar();
+      applyUpdate();
+    });
+    el.querySelector('#snack-dismiss-btn').addEventListener('click', () => {
+      hideSnackbar();
+    });
+
+    _snackbarEl = el;
+    return el;
+  }
+
+  function showSnackbar() {
+    // Aguarda o DOM estar pronto
+    const show = () => { getSnackbar().classList.add('visible'); };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', show, { once: true });
+    } else {
+      show();
+    }
+  }
+
+  function hideSnackbar() {
+    if (_snackbarEl) _snackbarEl.classList.remove('visible');
+  }
+
+  function applyUpdate() {
+    if (_swReg && _swReg.waiting) {
+      // Pede ao SW esperando para assumir controle
+      _swReg.waiting.postMessage({ type: 'SKIP_WAITING' });
+    } else {
+      // SW já ativo (ex: recebeu SW_UPDATED depois de claim())
+      window.location.reload();
+    }
+  }
+
+  function registerSW() {
+    if (!('serviceWorker' in navigator)) return;
+
+    navigator.serviceWorker.register('./sw.js').then((reg) => {
+      _swReg = reg;
+
+      // Caso já haja um SW aguardando quando a página carrega
+      if (reg.waiting) {
+        _updatePending = true;
+        showSnackbar();
+      }
+
+      // Novo SW foi instalado e está aguardando
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        if (!newWorker) return;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // Há um novo SW instalado esperando ativação
+            _updatePending = true;
+            showSnackbar();
+          }
+        });
+      });
+    }).catch((err) => {
+      console.warn('[QR PIX] SW registration failed:', err);
+    });
+
+    // Escuta mensagem do SW ativo avisando que houve atualização
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'SW_UPDATED') {
+        // O SW já assumiu controle — basta recarregar
+        window.location.reload();
+      }
+    });
+
+    // Quando o controller muda (SKIP_WAITING foi aceito), recarrega
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        window.location.reload();
+      }
+    });
+  }
+
+  // Registra o SW após o load para não bloquear o parse
+  if (document.readyState === 'loading') {
+    window.addEventListener('load', registerSW, { once: true });
+  } else {
+    registerSW();
+  }
 
   window.PixKeyUI = {
     SETTINGS_KEY, loadSettings, saveSettings,
@@ -91,6 +270,6 @@
 })();
 
 
-window.addEventListener("pixkey:settings-imported", () => {
+window.addEventListener('pixkey:settings-imported', () => {
   // Eventos de tema/eyecare são aplicados pelo theme.js; aqui mantemos consistência para módulos que releem configurações.
 });

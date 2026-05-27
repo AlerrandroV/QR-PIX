@@ -1,64 +1,90 @@
-// Service Worker — QR PIX
-// Baseado no template PWABuilder + Workbox 5.1.2
-// Ajuste: fetch de navegação busca no cache pela URL sem query string
-// para evitar 404 no GitHub Pages quando há parâmetros na URL.
+// ─────────────────────────────────────────────────────────────────
+//  Service Worker — QR PIX
+//  Estratégia: NetworkFirst com fallback para cache.
+//  Cache nomeado por versão — ao mudar APP_VERSION o cache antigo
+//  é limpo automaticamente e todos os clientes recebem a versão nova.
+// ─────────────────────────────────────────────────────────────────
 
-const CACHE = "pwabuilder-offline-page";
+importScripts('app-version.js');
 
-importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
+const CACHE_NAME = `qr-pix-v${APP_VERSION}`;
 
-const offlineFallbackPage = "index.html";
+// Arquivos que devem ser cacheados na instalação (shell do app)
+const PRECACHE_URLS = [
+  './',
+  './index.html',
+  './style.css',
+  './ui.js',
+  './app.js',
+  './app-version.js',
+  './manifest.json',
+  './qr-pix-monochromd.svg',
+];
 
-self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "SKIP_WAITING") {
+// ── INSTALL: pré-cacheia o shell do app ──────────────────────────
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(PRECACHE_URLS))
+      // Não chama skipWaiting aqui: espera o cliente decidir atualizar
+  );
+});
+
+// ── ACTIVATE: limpa caches de versões antigas ────────────────────
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys
+          .filter((key) => key !== CACHE_NAME)
+          .map((key) => caches.delete(key))
+      )
+    ).then(() => {
+      // Assume controle de todas as abas abertas imediatamente
+      self.clients.claim();
+      // Avisa todas as abas que o app foi atualizado
+      self.clients.matchAll({ includeUncontrolled: true, type: 'window' })
+        .then((clients) => {
+          clients.forEach((client) =>
+            client.postMessage({ type: 'SW_UPDATED', version: APP_VERSION })
+          );
+        });
+    })
+  );
+});
+
+// ── SKIP_WAITING sob demanda (enviado pelo ui.js) ────────────────
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
 });
 
-self.addEventListener('install', async (event) => {
-  event.waitUntil(
-    caches.open(CACHE)
-      .then((cache) => cache.add(offlineFallbackPage))
-  );
-});
-
-if (workbox.navigationPreload.isSupported()) {
-  workbox.navigationPreload.enable();
-}
-
-workbox.routing.registerRoute(
-  new RegExp('/*'),
-  new workbox.strategies.StaleWhileRevalidate({
-    cacheName: CACHE
-  })
-);
-
+// ── FETCH: NetworkFirst com fallback para cache ──────────────────
 self.addEventListener('fetch', (event) => {
-  if (event.request.mode === 'navigate') {
-    event.respondWith((async () => {
-      try {
-        // 1. Tenta navigation preload (mais rápido quando suportado)
-        const preloadResp = await event.preloadResponse;
-        if (preloadResp) return preloadResp;
+  // Ignora requisições não-GET e cross-origin
+  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
 
-        // 2. Tenta buscar na rede normalmente
-        const networkResp = await fetch(event.request);
-        return networkResp;
-      } catch (error) {
-        // 3. Offline: busca no cache ignorando a query string
-        //    Isso evita 404 quando a URL tem parâmetros (ex: set-value.html?key=...)
-        //    pois o GitHub Pages não serve arquivos com query string no path.
-        const cache = await caches.open(CACHE);
-
-        // Tenta primeiro a URL sem query string
-        const urlWithoutQuery = event.request.url.split('?')[0];
-        const cachedByPath = await cache.match(urlWithoutQuery);
-        if (cachedByPath) return cachedByPath;
-
-        // Fallback final: index.html
-        const cachedFallback = await cache.match(offlineFallbackPage);
-        return cachedFallback;
-      }
-    })());
-  }
+  event.respondWith(
+    fetch(event.request)
+      .then((networkResponse) => {
+        // Salva cópia fresca no cache
+        const clone = networkResponse.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        return networkResponse;
+      })
+      .catch(() => {
+        // Offline: serve do cache
+        return caches.match(event.request).then((cached) => {
+          if (cached) return cached;
+          // Fallback para navegação: serve index.html
+          if (event.request.mode === 'navigate') {
+            return caches.match('./index.html');
+          }
+          return new Response('Offline', { status: 503 });
+        });
+      })
+  );
 });
