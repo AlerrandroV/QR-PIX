@@ -46,6 +46,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "qr-pix-monochromd.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "monochrome"
     }
   ],
   "shortcuts": [
@@ -58,7 +64,7 @@
         {
           "src": "new-key-icon.svg",
           "sizes": "128x128",
-          "type": "image/svg"
+          "type": "image/svg+xml"
         }
       ]
     },
@@ -71,7 +77,7 @@
         {
           "src": "qr-customize-icon.svg",
           "sizes": "128x128",
-          "type": "image/svg"
+          "type": "image/svg+xml"
         }
       ]
     },
@@ -79,12 +85,12 @@
       "name": "Doe p/ o criador",
       "short_name": "Doe",
       "description": "Doar para o desenvolvedor",
-      "url": "./generate-qr-pix.html?bank=Mercado+Pago&amp;name=Victor+Alerrandro+Tavares&amp;keyType=email&amp;key=v.alerrandro.t%40hotmail.com&amp;value=0",
+      "url": "./generate-qr-pix.html?bank=Mercado+Pago&name=Victor+Alerrandro+Tavares&keyType=email&key=v.alerrandro.t%40hotmail.com&value=0",
       "icons": [
         {
           "src": "donate-icon.svg",
           "sizes": "128x128",
-          "type": "image/svg"
+          "type": "image/svg+xml"
         }
       ]
     },
@@ -97,7 +103,7 @@
         {
           "src": "settings-icon.svg",
           "sizes": "128x128",
-          "type": "image/svg"
+          "type": "image/svg+xml"
         }
       ]
     }
@@ -118,5 +124,5 @@
       "label": "Criação e personalização de QR PIX"
     }
   ],
-  "version": "1.0.40"
+  "version": "1.0.41"
 }
