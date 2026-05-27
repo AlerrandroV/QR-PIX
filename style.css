@@ -3,6 +3,9 @@
   --topbar-height: 64px;
   --bottombar-height: 77px;
 
+  /* ── Logo monochrome filter — tema claro: logo fica escura ── */
+  --logo-filter: none;
+
   /* ── Material You — Tema Azul (Light) ── */
   --md-sys-color-primary:                  #006493;
   --md-sys-color-on-primary:               #ffffff;
@@ -43,6 +46,9 @@
 }
 
 [data-theme="dark"] {
+  /* Logo monochrome filter — tema escuro: inverte para ficar clara */
+  --logo-filter: invert(1);
+
   --md-sys-color-primary:                  #90caf9;
   --md-sys-color-on-primary:               #003353;
   --md-sys-color-primary-container:        #004b76;
@@ -64,6 +70,13 @@
   --md-sys-color-surface-container:        #1c2024;
   --md-sys-color-surface-container-high:   #262a2e;
   --md-sys-color-surface-container-highest:#303438;
+}
+
+/* ── Preferência do sistema para dark mode (antes de toggle manual) ── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --logo-filter: invert(1);
+  }
 }
 
 /* ===== EYE CARE ===== */
@@ -161,6 +174,20 @@ html, body {
   font-weight: 500;
   color: var(--md-sys-color-on-surface);
   letter-spacing: 0.01em;
+}
+
+/* ===== LOGO SVG MONOCHROME ===== */
+.app-logo {
+  display: flex;
+  align-items: center;
+  height: 32px;
+}
+
+.app-logo img {
+  height: 32px;
+  width: auto;
+  filter: var(--logo-filter, none);
+  transition: filter 200ms ease;
 }
 
 .top-app-bar__actions {
