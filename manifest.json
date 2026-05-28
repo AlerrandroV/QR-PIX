@@ -25,19 +25,31 @@
   "icons": [
     {
       "src": "qr-pix-icon.svg",
-      "sizes": "512x512 any",
+      "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
       "src": "qr-pix-icon.svg",
-      "sizes": "512x512 any",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "qr-pix-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "qr-pix-icon.svg",
+      "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "maskable"
     },
     {
       "src": "qr-pix-monochromd.svg",
-      "sizes": "512x512 any",
+      "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "monochrome"
     }
@@ -51,7 +63,7 @@
       "icons": [
         {
           "src": "new-key-icon.svg",
-          "sizes": "512x512 any",
+          "sizes": "128x128",
           "type": "image/svg+xml"
         }
       ]
@@ -64,7 +76,7 @@
       "icons": [
         {
           "src": "qr-customize-icon.svg",
-          "sizes": "512x512 any",
+          "sizes": "128x128",
           "type": "image/svg+xml"
         }
       ]
@@ -77,7 +89,7 @@
       "icons": [
         {
           "src": "donate-icon.svg",
-          "sizes": "512x512 any",
+          "sizes": "128x128",
           "type": "image/svg+xml"
         }
       ]
@@ -90,7 +102,7 @@
       "icons": [
         {
           "src": "settings-icon.svg",
-          "sizes": "512x512 any",
+          "sizes": "128x128",
           "type": "image/svg+xml"
         }
       ]
@@ -112,5 +124,5 @@
       "label": "Cria\u00e7\u00e3o e personaliza\u00e7\u00e3o de QR PIX"
     }
   ],
-  "version": "1.0.45"
+  "version": "1.0.46"
 }
