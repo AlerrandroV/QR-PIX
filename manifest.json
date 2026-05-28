@@ -24,27 +24,15 @@
   ],
   "icons": [
     {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
+      "src": "qr-pix-monochromd.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "icon-192-maskable.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512-maskable.png",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "qr-pix-monochromd.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "maskable"
     },
     {
@@ -63,7 +51,7 @@
       "icons": [
         {
           "src": "new-key-icon.svg",
-          "sizes": "128x128",
+          "sizes": "any",
           "type": "image/svg+xml"
         }
       ]
@@ -76,7 +64,7 @@
       "icons": [
         {
           "src": "qr-customize-icon.svg",
-          "sizes": "128x128",
+          "sizes": "any",
           "type": "image/svg+xml"
         }
       ]
@@ -89,7 +77,7 @@
       "icons": [
         {
           "src": "donate-icon.svg",
-          "sizes": "128x128",
+          "sizes": "any",
           "type": "image/svg+xml"
         }
       ]
@@ -102,7 +90,7 @@
       "icons": [
         {
           "src": "settings-icon.svg",
-          "sizes": "128x128",
+          "sizes": "any",
           "type": "image/svg+xml"
         }
       ]
@@ -124,5 +112,5 @@
       "label": "Criação e personalização de QR PIX"
     }
   ],
-  "version": "1.0.41"
+  "version": "1.0.43"
 }
