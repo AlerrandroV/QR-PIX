@@ -18,10 +18,11 @@ const PRECACHE_URLS = [
   './app.js',
   './app-version.js',
   './manifest.json',
+  './qr-pix-icon.svg',
   './qr-pix-monochromd.svg',
 ];
 
-// ── INSTALL: pré-cacheia o shell do app ──────────────────────────
+// ── INSTALL: pré-cacheia o shell do app ────────────────────────
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
