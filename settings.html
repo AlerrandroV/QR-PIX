@@ -9,6 +9,7 @@
 
   <title>Configurações — QR PIX</title>
   <script src="ui.js"></script>
+  <script src="app-version.js"></script>
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="settings.css" />
@@ -116,35 +117,34 @@
     </section>
 
     <section class="settings-group">
-  <h2 class="settings-group__label">Backup</h2>
+      <h2 class="settings-group__label">Backup</h2>
 
-  <div class="settings-item" id="item-export-backup" role="button" tabindex="0" aria-label="Exportar backup">
-    <div class="settings-item__leading">
-      <span class="material-symbols-rounded settings-item__icon">upload_file</span>
-    </div>
-    <div class="settings-item__content">
-      <span class="settings-item__title">Exportar configurações</span>
-      <span class="settings-item__subtitle">Aparência, QR Code e chaves salvas</span>
-    </div>
-    <span class="material-symbols-rounded settings-item__chevron">download</span>
-  </div>
+      <div class="settings-item" id="item-export-backup" role="button" tabindex="0" aria-label="Exportar backup">
+        <div class="settings-item__leading">
+          <span class="material-symbols-rounded settings-item__icon">upload_file</span>
+        </div>
+        <div class="settings-item__content">
+          <span class="settings-item__title">Exportar configurações</span>
+          <span class="settings-item__subtitle">Aparência, QR Code e chaves salvas</span>
+        </div>
+        <span class="material-symbols-rounded settings-item__chevron">download</span>
+      </div>
 
-  <div class="settings-divider"></div>
+      <div class="settings-divider"></div>
 
-  <div class="settings-item" id="item-import-backup" role="button" tabindex="0" aria-label="Importar backup">
-    <div class="settings-item__leading">
-      <span class="material-symbols-rounded settings-item__icon">download</span>
-    </div>
-    <div class="settings-item__content">
-      <span class="settings-item__title">Importar configurações</span>
-      <span class="settings-item__subtitle">Restaurar backup em arquivo JSON</span>
-    </div>
-    <span class="material-symbols-rounded settings-item__chevron">chevron_right</span>
-  </div>
+      <div class="settings-item" id="item-import-backup" role="button" tabindex="0" aria-label="Importar backup">
+        <div class="settings-item__leading">
+          <span class="material-symbols-rounded settings-item__icon">download</span>
+        </div>
+        <div class="settings-item__content">
+          <span class="settings-item__title">Importar configurações</span>
+          <span class="settings-item__subtitle">Restaurar backup em arquivo JSON</span>
+        </div>
+        <span class="material-symbols-rounded settings-item__chevron">chevron_right</span>
+      </div>
 
-  <input type="file" id="backup-file-input" accept="application/json,.json" hidden>
-</section>
-
+      <input type="file" id="backup-file-input" accept="application/json,.json" hidden>
+    </section>
 
     <section class="settings-group">
       <h2 class="settings-group__label">Apoio</h2>
@@ -158,6 +158,22 @@
           <span class="settings-item__subtitle">Contribua via Pix com valor livre</span>
         </div>
         <span class="material-symbols-rounded settings-item__chevron">chevron_right</span>
+      </div>
+    </section>
+
+    <!-- ── Seção App ───────────────────────────────────────────────── -->
+    <section class="settings-group">
+      <h2 class="settings-group__label">App</h2>
+
+      <div class="settings-item" id="item-update" role="button" tabindex="0" aria-label="Verificar atualização">
+        <div class="settings-item__leading">
+          <span class="material-symbols-rounded settings-item__icon">system_update</span>
+        </div>
+        <div class="settings-item__content">
+          <span class="settings-item__title">Verificar atualização</span>
+          <span class="settings-item__subtitle" id="update-subtitle">Verificando…</span>
+        </div>
+        <span class="material-symbols-rounded settings-item__chevron" id="update-chevron">refresh</span>
       </div>
     </section>
 

@@ -200,6 +200,92 @@ function setupBackupActions() {
   });
 }
 
+// ── Verificar atualização ────────────────────────────────────────────────────
+function setupUpdateAction() {
+  const item = document.getElementById("item-update");
+  const subtitle = document.getElementById("update-subtitle");
+  const chevron = document.getElementById("update-chevron");
+  if (!item || !subtitle) return;
+
+  // Injeta versão atual no item "Sobre"
+  const versionEl = document.getElementById("app-version");
+  if (versionEl && typeof APP_VERSION !== 'undefined') {
+    versionEl.textContent = 'Versão ' + APP_VERSION;
+  }
+
+  if (!('serviceWorker' in navigator)) {
+    subtitle.textContent = 'Service Worker não suportado';
+    return;
+  }
+
+  // Estado inicial: descobre se há update pendente
+  navigator.serviceWorker.getRegistration('./sw.js').then((reg) => {
+    if (!reg) {
+      subtitle.textContent = 'SW não registrado';
+      return;
+    }
+
+    function setUpToDate() {
+      subtitle.textContent = 'App atualizado';
+      if (chevron) chevron.textContent = 'check_circle';
+    }
+
+    function setUpdateAvailable() {
+      subtitle.textContent = 'Toque para atualizar agora';
+      if (chevron) chevron.textContent = 'system_update_alt';
+    }
+
+    // Verifica se há SW esperando (update já baixado)
+    if (reg.waiting) {
+      setUpdateAvailable();
+    } else {
+      setUpToDate();
+      // Faz check explícito no servidor
+      reg.update().catch(() => {});
+    }
+
+    // Escuta novo SW que pode aparecer durante a permanência na tela
+    reg.addEventListener('updatefound', () => {
+      const newWorker = reg.installing;
+      if (!newWorker) return;
+      newWorker.addEventListener('statechange', () => {
+        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+          setUpdateAvailable();
+        }
+      });
+    });
+
+    // Clique: força a atualização
+    item.addEventListener('click', () => {
+      if (reg.waiting) {
+        // Há SW novo esperando: pede skip waiting e recarrega
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        subtitle.textContent = 'Aplicando atualização…';
+        if (chevron) chevron.textContent = 'refresh';
+        // controllerchange no ui.js vai recarregar a página
+      } else {
+        // Nenhum update pendente: faz verificação manual no servidor
+        subtitle.textContent = 'Verificando…';
+        if (chevron) chevron.textContent = 'refresh';
+        reg.update().then(() => {
+          // Pequeno delay para o updatefound ter chance de disparar
+          setTimeout(() => {
+            if (!reg.waiting && !reg.installing) {
+              setUpToDate();
+            }
+          }, 3000);
+        }).catch(() => {
+          subtitle.textContent = 'Sem conexão';
+        });
+      }
+    });
+
+    item.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); item.click(); }
+    });
+  });
+}
+
 document.getElementById("btn-back")?.addEventListener("click", () => {
   history.back();
 });
@@ -217,4 +303,5 @@ document.getElementById("btn-back")?.addEventListener("click", () => {
   setupRadioGroup("eyecare", "eyecare-subtitle", EYECARE_LABELS, "eyecare");
   setupNavItems();
   setupBackupActions();
+  setupUpdateAction();
 })();

@@ -8,6 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <title>Sobre — QR PIX</title>
   <script src="ui.js"></script>
+  <script src="app-version.js"></script>
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="info-page.css" />
@@ -32,7 +33,7 @@
 
   <main class="info-content">
     <div class="about-hero">
-      <img class="about-hero__logo" src="icon-192.png" alt="Logo QR PIX"
+      <img class="about-hero__logo" src="qr-pix-icon.svg" alt="Logo QR PIX"
            onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
       <div class="about-hero__logo-fallback" style="display:none;">
         <span class="material-symbols-rounded">qr_code_2</span>
@@ -75,15 +76,15 @@
   </main>
 
   <script>
-    document.getElementById("btn-back").addEventListener("click", () => history.back());
-    
-  // Lê versão do manifest
-  fetch('./manifest.json')
-    .then(r => r.json())
-    .then(m => {
-      if (m.version) document.getElementById('about-version').textContent = 'Versão ' + m.version;
-    }).catch(() => {});
+    document.getElementById('btn-back').addEventListener('click', () => history.back());
 
+    // Lê a versão de APP_VERSION (app-version.js carregado no head) — sem fetch
+    (function () {
+      const el = document.getElementById('about-version');
+      if (el && typeof APP_VERSION !== 'undefined') {
+        el.textContent = 'Versão ' + APP_VERSION;
+      }
+    })();
   </script>
 </body>
 </html>
