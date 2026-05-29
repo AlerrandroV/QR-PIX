@@ -219,7 +219,7 @@ function setupUpdateAction() {
   }
 
   // Estado inicial: descobre se há update pendente
-  navigator.serviceWorker.getRegistration('./sw.js').then((reg) => {
+  navigator.serviceWorker.getRegistration().then((reg) => {
     if (!reg) {
       subtitle.textContent = 'SW não registrado';
       return;
@@ -283,6 +283,8 @@ function setupUpdateAction() {
     item.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); item.click(); }
     });
+  }).catch(() => {
+    subtitle.textContent = 'Erro ao verificar atualização';
   });
 }
 
