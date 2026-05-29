@@ -1,5 +1,5 @@
 (function () {
-  // ── Configurações / tema ────────────────────────────────────────
+  // ── Configurações / tema ────────────────────────────────────────────────
   const SETTINGS_KEY = 'pixkey_settings';
   const defaults = { tema: 'system', eyecare: 'off' };
 
@@ -77,8 +77,63 @@
   window.addEventListener('orientationchange', setAppHeight);
   setAppHeight();
 
-  // ── Service Worker + sistema de atualização ─────────────────────
-  // O snackbar só é injetado uma vez no DOM (lazy)
+  // ── Botão de instalação PWA ─────────────────────────────────────────
+  let _deferredInstallPrompt = null;
+
+  // Se já está rodando em modo standalone (instalado), oculta o botão
+  const isStandalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
+
+  function getInstallBtn() {
+    return document.getElementById('btn-install');
+  }
+
+  function showInstallBtn() {
+    const btn = getInstallBtn();
+    if (btn) btn.style.display = '';
+  }
+
+  function hideInstallBtn() {
+    const btn = getInstallBtn();
+    if (btn) btn.style.display = 'none';
+  }
+
+  // O browser dispara beforeinstallprompt quando a PWA está installável.
+  // Guardamos o evento para acionar o prompt manualmente no clique do botão.
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault(); // Impede o mini-infobar automático
+    _deferredInstallPrompt = e;
+    if (!isStandalone) showInstallBtn();
+  });
+
+  // Quando o usuário instala pelo browser (fora do botão), oculta o botão
+  window.addEventListener('appinstalled', () => {
+    _deferredInstallPrompt = null;
+    hideInstallBtn();
+  });
+
+  // Conecta o clique do botão ao prompt nativo — aguarda o DOM estar pronto
+  function bindInstallBtn() {
+    const btn = getInstallBtn();
+    if (!btn) return;
+    btn.addEventListener('click', async () => {
+      if (!_deferredInstallPrompt) return;
+      _deferredInstallPrompt.prompt();
+      const { outcome } = await _deferredInstallPrompt.userChoice;
+      // Independente da escolha, descarta o prompt usado
+      _deferredInstallPrompt = null;
+      if (outcome === 'accepted') hideInstallBtn();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindInstallBtn, { once: true });
+  } else {
+    bindInstallBtn();
+  }
+
+  // ── Service Worker + sistema de atualização ───────────────────────
   let _snackbarEl = null;
   let _swReg = null;
   let _updatePending = false;
@@ -86,7 +141,6 @@
   function getSnackbar() {
     if (_snackbarEl) return _snackbarEl;
 
-    // Estilos inline para não depender de CSS externo
     const style = document.createElement('style');
     style.textContent = `
       #sw-update-snackbar {
@@ -187,7 +241,6 @@
   }
 
   function showSnackbar() {
-    // Aguarda o DOM estar pronto
     const show = () => { getSnackbar().classList.add('visible'); };
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', show, { once: true });
@@ -202,10 +255,8 @@
 
   function applyUpdate() {
     if (_swReg && _swReg.waiting) {
-      // Pede ao SW esperando para assumir controle
       _swReg.waiting.postMessage({ type: 'SKIP_WAITING' });
     } else {
-      // SW já ativo (ex: recebeu SW_UPDATED depois de claim())
       window.location.reload();
     }
   }
@@ -216,19 +267,16 @@
     navigator.serviceWorker.register('./sw.js').then((reg) => {
       _swReg = reg;
 
-      // Caso já haja um SW aguardando quando a página carrega
       if (reg.waiting) {
         _updatePending = true;
         showSnackbar();
       }
 
-      // Novo SW foi instalado e está aguardando
       reg.addEventListener('updatefound', () => {
         const newWorker = reg.installing;
         if (!newWorker) return;
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            // Há um novo SW instalado esperando ativação
             _updatePending = true;
             showSnackbar();
           }
@@ -238,15 +286,12 @@
       console.warn('[QR PIX] SW registration failed:', err);
     });
 
-    // Escuta mensagem do SW ativo avisando que houve atualização
     navigator.serviceWorker.addEventListener('message', (event) => {
       if (event.data && event.data.type === 'SW_UPDATED') {
-        // O SW já assumiu controle — basta recarregar
         window.location.reload();
       }
     });
 
-    // Quando o controller muda (SKIP_WAITING foi aceito), recarrega
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (!refreshing) {
@@ -256,7 +301,6 @@
     });
   }
 
-  // Registra o SW após o load para não bloquear o parse
   if (document.readyState === 'loading') {
     window.addEventListener('load', registerSW, { once: true });
   } else {
@@ -269,7 +313,4 @@
   };
 })();
 
-
-window.addEventListener('pixkey:settings-imported', () => {
-  // Eventos de tema/eyecare são aplicados pelo theme.js; aqui mantemos consistência para módulos que releem configurações.
-});
+window.addEventListener('pixkey:settings-imported', () => {});
