@@ -12,8 +12,8 @@
     "window-controls-overlay",
     "standalone"
   ],
-  "background_color": "#006493",
-  "theme_color": "#006493",
+  "background_color": "#333333",
+  "theme_color": "#333333",
   "orientation": "portrait",
   "categories": [
     "business",
