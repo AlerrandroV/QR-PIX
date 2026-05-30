@@ -19,7 +19,7 @@ const PRECACHE_URLS = [
   './app-version.js',
   './manifest.json',
   './qr-pix-icon.svg',
-  './qr-pix-monochromd.svg',
+  './qr-pix-monochrome.svg',
 ];
 
 // ── INSTALL: pré-cacheia o shell do app ────────────────────────

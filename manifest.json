@@ -48,7 +48,7 @@
       "purpose": "maskable"
     },
     {
-      "src": "qr-pix-monochromd.svg",
+      "src": "qr-pix-monochrome.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "monochrome"
@@ -71,7 +71,7 @@
     {
       "name": "Personalizar QR",
       "short_name": "QR custom",
-      "description": "Abrir a tela de personaliza\u00e7\u00e3o do QR Code",
+      "description": "Abrir a tela de personalização do QR Code",
       "url": "./qr-customize.html",
       "icons": [
         {
@@ -95,9 +95,9 @@
       ]
     },
     {
-      "name": "Configura\u00e7\u00f5es",
+      "name": "Configurações",
       "short_name": "Config",
-      "description": "Abrir as configura\u00e7\u00f5es do app",
+      "description": "Abrir as configurações do app",
       "url": "./settings.html",
       "icons": [
         {
@@ -121,7 +121,7 @@
       "sizes": "1080x2400",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Cria\u00e7\u00e3o e personaliza\u00e7\u00e3o de QR PIX"
+      "label": "Criação e personalização de QR PIX"
     }
   ],
   "version": "1.0.46"
