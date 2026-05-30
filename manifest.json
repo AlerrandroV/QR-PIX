@@ -48,15 +48,9 @@
       "purpose": "maskable"
     },
     {
-      "src": "qr-pix-icon.svg",
+      "src": "qr-pix-monochrome.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "qr-pix-monochrome.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "monochrome"
     }
   ],
@@ -130,5 +124,5 @@
       "label": "Criação e personalização de QR PIX"
     }
   ],
-  "version": "1.0.46"
+  "version": "1.0.48"
 }
