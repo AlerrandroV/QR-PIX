@@ -68,9 +68,9 @@
       "url": "./new-key.html",
       "icons": [
         {
-          "src": "new-key-icon.svg",
+          "src": "new-key-icon.png",
           "sizes": "128x128",
-          "type": "image/svg+xml"
+          "type": "image/png"
         }
       ]
     },
@@ -81,9 +81,9 @@
       "url": "./qr-customize.html",
       "icons": [
         {
-          "src": "qr-customize-icon.svg",
+          "src": "qr-customize-icon.png",
           "sizes": "128x128",
-          "type": "image/svg+xml"
+          "type": "image/png"
         }
       ]
     },
@@ -94,9 +94,9 @@
       "url": "./generate-qr-pix.html?bank=Mercado+Pago&name=Victor+Alerrandro+Tavares&keyType=email&key=v.alerrandro.t%40hotmail.com&value=0",
       "icons": [
         {
-          "src": "donate-icon.svg",
+          "src": "donate-icon.png",
           "sizes": "128x128",
-          "type": "image/svg+xml"
+          "type": "image/png"
         }
       ]
     },
@@ -107,9 +107,9 @@
       "url": "./settings.html",
       "icons": [
         {
-          "src": "settings-icon.svg",
+          "src": "settings-icon.png",
           "sizes": "128x128",
-          "type": "image/svg+xml"
+          "type": "image/png"
         }
       ]
     }
