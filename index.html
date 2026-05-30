@@ -23,21 +23,44 @@
     .app-logo {
       display: flex;
       align-items: center;
+      gap: 8px;
       height: 32px;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
     }
-    .app-logo svg {
+    .app-logo img {
       height: 32px;
       width: auto;
-      fill: currentColor;
+      filter: var(--logo-filter, none);
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-user-drag: none;
+      -webkit-touch-callout: none;
+      draggable: false;
+    }
+    .app-logo__name {
+      font-family: "Roboto", sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
       color: var(--md-sys-color-on-surface);
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
     }
   </style>
 </head>
 <body>
   <header class="top-app-bar">
     <span class="app-logo" aria-label="QR PIX">
-      <img src="qr-pix-monochrome.svg" alt="QR PIX" height="32" width="32"
-           style="height:32px;width:auto;filter:var(--logo-filter,none);" />
+      <img src="qr-pix-monochrome.svg" alt="" height="32" width="32"
+           draggable="false"
+           oncontextmenu="return false;"
+           ondragstart="return false;" />
+      <span class="app-logo__name">QR-PIX</span>
     </span>
     <div class="top-app-bar__actions">
       <!-- Botão instalar: HTML nativo para garantir consistência cross-browser -->
