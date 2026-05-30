@@ -1,10 +1,5 @@
 // ===== BANCOS (sugestões) =====
-const BANKS = [
-  "Banco do Brasil", "Bradesco", "Caixa Econômica Federal", "Itaú",
-  "Nubank", "Santander", "Inter", "C6 Bank", "Sicredi", "Sicoob",
-  "BTG Pactual", "PicPay", "Mercado Pago", "Next", "Neon",
-  "PagBank", "Original", "Safra", "XP Investimentos", "BS2",
-];
+const BANKS = ["Banco do Brasil", "Bradesco", "Caixa Econômica Federal", "Itaú Unibanco", "Santander", "Banco Safra", "BTG Pactual", "Banco Pan", "Banco Inter", "C6 Bank", "Banco Original", "Banco BV", "Banco Votorantim", "Banco BMG", "Banco Mercantil do Brasil", "Banco Daycoval", "Banco Fibra", "Banco ABC Brasil", "Banestes", "Banrisul", "BRB (Banco de Brasília)", "Banco da Amazônia", "Banco do Nordeste", "Citibank", "Banco BNP Paribas Brasil", "J.P. Morgan", "Banco Inbursa", "HSBC", "Banco Western Union", "Banco Travelex", "Ebury", "Banco Semear", "Banco Topázio", "Banco Bari", "Banco Digio", "Banco Genial", "Banco Master", "Banco Guanabara", "Banco Industrial do Brasil", "Banco Paulista", "Banco Pine", "Banco Ribeirão Preto", "Banco VR", "Banco B3", "Banco Sofisa", "Banco CSF", "Banco Crefisa", "Banco BS2", "Sicredi", "Sicoob", "Cresol", "Unicred", "Ailos", "Nubank", "Neon", "PicPay", "PicPay Bank", "Mercado Pago", "PagBank (PagSeguro)", "Next", "Agibank", "XP Investimentos", "Mercado Bitcoin", "Wise", "Wise Brasil IP", "EBANX", "Dlocal", "Revolut", "Transfero", "Money Cloud", "Asaas", "Celcoin", "FitBank", "Galax Pay", "Iugu", "Efí", "Dock", "Stone", "SumUp", "Cielo", "PagHiper", "PagueVeloz", "Pay4Fun", "RecargaPay"];
 
 // ===== ESTADO =====
 let selectedType = null;
