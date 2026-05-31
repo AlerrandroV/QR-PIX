@@ -77,7 +77,6 @@
       <div class="form-group">
         <span class="form-group__label">Instituição Financeira</span>
         <div class="field-wrapper">
-          <!-- Sugestões de banco (acima do input) -->
           <ul class="bank-suggestions" id="bank-suggestions" role="listbox" aria-label="Sugestões de banco" hidden></ul>
           <md-outlined-text-field
             id="field-bank"
@@ -102,12 +101,9 @@
           </div>
         </div>
 
-        <!-- Campo da chave + sugestões de email -->
         <div class="field-wrapper">
-          <!-- Sugestões de provedor de e-mail (acima do input) -->
           <ul class="bank-suggestions email-suggestions" id="email-suggestions"
               role="listbox" aria-label="Provedores de e-mail" hidden></ul>
-
           <md-outlined-text-field
             id="field-pix-key"
             label="Selecione o tipo acima"
@@ -128,7 +124,6 @@
       <div class="form-group">
         <span class="form-group__label">Perfil público <span style="font-size:10px;font-weight:400;opacity:.7;text-transform:none">(opcional)</span></span>
 
-        <!-- Avatar -->
         <div class="avatar-upload" id="avatar-upload" role="button" tabindex="0"
              aria-label="Escolher foto de perfil">
           <div class="avatar-preview" id="avatar-preview">
@@ -141,7 +136,6 @@
           <input type="file" id="avatar-input" accept="image/*" hidden aria-hidden="true" />
         </div>
 
-        <!-- Username -->
         <div class="field-wrapper username-wrapper">
           <md-outlined-text-field
             id="field-username"
@@ -159,7 +153,6 @@
     <!-- ====== ETAPA 3: CONFIRMAR ====== -->
     <section class="cp-step cp-step--hidden" id="step-3" aria-label="Etapa 3: Confirmar">
 
-      <!-- Card de prévia -->
       <div class="profile-preview-card">
         <div class="profile-preview-card__avatar" id="preview-avatar">
           <span class="material-symbols-rounded" style="font-size:40px;color:var(--md-sys-color-primary)">account_circle</span>
@@ -172,7 +165,6 @@
         </div>
       </div>
 
-      <!-- Detalhes PIX -->
       <div class="form-group">
         <span class="form-group__label">Chave PIX</span>
         <div class="review-row">
@@ -191,7 +183,6 @@
         </div>
       </div>
 
-      <!-- Termos -->
       <div class="form-group terms-group">
         <span class="form-group__label">Termos de Uso</span>
         <p class="terms-text">
@@ -212,7 +203,6 @@
   <!-- BARRA DE NAVEGAÇÃO -->
   <div class="bottom-bar">
     <md-outlined-button class="nav-btn--prev" id="btn-prev" style="display:none">
-      <span class="material-symbols-rounded" slot="icon">arrow_back</span>
       Anterior
     </md-outlined-button>
     <md-filled-button class="nav-btn--next" id="btn-next">
