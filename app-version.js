@@ -1,7 +1,8 @@
-const APP_VERSION = '1.0.62';
+const APP_VERSION = '1.0.63';
 
 // Histórico de versões (mais recente primeiro)
 const VERSION_HISTORY = [
+  { version: '1.0.63', date: '2026-05-31', desc: 'fix: username — layout igual, validação 3-20 alfanum+ponto+underline, bloqueia avanço se inválido' },
   { version: '1.0.62', date: '2026-05-31', desc: 'fix: usar all.js no create-profile, corrige NotSupportedError md-focus-ring' },
   { version: '1.0.61', date: '2026-05-31', desc: 'fix: botões Anterior/Próximo mesma largura, sem seta no Anterior' },
   { version: '1.0.60', date: '2026-05-31', desc: 'fix: substituir button.icon-btn por md-icon-button no create-profile' },

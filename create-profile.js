@@ -1,7 +1,6 @@
 /* =================================================================
    create-profile.js
    Wizard de 3 etapas para criação de perfil de cobrança PIX.
-   Reutiliza a lógica de formatação e validação do new-key.js.
 ================================================================= */
 
 'use strict';
@@ -123,9 +122,16 @@ const TYPE_CONFIG = {
   random: { label: 'Chave aleatória', placeholder: 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx', inputMode: 'text',    format: v => v,      validate: validateRandom },
 };
 
+// ── Validação de username ────────────────────────────────────────
+// Regras: opcional; se preenchido → 3-20 chars, alfanumérico + ponto + underline.
+// Não pode começar ou terminar com ponto. Sem pontos consecutivos.
 function validateUsername(val) {
-  if (!val) return null;
-  return /^[a-zA-Z0-9_]{3,30}$/.test(val);
+  if (!val) return null; // campo vazio = válido (opcional)
+  if (val.length < 3 || val.length > 20) return false;
+  if (!/^[a-zA-Z0-9_.]+$/.test(val)) return false;
+  if (val.startsWith('.') || val.endsWith('.')) return false;
+  if (/\.{2,}/.test(val)) return false;
+  return true;
 }
 
 // ── Refs DOM ─────────────────────────────────────────────────────
@@ -197,13 +203,11 @@ function onPixKeyInput(e) {
   if (!profile.keyType) return;
   const cfg = TYPE_CONFIG[profile.keyType];
 
-  // aplica máscara
   const formatted = cfg.format(e.target.value);
   if (formatted !== e.target.value) e.target.value = formatted;
 
   const val = e.target.value.trim();
 
-  // sugestões de e-mail
   if (profile.keyType === 'email') renderEmailSuggestions(val);
 
   if (!val) {
@@ -242,13 +246,11 @@ function renderEmailSuggestions(val) {
 
   const matches = EMAIL_PROVIDERS.filter(p => p.startsWith(partial)).slice(0, 5);
   if (!matches.length || partial === '') {
-    // mostrar todos quando só tem @
     const all = partial === '' ? EMAIL_PROVIDERS.slice(0, 6) : [];
     if (!all.length) { emailSuggestions.hidden = true; return; }
     buildEmailList(local, all);
     return;
   }
-  // não sugerir se o domínio já está completo e válido
   if (matches.length === 1 && matches[0] === partial) { emailSuggestions.hidden = true; return; }
   buildEmailList(local, matches);
 }
@@ -297,13 +299,31 @@ keyTypeChips.forEach(chip => {
   });
 });
 
-// ── Validação username ───────────────────────────────────────────────
+// ── Feedback visual do username em tempo real ────────────────────
+function updateUsernameIcon(val) {
+  const result = validateUsername(val);
+  if (result === null) {
+    // campo vazio — limpa ícone e erro
+    usernameValIcon.className = 'key-validation-icon';
+    usernameValIcon.innerHTML = '';
+    fieldUsername.removeAttribute('error');
+    fieldUsername.setAttribute('supporting-text', '3-20 caracteres: letras, números, . e _');
+    return;
+  }
+  usernameValIcon.className = 'key-validation-icon ' + (result ? 'valid' : 'invalid');
+  usernameValIcon.innerHTML = '<span class="material-symbols-rounded">' + (result ? 'check_circle' : 'cancel') + '</span>';
+  if (result) {
+    fieldUsername.removeAttribute('error');
+    fieldUsername.setAttribute('supporting-text', 'Username disponível ✔');
+  } else {
+    fieldUsername.setAttribute('error', '');
+    fieldUsername.setAttribute('supporting-text', 'Use 3-20 chars: letras, números, . e _ (sem ponto no início/fim)');
+  }
+}
+
 fieldUsername.addEventListener('input', () => {
   const val = fieldUsername.value.trim().replace(/^@/, '');
-  if (!val) { usernameValIcon.className = 'key-validation-icon'; usernameValIcon.innerHTML = ''; return; }
-  const ok = validateUsername(val);
-  usernameValIcon.className = 'key-validation-icon ' + (ok ? 'valid' : 'invalid');
-  usernameValIcon.innerHTML = '<span class="material-symbols-rounded">' + (ok ? 'check_circle' : 'cancel') + '</span>';
+  updateUsernameIcon(val);
 });
 
 // ── Validação por etapa ──────────────────────────────────────────
@@ -320,6 +340,20 @@ function validateStep1() {
     fieldPixKey.focus();
     showError('Chave PIX inválida para o tipo selecionado.');
     fieldPixKey.setAttribute('error', '');
+    return false;
+  }
+  return true;
+}
+
+function validateStep2() {
+  const val = fieldUsername.value.trim().replace(/^@/, '');
+  const result = validateUsername(val);
+  // null = vazio = válido (campo opcional)
+  if (result === false) {
+    fieldUsername.focus();
+    showError('Username inválido. Use 3-20 caracteres: letras, números, ponto ou underline.');
+    fieldUsername.setAttribute('error', '');
+    updateUsernameIcon(val);
     return false;
   }
   return true;
@@ -378,6 +412,7 @@ btnNext.addEventListener('click', () => {
     currentStep = 2; showStep(currentStep);
   } else if (currentStep === 2) {
     profile.username = (fieldUsername.value || '').trim().replace(/^@/, '');
+    if (!validateStep2()) return;
     currentStep = 3; fillReview(); showStep(currentStep);
   } else if (currentStep === 3) {
     if (!validateStep3()) return;

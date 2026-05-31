@@ -267,8 +267,9 @@ md-outlined-text-field {
 .key-validation-icon.invalid .material-symbols-rounded { color: #b3261e; }
 
 /* ------- USERNAME WRAPPER ------- */
-.username-wrapper md-outlined-text-field {
-  padding-right: 40px;
+/* Sem padding-right extra: o ícone flutua sobre o input igual ao campo de chave PIX */
+.username-wrapper {
+  position: relative;
 }
 
 /* ------- AVATAR UPLOAD ------- */
