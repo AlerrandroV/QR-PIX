@@ -2,6 +2,24 @@
    firebase.js
    Inicialização do Firebase + helpers do Firestore.
    Importado como módulo ES nos scripts que precisam do banco.
+
+   NOTA DE SEGURANÇA — apiKey do Firebase:
+   ─────────────────────────────────────────────────────────────────
+   A apiKey abaixo é uma chave PÚBLICA por design. Ela identifica
+   o projeto Firebase para o SDK do lado do cliente, mas NÃO
+   concede acesso administrativo nem bypassa as regras do Firestore.
+
+   A segurança real é garantida pelas Security Rules do Firestore
+   (console.firebase.google.com → Firestore → Regras), que controlam
+   quem pode ler e escrever cada documento — independente de quem
+   tenha a apiKey.
+
+   Referência oficial:
+   https://firebase.google.com/docs/projects/api-keys
+
+   Por isso, esta chave pode estar no código-fonte público sem risco.
+   O alerta do GitHub Secret Scanning pode ser ignorado / dismissado
+   como "used in tests" ou "false positive" no painel de alertas.
 ================================================================= */
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
@@ -13,6 +31,8 @@ import {
   serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
+// Configuração pública do projeto Firebase (segura para repositórios públicos).
+// Veja a nota acima sobre por que a apiKey não precisa ser ocultada.
 const firebaseConfig = {
   apiKey:            'AIzaSyBNopSwIW7wAtPbUgNg9cAtrSYWLnH2d3I',
   authDomain:        'alerrandrov-qr-pix.firebaseapp.com',
@@ -53,14 +73,14 @@ export async function saveProfileToFirestore(profile) {
 
   try {
     await setDoc(doc(db, 'profiles', docId), {
-      name:         profile.name,
-      city:         profile.city,
-      bank:         profile.bank,
-      keyType:      profile.keyType,
-      pixKey:       profile.pixKey,
-      username:     profile.username || null,
-      avatarDataUrl:profile.avatarDataUrl || null,
-      createdAt:    serverTimestamp()
+      name:          profile.name,
+      city:          profile.city,
+      bank:          profile.bank,
+      keyType:       profile.keyType,
+      pixKey:        profile.pixKey,
+      username:      profile.username || null,
+      avatarDataUrl: profile.avatarDataUrl || null,
+      createdAt:     serverTimestamp()
     });
     return { ok: true, docId };
   } catch (err) {
