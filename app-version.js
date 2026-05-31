@@ -5,4 +5,4 @@
 //      O Service Worker usa este valor como nome do cache:
 //      um número diferente = novo cache = todos os clientes atualizam.
 // ─────────────────────────────────────────────────────────────────
-const APP_VERSION = '1.0.59';
+const APP_VERSION = '1.0.60';

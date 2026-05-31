@@ -8,6 +8,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>QR PIX</title>
+  <!-- ui.js DEVE ser o primeiro script: aplica tema antes do render para evitar flash -->
+  <script src="ui.js"></script>
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/png" href="qr-pix-icon-192.png" />
@@ -237,44 +239,24 @@
     </a>
   </main>
 
-  <!-- JS mínimo da home: apenas settings e PWA install -->
+  <!--
+    ui.js (carregado no <head>) já cuida de:
+      - tema (dark/light/system) sem flash
+      - eyecare
+      - --app-height
+      - PWA install button
+      - Service Worker + snackbar de atualização
+    Só precisamos vincular o botão settings aqui.
+  -->
   <script>
-    // Botão settings
-    document.getElementById('btn-settings').addEventListener('click', function() {
-      window.location.href = 'settings.html';
-    });
-
-    // PWA Install
-    var deferredPrompt = null;
-    var installBtn = document.getElementById('btn-install');
-
-    window.addEventListener('beforeinstallprompt', function(e) {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBtn.style.display = 'inline-flex';
-    });
-
-    installBtn.addEventListener('click', async function() {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      var result = await deferredPrompt.userChoice;
-      if (result.outcome === 'accepted') installBtn.style.display = 'none';
-      deferredPrompt = null;
-    });
-
-    window.addEventListener('appinstalled', function() {
-      installBtn.style.display = 'none';
-      deferredPrompt = null;
-    });
-
-    // Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('./sw.js').catch(function(err) {
-          console.warn('SW erro:', err);
+    document.addEventListener('DOMContentLoaded', function () {
+      var btnSettings = document.getElementById('btn-settings');
+      if (btnSettings) {
+        btnSettings.addEventListener('click', function () {
+          window.location.href = 'settings.html';
         });
-      });
-    }
+      }
+    });
   </script>
 </body>
 </html>
