@@ -17,17 +17,20 @@
     import '@material/web/button/outlined-button.js';
     import '@material/web/checkbox/checkbox.js';
     import '@material/web/ripple/ripple.js';
+    import '@material/web/iconbutton/icon-button.js';
+    import '@material/web/icon/icon.js';
   </script>
 </head>
 <body>
 
   <!-- TOP APP BAR -->
   <header class="top-app-bar">
-    <button class="icon-btn" id="btn-back" aria-label="Voltar">
-      <span class="material-symbols-rounded">arrow_back</span>
-    </button>
-    <span class="top-app-bar__title">Criar Perfil</span>
-    <div style="width:40px"></div>
+    <div class="top-app-bar__start">
+      <md-icon-button id="btn-back" aria-label="Voltar">
+        <md-icon>arrow_back</md-icon>
+      </md-icon-button>
+      <span class="top-app-bar__title">Criar Perfil</span>
+    </div>
   </header>
 
   <!-- STEPPER -->
