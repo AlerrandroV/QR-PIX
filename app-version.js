@@ -1,8 +1,10 @@
-// ─────────────────────────────────────────────────────────────────
-//  APP_VERSION — fonte única de verdade para a versão do QR PIX
-//  ⚠️  Sempre que qualquer arquivo do projeto for modificado,
-//      incremente este número ANTES de fazer o commit.
-//      O Service Worker usa este valor como nome do cache:
-//      um número diferente = novo cache = todos os clientes atualizam.
-// ─────────────────────────────────────────────────────────────────
-const APP_VERSION = '1.0.65';
+const APP_VERSION = '1.0.57';
+
+// Histórico de versões (mais recente primeiro)
+const VERSION_HISTORY = [
+  { version: '1.0.57', date: '2026-05-31', desc: 'feat: wizard create-profile (3 etapas)' },
+  { version: '1.0.56', date: '2026-05-30', desc: 'chore: commit de teste' },
+  { version: '1.0.55', date: '2026-05-29', desc: 'fix: applyTheme light usa setAttribute' }
+];
+
+if (typeof module !== 'undefined') module.exports = { APP_VERSION };
