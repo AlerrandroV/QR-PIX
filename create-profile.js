@@ -1,14 +1,23 @@
 /* =================================================================
    create-profile.js
    Wizard de 3 etapas para criação de perfil de cobrança PIX.
+   Os dados são persistidos no Firebase Firestore.
 ================================================================= */
 
 'use strict';
+
+import { isUsernameAvailable, saveProfileToFirestore } from './firebase.js';
 
 // ── Estado global do wizard ──────────────────────────────────────
 const profile = { name: '', city: '', bank: '', keyType: '', pixKey: '', username: '', avatarDataUrl: '' };
 let currentStep = 1;
 const TOTAL_STEPS = 3;
+
+// ── Debounce helper ──────────────────────────────────────────────
+function debounce(fn, delay = 600) {
+  let timer;
+  return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), delay); };
+}
 
 // ── Bancos ──────────────────────────────────────────────────────
 const BANKS = [
@@ -39,7 +48,7 @@ const EMAIL_PROVIDERS = [
   'globo.com','zipmail.com.br','r7.com','oi.com.br'
 ];
 
-// ── Formatadores (igual ao new-key.js) ─────────────────────────────
+// ── Formatadores ────────────────────────────────────────────────
 const onlyDigits = v => v.replace(/\D/g, '');
 
 function formatCpf(raw) {
@@ -122,17 +131,19 @@ const TYPE_CONFIG = {
   random: { label: 'Chave aleatória', placeholder: 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx', inputMode: 'text',    format: v => v,      validate: validateRandom },
 };
 
-// ── Validação de username ────────────────────────────────────────
-// Regras: opcional; se preenchido → 3-20 chars, alfanumérico + ponto + underline.
-// Não pode começar ou terminar com ponto. Sem pontos consecutivos.
-function validateUsername(val) {
-  if (!val) return null; // campo vazio = válido (opcional)
+// ── Validação de username (formato) ────────────────────────────
+function validateUsernameFormat(val) {
+  if (!val) return null; // opcional — vazio é válido
   if (val.length < 3 || val.length > 20) return false;
   if (!/^[a-zA-Z0-9_.]+$/.test(val)) return false;
   if (val.startsWith('.') || val.endsWith('.')) return false;
   if (/\.{2,}/.test(val)) return false;
   return true;
 }
+
+// ── Estado de disponibilidade do username ────────────────────────
+// 'idle' | 'checking' | 'available' | 'taken' | 'invalid'
+let usernameState = 'idle';
 
 // ── Refs DOM ─────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
@@ -202,21 +213,16 @@ function showError(msg) {
 function onPixKeyInput(e) {
   if (!profile.keyType) return;
   const cfg = TYPE_CONFIG[profile.keyType];
-
   const formatted = cfg.format(e.target.value);
   if (formatted !== e.target.value) e.target.value = formatted;
-
   const val = e.target.value.trim();
-
   if (profile.keyType === 'email') renderEmailSuggestions(val);
-
   if (!val) {
     setKeyIcon(null);
     fieldPixKey.removeAttribute('error');
     fieldPixKey.setAttribute('supporting-text', ' ');
     return;
   }
-
   const valid = cfg.validate(val);
   setKeyIcon(valid);
   if (valid) {
@@ -240,10 +246,8 @@ fieldPixKey.addEventListener('input', onPixKeyInput);
 function renderEmailSuggestions(val) {
   const atIdx = val.indexOf('@');
   if (atIdx === -1) { emailSuggestions.hidden = true; return; }
-
   const local   = val.slice(0, atIdx);
   const partial = val.slice(atIdx + 1).toLowerCase();
-
   const matches = EMAIL_PROVIDERS.filter(p => p.startsWith(partial)).slice(0, 5);
   if (!matches.length || partial === '') {
     const all = partial === '' ? EMAIL_PROVIDERS.slice(0, 6) : [];
@@ -262,7 +266,6 @@ function buildEmailList(local, providers) {
     '<span>' + local + '@' + p + '</span></li>'
   ).join('');
   emailSuggestions.hidden = false;
-
   emailSuggestions.querySelectorAll('.bank-suggestion-item').forEach(item => {
     const pick = () => {
       const chosen = item.querySelector('span:last-child').textContent;
@@ -275,7 +278,6 @@ function buildEmailList(local, providers) {
     item.addEventListener('keydown',   e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
   });
 }
-
 fieldPixKey.addEventListener('blur', () => setTimeout(() => { emailSuggestions.hidden = true; }, 180));
 
 // ── Key type chips ───────────────────────────────────────────────
@@ -285,7 +287,6 @@ keyTypeChips.forEach(chip => {
     chip.classList.add('key-type-chip--active');
     chip.setAttribute('aria-pressed','true');
     profile.keyType = chip.dataset.type;
-
     const cfg = TYPE_CONFIG[profile.keyType];
     fieldPixKey.setAttribute('label', cfg.label);
     fieldPixKey.setAttribute('placeholder', cfg.placeholder);
@@ -299,32 +300,56 @@ keyTypeChips.forEach(chip => {
   });
 });
 
-// ── Feedback visual do username em tempo real ────────────────────
-function updateUsernameIcon(val) {
-  const result = validateUsername(val);
-  if (result === null) {
-    // campo vazio — limpa ícone e erro
-    usernameValIcon.className = 'key-validation-icon';
-    usernameValIcon.innerHTML = '';
+// ── Feedback visual do username ───────────────────────────────────
+function setUsernameUI(state, msg) {
+  usernameState = state;
+  const icons = {
+    idle:      { cls: '',        icon: '' },
+    checking:  { cls: '',        icon: '<span class="material-symbols-rounded" style="animation:spin .8s linear infinite;display:inline-block">progress_activity</span>' },
+    available: { cls: 'valid',   icon: '<span class="material-symbols-rounded">check_circle</span>' },
+    taken:     { cls: 'invalid', icon: '<span class="material-symbols-rounded">cancel</span>' },
+    invalid:   { cls: 'invalid', icon: '<span class="material-symbols-rounded">cancel</span>' },
+  };
+  const { cls, icon } = icons[state];
+  usernameValIcon.className = 'key-validation-icon' + (cls ? ' ' + cls : '');
+  usernameValIcon.innerHTML = icon;
+  if (state === 'available') {
     fieldUsername.removeAttribute('error');
-    fieldUsername.setAttribute('supporting-text', '3-20 caracteres: letras, números, . e _');
-    return;
-  }
-  usernameValIcon.className = 'key-validation-icon ' + (result ? 'valid' : 'invalid');
-  usernameValIcon.innerHTML = '<span class="material-symbols-rounded">' + (result ? 'check_circle' : 'cancel') + '</span>';
-  if (result) {
-    fieldUsername.removeAttribute('error');
-    fieldUsername.setAttribute('supporting-text', 'Username disponível ✔');
-  } else {
+    fieldUsername.setAttribute('supporting-text', msg || 'Username disponível ✔');
+  } else if (state === 'taken' || state === 'invalid') {
     fieldUsername.setAttribute('error', '');
-    fieldUsername.setAttribute('supporting-text', 'Use 3-20 chars: letras, números, . e _ (sem ponto no início/fim)');
+    fieldUsername.setAttribute('supporting-text', msg || 'Username inválido');
+  } else {
+    fieldUsername.removeAttribute('error');
+    fieldUsername.setAttribute('supporting-text', msg || '3-20 caracteres: letras, números, . e _');
   }
 }
 
+// Verifica disponibilidade no Firestore (debounced)
+const checkAvailability = debounce(async (val) => {
+  setUsernameUI('checking', 'Verificando disponibilidade…');
+  const available = await isUsernameAvailable(val);
+  setUsernameUI(
+    available ? 'available' : 'taken',
+    available ? 'Username disponível ✔' : 'Este username já está em uso.'
+  );
+}, 700);
+
 fieldUsername.addEventListener('input', () => {
   const val = fieldUsername.value.trim().replace(/^@/, '');
-  updateUsernameIcon(val);
+  if (!val) { setUsernameUI('idle'); return; }
+  const fmt = validateUsernameFormat(val);
+  if (!fmt) {
+    setUsernameUI('invalid', 'Use 3-20 chars: letras, números, . e _ (sem ponto no início/fim)');
+    return;
+  }
+  checkAvailability(val);
 });
+
+// ── Spin animation ───────────────────────────────────────────────
+const spinStyle = document.createElement('style');
+spinStyle.textContent = '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+document.head.appendChild(spinStyle);
 
 // ── Validação por etapa ──────────────────────────────────────────
 function validateStep1() {
@@ -345,16 +370,37 @@ function validateStep1() {
   return true;
 }
 
-function validateStep2() {
+async function validateStep2() {
   const val = fieldUsername.value.trim().replace(/^@/, '');
-  const result = validateUsername(val);
-  // null = vazio = válido (campo opcional)
-  if (result === false) {
+  // Sem username → válido (campo opcional)
+  if (!val) return true;
+  // Formato inválido
+  if (!validateUsernameFormat(val)) {
     fieldUsername.focus();
     showError('Username inválido. Use 3-20 caracteres: letras, números, ponto ou underline.');
-    fieldUsername.setAttribute('error', '');
-    updateUsernameIcon(val);
+    setUsernameUI('invalid');
     return false;
+  }
+  // Se ainda está verificando, aguarda o resultado atual
+  if (usernameState === 'checking') {
+    showError('Aguarde — verificando disponibilidade do username…');
+    return false;
+  }
+  if (usernameState === 'taken') {
+    fieldUsername.focus();
+    showError('Este username já está em uso. Escolha outro.');
+    return false;
+  }
+  // Se o estado for 'idle' (usuário não esperou debounce), faz consulta síncrona
+  if (usernameState === 'idle' || usernameState === 'invalid') {
+    setUsernameUI('checking', 'Verificando…');
+    const available = await isUsernameAvailable(val);
+    if (!available) {
+      setUsernameUI('taken', 'Este username já está em uso.');
+      showError('Este username já está em uso. Escolha outro.');
+      return false;
+    }
+    setUsernameUI('available');
   }
   return true;
 }
@@ -379,11 +425,7 @@ function fillReview() {
     : '<span class="material-symbols-rounded" style="font-size:40px;color:var(--md-sys-color-primary)">account_circle</span>';
 }
 
-// ── Salvar + snackbar ──────────────────────────────────────────────
-function saveProfile() {
-  try { localStorage.setItem('qrpix_profile', JSON.stringify(Object.assign({}, profile, { createdAt: Date.now() }))); } catch(e) {}
-}
-
+// ── Snackbar de sucesso ────────────────────────────────────────────
 function showSuccessSnackbar() {
   const snack = document.createElement('div');
   snack.className = 'cp-snackbar';
@@ -401,8 +443,18 @@ function showSuccessSnackbar() {
   setTimeout(() => { snack.classList.remove('cp-snackbar--show'); setTimeout(() => snack.remove(), 350); }, 6000);
 }
 
+// ── Botão de progresso ────────────────────────────────────────────
+function setBtnLoading(loading) {
+  btnNext.disabled = loading;
+  if (loading) {
+    btnNext.innerHTML = '<span class="material-symbols-rounded" style="animation:spin .8s linear infinite;display:inline-block;vertical-align:middle">progress_activity</span> Salvando…';
+  } else {
+    btnNext.innerHTML = 'Confirmar <span class="material-symbols-rounded" slot="trailing-icon">check</span>';
+  }
+}
+
 // ── Navegação wizard ───────────────────────────────────────────────
-btnNext.addEventListener('click', () => {
+btnNext.addEventListener('click', async () => {
   if (currentStep === 1) {
     profile.name    = fieldName.value.trim();
     profile.city    = fieldCity.value.trim();
@@ -410,13 +462,24 @@ btnNext.addEventListener('click', () => {
     profile.pixKey  = fieldPixKey.value.trim();
     if (!validateStep1()) return;
     currentStep = 2; showStep(currentStep);
+
   } else if (currentStep === 2) {
     profile.username = (fieldUsername.value || '').trim().replace(/^@/, '');
-    if (!validateStep2()) return;
+    const ok = await validateStep2();
+    if (!ok) return;
     currentStep = 3; fillReview(); showStep(currentStep);
+
   } else if (currentStep === 3) {
     if (!validateStep3()) return;
-    saveProfile();
+    setBtnLoading(true);
+    const result = await saveProfileToFirestore(profile);
+    setBtnLoading(false);
+    if (!result.ok) {
+      showError('Erro ao salvar perfil: ' + result.error + '. Tente novamente.');
+      return;
+    }
+    // Também guarda o docId no sessionStorage para outras páginas acessarem
+    try { sessionStorage.setItem('qrpix_profile_id', result.docId); } catch(e) {}
     showSuccessSnackbar();
     setTimeout(() => { window.location.href = 'index.html'; }, 1200);
   }
