@@ -23,31 +23,42 @@ const TOTAL_STEPS = 3;
 // ── Bancos para autocomplete ─────────────────────────────────────
 const BANKS = [
   'Banco do Brasil', 'Bradesco', 'Caixa Econômica Federal', 'Itaú Unibanco',
-  'Santander', 'Nubank', 'Inter', 'BTG Pactual', 'Sicoob', 'Sicredi',
-  'C6 Bank', 'PicPay', 'Mercado Pago', 'PagBank', 'Neon', 'Banco Pan',
-  'Original', 'Safra', 'BRB', 'Banrisul', 'Unicred', 'Ailos',
-  'Banco da Amazônia', 'Banco do Nordeste', 'XP Investimentos',
-  'Avenue', 'Wise', 'Nomad', 'Digio', 'Will Bank'
+  'Santander', 'Banco Safra', 'BTG Pactual', 'Banco Pan', 'Banco Inter',
+  'C6 Bank', 'Banco Original', 'Banco BV', 'Banco Votorantim', 'Banco BMG',
+  'Banco Mercantil do Brasil', 'Banco Daycoval', 'Banco Fibra', 'Banco ABC Brasil',
+  'Banestes', 'Banrisul', 'BRB (Banco de Brasília)', 'Banco da Amazônia',
+  'Banco do Nordeste', 'Citibank', 'Banco BNP Paribas Brasil', 'J.P. Morgan',
+  'Banco Inbursa', 'HSBC', 'Banco Western Union', 'Banco Travelex', 'Ebury',
+  'Banco Semear', 'Banco Topázio', 'Banco Bari', 'Banco Digio', 'Banco Genial',
+  'Banco Master', 'Banco Guanabara', 'Banco Industrial do Brasil', 'Banco Paulista',
+  'Banco Pine', 'Banco Ribeirão Preto', 'Banco VR', 'Banco B3', 'Banco Sofisa',
+  'Banco CSF', 'Banco Crefisa', 'Banco BS2', 'Sicredi', 'Sicoob', 'Cresol',
+  'Unicred', 'Ailos', 'Nubank', 'Neon', 'PicPay', 'PicPay Bank',
+  'Mercado Pago', 'PagBank (PagSeguro)', 'Next', 'Agibank', 'XP Investimentos',
+  'Mercado Bitcoin', 'Wise', 'Wise Brasil IP', 'EBANX', 'Dlocal', 'Revolut',
+  'Transfero', 'Money Cloud', 'Asaas', 'Celcoin', 'FitBank', 'Galax Pay',
+  'Iugu', 'Efí', 'Dock', 'Stone', 'SumUp', 'Cielo', 'PagHiper',
+  'PagueVeloz', 'Pay4Fun', 'RecargaPay'
 ];
 
 // ── Refs DOM ─────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 
-const fieldName     = $('field-name');
-const fieldCity     = $('field-city');
-const fieldBank     = $('field-bank');
-const fieldPixKey   = $('field-pix-key');
-const fieldUsername = $('field-username');
-const keyValIcon    = $('key-val-icon');
+const fieldName       = $('field-name');
+const fieldCity       = $('field-city');
+const fieldBank       = $('field-bank');
+const fieldPixKey     = $('field-pix-key');
+const fieldUsername   = $('field-username');
+const keyValIcon      = $('key-val-icon');
 const usernameValIcon = $('username-val-icon');
 const bankSuggestions = $('bank-suggestions');
-const avatarUpload  = $('avatar-upload');
-const avatarInput   = $('avatar-input');
-const avatarPreview = $('avatar-preview');
-const btnNext       = $('btn-next');
-const btnPrev       = $('btn-prev');
-const btnBack       = $('btn-back');
-const keyTypeChips  = document.querySelectorAll('.key-type-chip');
+const avatarUpload    = $('avatar-upload');
+const avatarInput     = $('avatar-input');
+const avatarPreview   = $('avatar-preview');
+const btnNext         = $('btn-next');
+const btnPrev         = $('btn-prev');
+const btnBack         = $('btn-back');
+const keyTypeChips    = document.querySelectorAll('.key-type-chip');
 
 // ── Helpers de validação (reutiliza padrões do pix-payload.js) ──
 function validatePixKey(type, value) {
@@ -62,10 +73,10 @@ function validatePixKey(type, value) {
 
 function formatPixKeyPlaceholder(type) {
   const map = {
-    cpf: 'Ex: 000.000.000-00',
-    cnpj: 'Ex: 00.000.000/0001-00',
-    phone: 'Ex: +55 11 99999-9999',
-    email: 'Ex: voce@email.com',
+    cpf:    'Ex: 000.000.000-00',
+    cnpj:   'Ex: 00.000.000/0001-00',
+    phone:  'Ex: +55 11 99999-9999',
+    email:  'Ex: voce@email.com',
     random: 'Ex: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
   };
   return map[type] || 'Chave PIX';
@@ -92,7 +103,6 @@ function updateStepper(step) {
       circle.innerHTML = '<span>' + i + '</span>';
     }
   }
-  // linhas
   document.querySelectorAll('.stepper__line').forEach((line, idx) => {
     line.classList.toggle('stepper__line--done', idx < step - 1);
   });
@@ -101,18 +111,15 @@ function updateStepper(step) {
 // ── Navegação entre etapas ───────────────────────────────────────
 function showStep(step) {
   for (let i = 1; i <= TOTAL_STEPS; i++) {
-    const s = $('step-' + i);
-    s.classList.toggle('cp-step--hidden', i !== step);
+    $('step-' + i).classList.toggle('cp-step--hidden', i !== step);
   }
   updateStepper(step);
-
   btnPrev.style.display = step > 1 ? '' : 'none';
   if (step === TOTAL_STEPS) {
     btnNext.innerHTML = 'Confirmar <span class="material-symbols-rounded" slot="trailing-icon">check</span>';
   } else {
     btnNext.innerHTML = 'Próximo <span class="material-symbols-rounded" slot="trailing-icon">arrow_forward</span>';
   }
-
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -122,7 +129,6 @@ function validateStep1() {
   const city = fieldCity.value.trim();
   const bank = fieldBank.value.trim();
   const key  = fieldPixKey.value.trim();
-
   if (!name) { fieldName.focus(); showError('O nome do titular é obrigatório.'); return false; }
   if (!city) { fieldCity.focus(); showError('A cidade é obrigatória.'); return false; }
   if (!bank) { fieldBank.focus(); showError('Informe a instituição financeira.'); return false; }
@@ -133,23 +139,22 @@ function validateStep1() {
 }
 
 function validateStep3() {
-  const chk = $('chk-terms');
-  if (!chk.checked) { showError('Você precisa aceitar os Termos de Uso para continuar.'); return false; }
+  if (!$('chk-terms').checked) {
+    showError('Você precisa aceitar os Termos de Uso para continuar.');
+    return false;
+  }
   return true;
 }
 
 // ── Preenchimento do card de revisão (etapa 3) ───────────────────
 function fillReview() {
-  $('preview-name').textContent  = profile.name  || '—';
-  $('preview-bank').textContent  = profile.bank  || '—';
-  $('preview-city').textContent  = profile.city  || '—';
-  const usernameEl = $('preview-username');
-  usernameEl.textContent = profile.username ? '@' + profile.username : '';
-
+  $('preview-name').textContent = profile.name || '—';
+  $('preview-bank').textContent = profile.bank || '—';
+  $('preview-city').textContent = profile.city || '—';
+  $('preview-username').textContent = profile.username ? '@' + profile.username : '';
   const typeLabels = { cpf:'CPF', cnpj:'CNPJ', phone:'Telefone', email:'E-mail', random:'Chave Aleatória' };
   $('preview-key-type').textContent = typeLabels[profile.keyType] || '—';
   $('preview-key').textContent      = profile.pixKey || '—';
-
   const previewAvatar = $('preview-avatar');
   if (profile.avatarDataUrl) {
     previewAvatar.innerHTML = '<img src="' + profile.avatarDataUrl + '" alt="Foto de perfil" />';
@@ -160,8 +165,7 @@ function fillReview() {
 
 // ── Salvar perfil no localStorage ───────────────────────────────
 function saveProfile() {
-  const data = Object.assign({}, profile, { createdAt: Date.now() });
-  try { localStorage.setItem('qrpix_profile', JSON.stringify(data)); } catch(e) {}
+  try { localStorage.setItem('qrpix_profile', JSON.stringify(Object.assign({}, profile, { createdAt: Date.now() }))); } catch(e) {}
 }
 
 // ── Snackbar de sucesso ──────────────────────────────────────────
@@ -178,15 +182,8 @@ function showSuccessSnackbar() {
     '</div>';
   document.body.appendChild(snack);
   requestAnimationFrame(() => snack.classList.add('cp-snackbar--show'));
-
-  snack.querySelector('#snack-cta').addEventListener('click', () => {
-    window.location.href = 'generate-invoice.html';
-  });
-
-  setTimeout(() => {
-    snack.classList.remove('cp-snackbar--show');
-    setTimeout(() => snack.remove(), 350);
-  }, 6000);
+  snack.querySelector('#snack-cta').addEventListener('click', () => { window.location.href = 'generate-invoice.html'; });
+  setTimeout(() => { snack.classList.remove('cp-snackbar--show'); setTimeout(() => snack.remove(), 350); }, 6000);
 }
 
 // ── Feedback de erro inline ──────────────────────────────────────
@@ -199,33 +196,24 @@ function showError(msg) {
     el.style.cssText = 'color:var(--md-sys-color-error);font-size:13px;font-family:Roboto,sans-serif;padding:0 4px;margin-top:-6px;';
   }
   el.textContent = msg;
-  const activeStep = $('step-' + currentStep);
-  activeStep.prepend(el);
+  $('step-' + currentStep).prepend(el);
   setTimeout(() => el.remove(), 4000);
 }
 
 // ── Event: botão Próximo / Confirmar ─────────────────────────────
 btnNext.addEventListener('click', () => {
-  // Coletar dados do step atual antes de validar
   if (currentStep === 1) {
-    profile.name    = fieldName.value.trim();
-    profile.city    = fieldCity.value.trim();
-    profile.bank    = fieldBank.value.trim();
-    profile.pixKey  = fieldPixKey.value.trim();
+    profile.name   = fieldName.value.trim();
+    profile.city   = fieldCity.value.trim();
+    profile.bank   = fieldBank.value.trim();
+    profile.pixKey = fieldPixKey.value.trim();
     if (!validateStep1()) return;
-    currentStep = 2;
-    showStep(currentStep);
-    return;
+    currentStep = 2; showStep(currentStep); return;
   }
-
   if (currentStep === 2) {
     profile.username = (fieldUsername.value || '').trim().replace(/^@/, '');
-    currentStep = 3;
-    fillReview();
-    showStep(currentStep);
-    return;
+    currentStep = 3; fillReview(); showStep(currentStep); return;
   }
-
   if (currentStep === 3) {
     if (!validateStep3()) return;
     saveProfile();
@@ -235,12 +223,7 @@ btnNext.addEventListener('click', () => {
 });
 
 // ── Event: botão Anterior ────────────────────────────────────────
-btnPrev.addEventListener('click', () => {
-  if (currentStep > 1) {
-    currentStep--;
-    showStep(currentStep);
-  }
-});
+btnPrev.addEventListener('click', () => { if (currentStep > 1) { currentStep--; showStep(currentStep); } });
 
 // ── Event: botão Voltar (topbar) ─────────────────────────────────
 btnBack.addEventListener('click', () => {
@@ -255,9 +238,9 @@ keyTypeChips.forEach(chip => {
     chip.classList.add('key-type-chip--active');
     chip.setAttribute('aria-pressed','true');
     profile.keyType = chip.dataset.type;
-    fieldPixKey.label   = formatPixKeyPlaceholder(profile.keyType).replace('Ex: ','');
-    fieldPixKey.value   = '';
-    fieldPixKey.type    = profile.keyType === 'email' ? 'email' : (profile.keyType === 'phone' ? 'tel' : 'text');
+    fieldPixKey.label = formatPixKeyPlaceholder(profile.keyType).replace('Ex: ','');
+    fieldPixKey.value = '';
+    fieldPixKey.type  = profile.keyType === 'email' ? 'email' : (profile.keyType === 'phone' ? 'tel' : 'text');
     keyValIcon.className = 'key-validation-icon';
     keyValIcon.innerHTML = '';
   });
@@ -281,48 +264,52 @@ fieldUsername.addEventListener('input', () => {
   usernameValIcon.innerHTML = '<span class="material-symbols-rounded">' + (ok ? 'check_circle' : 'cancel') + '</span>';
 });
 
-// ── Autocomplete de banco ────────────────────────────────────────
-fieldBank.addEventListener('input', () => {
-  const q = fieldBank.value.trim().toLowerCase();
+// ── Autocomplete de banco (sugestão ACIMA do input) ──────────────
+function renderBankSuggestions(q) {
   if (!q) { bankSuggestions.hidden = true; bankSuggestions.innerHTML = ''; return; }
-  const matches = BANKS.filter(b => b.toLowerCase().includes(q)).slice(0, 6);
+  const matches = BANKS.filter(b => b.toLowerCase().includes(q.toLowerCase())).slice(0, 6);
   if (!matches.length) { bankSuggestions.hidden = true; return; }
   bankSuggestions.innerHTML = matches.map(b =>
     '<li class="bank-suggestion-item" role="option" tabindex="0">' +
-    '<span class="material-symbols-rounded">account_balance</span>' + b + '</li>'
+    '<span class="material-symbols-rounded">account_balance</span>' +
+    '<span>' + b + '</span></li>'
   ).join('');
   bankSuggestions.hidden = false;
   bankSuggestions.querySelectorAll('.bank-suggestion-item').forEach(item => {
-    item.addEventListener('mousedown', e => { e.preventDefault(); fieldBank.value = item.textContent.trim().replace('account_balance','').trim(); bankSuggestions.hidden = true; });
-    item.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') { fieldBank.value = item.textContent.trim().replace('account_balance','').trim(); bankSuggestions.hidden = true; } });
+    const selectBank = () => {
+      fieldBank.value = item.querySelector('span:last-child').textContent;
+      bankSuggestions.hidden = true;
+      bankSuggestions.innerHTML = '';
+    };
+    item.addEventListener('mousedown', e => { e.preventDefault(); selectBank(); });
+    item.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectBank(); } });
   });
-});
+}
 
-fieldBank.addEventListener('blur', () => setTimeout(() => { bankSuggestions.hidden = true; }, 200));
+fieldBank.addEventListener('input', () => renderBankSuggestions(fieldBank.value.trim()));
+fieldBank.addEventListener('focus', () => { if (fieldBank.value.trim()) renderBankSuggestions(fieldBank.value.trim()); });
+fieldBank.addEventListener('blur',  () => setTimeout(() => { bankSuggestions.hidden = true; }, 200));
 
 // ── Upload de avatar ─────────────────────────────────────────────
 avatarUpload.addEventListener('click', () => avatarInput.click());
-avatarUpload.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') avatarInput.click(); });
+avatarUpload.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') avatarInput.click(); });
 
 avatarInput.addEventListener('change', () => {
   const file = avatarInput.files[0];
   if (!file) return;
   if (file.size > 2 * 1024 * 1024) { showError('A imagem deve ter no máximo 2 MB.'); return; }
   const reader = new FileReader();
-  reader.onload = e => {
-    const src = e.target.result;
-    // Crop para quadrado via canvas
+  reader.onload = ev => {
     const img = new Image();
     img.onload = () => {
-      const size = Math.min(img.width, img.height);
+      const size   = Math.min(img.width, img.height);
       const canvas = document.createElement('canvas');
       canvas.width = canvas.height = 256;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, (img.width-size)/2, (img.height-size)/2, size, size, 0, 0, 256, 256);
+      canvas.getContext('2d').drawImage(img, (img.width-size)/2, (img.height-size)/2, size, size, 0, 0, 256, 256);
       profile.avatarDataUrl = canvas.toDataURL('image/jpeg', 0.85);
       avatarPreview.innerHTML = '<img src="' + profile.avatarDataUrl + '" alt="Preview da foto de perfil" />';
     };
-    img.src = src;
+    img.src = ev.target.result;
   };
   reader.readAsDataURL(file);
 });
