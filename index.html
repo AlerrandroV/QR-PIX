@@ -8,7 +8,6 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>QR PIX</title>
-  <script src="ui.js"></script>
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/png" href="qr-pix-icon-192.png" />
@@ -39,7 +38,6 @@
       -webkit-user-select: none;
       -webkit-user-drag: none;
       -webkit-touch-callout: none;
-      draggable: false;
     }
     .app-logo__name {
       font-family: "Roboto", sans-serif;
@@ -53,7 +51,7 @@
       -webkit-user-select: none;
     }
 
-    /* ===== HOME CARDS v1 ===== */
+    /* ===== HOME CARDS ===== */
     .home-content {
       display: flex;
       flex-direction: column;
@@ -239,6 +237,44 @@
     </a>
   </main>
 
-  <script src="app.js"></script>
+  <!-- JS mínimo da home: apenas settings e PWA install -->
+  <script>
+    // Botão settings
+    document.getElementById('btn-settings').addEventListener('click', function() {
+      window.location.href = 'settings.html';
+    });
+
+    // PWA Install
+    var deferredPrompt = null;
+    var installBtn = document.getElementById('btn-install');
+
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'inline-flex';
+    });
+
+    installBtn.addEventListener('click', async function() {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      var result = await deferredPrompt.userChoice;
+      if (result.outcome === 'accepted') installBtn.style.display = 'none';
+      deferredPrompt = null;
+    });
+
+    window.addEventListener('appinstalled', function() {
+      installBtn.style.display = 'none';
+      deferredPrompt = null;
+    });
+
+    // Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js').catch(function(err) {
+          console.warn('SW erro:', err);
+        });
+      });
+    }
+  </script>
 </body>
 </html>
