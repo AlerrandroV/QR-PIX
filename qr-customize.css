@@ -165,7 +165,7 @@ html, body {
 }
 
 .chip--active {
-  background-color: var(--md-sys-color-secondary-container);
+  background-color: var(--md-sys-color-primary-container);
   border-color: transparent;
   color: var(--md-sys-color-on-secondary-container);
 }

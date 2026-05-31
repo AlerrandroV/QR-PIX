@@ -313,7 +313,7 @@ html, body {
   padding: 0 14px;
   height: 36px;
   border-radius: var(--radius-full);
-  background-color: var(--md-sys-color-secondary-container);
+  background-color: var(--md-sys-color-primary-container);
   color: var(--md-sys-color-on-secondary-container);
   border: none;
   cursor: pointer;
@@ -328,7 +328,7 @@ html, body {
 .install-topbar-btn:active {
   background-color: color-mix(
     in srgb,
-    var(--md-sys-color-secondary-container) 85%,
+    var(--md-sys-color-primary-container) 85%,
     var(--md-sys-color-on-secondary-container)
   );
 }
