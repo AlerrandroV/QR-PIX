@@ -3,7 +3,7 @@
    Controle de versão e cache do Service Worker.
 ================================================================= */
 
-const APP_VERSION = '1.0.64';
+const APP_VERSION = '1.0.66';
 
 // Exporta para uso como módulo ES
 if (typeof module !== 'undefined') module.exports = { APP_VERSION };
