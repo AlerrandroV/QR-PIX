@@ -6,10 +6,12 @@
   <meta name="theme-color" content="#f7f9ff" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>Perfil de cobrança — QR PIX</title>
+  <title>Criar perfil — QR PIX</title>
   <script src="ui.js"></script>
   <script src="pix-utils.js"></script>
+  <script src="data.js"></script>
   <script src="key-form.js"></script>
+  <script src="profile-form.js"></script>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/png" href="qr-pix-icon-192.png" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap" />
@@ -20,10 +22,10 @@
 <body>
 
   <header class="app-bar">
-    <md-icon-button data-nav="back" data-fallback="index.html" aria-label="Voltar">
+    <md-icon-button data-nav="back" data-fallback="profile.html" aria-label="Voltar">
       <md-icon>arrow_back</md-icon>
     </md-icon-button>
-    <h1 class="app-bar__title">Perfil de cobrança</h1>
+    <h1 class="app-bar__title">Criar perfil</h1>
   </header>
 
   <nav class="stepper" aria-label="Etapas">
@@ -32,7 +34,7 @@
     </div>
     <span class="stepper__line"></span>
     <div class="stepper__item" data-step-ind="2">
-      <span class="stepper__dot">2</span><span class="stepper__label">Perfil</span>
+      <span class="stepper__dot">2</span><span class="stepper__label">Loja</span>
     </div>
     <span class="stepper__line"></span>
     <div class="stepper__item" data-step-ind="3">
@@ -77,19 +79,18 @@
         </section>
       </div>
 
-      <!-- ===== Etapa 2: Perfil público ===== -->
+      <!-- ===== Etapa 2: Loja ===== -->
       <div class="step" data-step="2" hidden>
-        <section class="section" aria-labelledby="s2-photo">
+        <section class="section" aria-labelledby="s2-store">
           <div class="section__header">
-            <h2 class="section__title" id="s2-photo">Perfil público</h2>
+            <h2 class="section__title" id="s2-store">Sua loja</h2>
             <span class="badge">Opcional</span>
           </div>
           <div class="card form">
             <div class="upload">
-              <span class="upload__preview" id="avatar-preview"><span class="icon">add_a_photo</span></span>
+              <span class="upload__preview" id="avatar-preview" role="button" tabindex="0" aria-label="Escolher foto"><span class="icon">add_a_photo</span></span>
               <span class="upload__content">
-                <span class="title">Foto ou logo da loja</span>
-                <span class="label muted">PNG, JPG ou WebP · até 2 MB</span>
+                <span class="title">Foto ou logo</span>
                 <md-filled-tonal-button id="btn-avatar">
                   <md-icon slot="icon">upload</md-icon>
                   Escolher imagem
@@ -97,14 +98,33 @@
               </span>
               <input type="file" id="avatar-input" accept="image/*" hidden />
             </div>
+            <md-outlined-text-field id="field-bio" label="Descrição" type="textarea" rows="2" maxlength="160"
+              supporting-text="O que você vende, horários, entregas…"></md-outlined-text-field>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="s2-contact">
+          <div class="section__header"><h2 class="section__title" id="s2-contact">Onde o cliente fala com você</h2></div>
+          <div class="card form">
+            <md-outlined-text-field id="field-whatsapp" label="WhatsApp" type="tel" inputmode="tel" placeholder="(00) 00000-0000">
+              <md-icon slot="leading-icon">chat</md-icon>
+            </md-outlined-text-field>
+            <md-outlined-text-field id="field-instagram" label="Instagram" prefix-text="@" autocomplete="off">
+              <md-icon slot="leading-icon">photo_camera</md-icon>
+            </md-outlined-text-field>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="s2-link">
+          <div class="section__header"><h2 class="section__title" id="s2-link">Link da loja</h2></div>
+          <div class="card form">
             <div class="field">
               <md-outlined-text-field id="field-username" label="Nome de usuário" prefix-text="@" maxlength="20"
-                autocomplete="username" supporting-text="3 a 20 caracteres: letras, números, ponto e _">
-              </md-outlined-text-field>
+                autocomplete="username"></md-outlined-text-field>
               <span class="field__status" id="username-status" aria-hidden="true"></span>
             </div>
           </div>
-          <p class="section__hint">Com um nome de usuário, seus clientes poderão encontrar sua loja no futuro catálogo do QR PIX.</p>
+          <p class="section__hint">Com um nome de usuário sua loja ganha um link para divulgar no WhatsApp e Instagram.</p>
         </section>
       </div>
 
@@ -128,6 +148,17 @@
               </span>
             </div>
           </div>
+        </section>
+
+        <section class="card card--list" id="publish-row" aria-label="Publicação">
+          <label class="list-item list-item--action list-item--two-line">
+            <span class="list-item__leading"><span class="icon">public</span></span>
+            <span class="list-item__content">
+              <span class="list-item__headline">Publicar loja agora</span>
+              <span class="list-item__supporting list-item__supporting--wrap" id="review-link"></span>
+            </span>
+            <md-switch id="chk-publish" selected aria-label="Publicar loja agora"></md-switch>
+          </label>
         </section>
 
         <section class="section" aria-labelledby="s3-terms">

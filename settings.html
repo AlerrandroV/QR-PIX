@@ -9,6 +9,7 @@
   <title>Ajustes — QR PIX</title>
   <script src="ui.js"></script>
   <script src="app-version.js"></script>
+  <script src="data.js"></script>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/png" href="qr-pix-icon-192.png" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap" />
@@ -19,6 +20,9 @@
 <body>
 
   <header class="app-bar">
+    <md-icon-button data-nav="back" data-fallback="profile.html" aria-label="Voltar">
+      <md-icon>arrow_back</md-icon>
+    </md-icon-button>
     <h1 class="app-bar__title">Ajustes</h1>
   </header>
 
@@ -88,11 +92,11 @@
       <section class="section" aria-labelledby="sec-charge">
         <div class="section__header"><h2 class="section__title" id="sec-charge">Cobrança</h2></div>
         <div class="card card--list">
-          <a class="list-item list-item--action list-item--two-line" href="create-profile.html">
+          <a class="list-item list-item--action list-item--two-line" href="profile.html">
             <span class="list-item__leading"><span class="icon">storefront</span></span>
             <span class="list-item__content">
-              <span class="list-item__headline">Perfil de cobrança</span>
-              <span class="list-item__supporting">Nome, foto e chave PIX</span>
+              <span class="list-item__headline">Perfil da loja</span>
+              <span class="list-item__supporting">Nome, contatos, chave PIX e publicação</span>
             </span>
             <span class="list-item__trailing"><span class="icon">chevron_right</span></span>
           </a>
@@ -115,7 +119,7 @@
             <span class="list-item__leading"><span class="icon">upload_file</span></span>
             <span class="list-item__content">
               <span class="list-item__headline">Exportar dados</span>
-              <span class="list-item__supporting">Chaves, aparência e estilo do QR</span>
+              <span class="list-item__supporting">Chaves, loja, catálogo e preferências</span>
             </span>
           </button>
           <button class="list-item list-item--action list-item--two-line" id="item-import" type="button">
@@ -180,17 +184,6 @@
     </div>
   </main>
 
-  <nav class="app-nav" aria-label="Navegação principal">
-    <a class="app-nav__item" href="index.html">
-      <span class="app-nav__indicator"><span class="icon">home</span></span>Início
-    </a>
-    <a class="app-nav__item" href="generate-invoice.html">
-      <span class="app-nav__indicator"><span class="icon">qr_code_2</span></span>Cobrar
-    </a>
-    <a class="app-nav__item" href="settings.html" aria-current="page">
-      <span class="app-nav__indicator"><span class="icon">settings</span></span>Ajustes
-    </a>
-  </nav>
 
   <script src="settings.js"></script>
 </body>

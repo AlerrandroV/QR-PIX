@@ -1,0 +1,42 @@
+rules_version = '2';
+
+// Regras do Firestore para o QR PIX.
+// Publicar: Firebase console → Firestore → Regras (ou `firebase deploy --only firestore:rules`).
+// Requer login anônimo ativado (Authentication → Sign-in method → Anônimo).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isOwner(data) { return signedIn() && data.ownerUid == request.auth.uid; }
+    function smallEnough() { return request.resource.size() < 900 * 1024; }
+
+    // Lojas públicas: qualquer um lê; só o dono cria/altera/apaga.
+    match /stores/{username} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && username.matches('^[a-z0-9_.]{3,20}$')
+        && smallEnough();
+      allow update: if isOwner(resource.data)
+        && request.resource.data.ownerUid == request.auth.uid
+        && smallEnough();
+      allow delete: if isOwner(resource.data);
+
+      match /products/{productId} {
+        allow read: if true;
+        // getAfter: a loja e os produtos são gravados no mesmo lote
+        allow create, update: if signedIn()
+          && getAfter(/databases/$(database)/documents/stores/$(username)).data.ownerUid == request.auth.uid
+          && request.resource.data.ownerUid == request.auth.uid
+          && smallEnough();
+        allow delete: if isOwner(resource.data);
+      }
+    }
+
+    // Coleção da v1.0 (perfis antigos): somente leitura daqui em diante.
+    match /profiles/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

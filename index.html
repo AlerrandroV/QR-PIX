@@ -28,6 +28,9 @@
         <md-icon slot="icon">download</md-icon>
         Instalar
       </md-filled-tonal-button>
+      <md-icon-button href="settings.html" aria-label="Ajustes">
+        <md-icon>settings</md-icon>
+      </md-icon-button>
     </div>
   </header>
 
@@ -62,11 +65,11 @@
           <h2 class="section__title" id="tools-title">Ferramentas</h2>
         </div>
         <div class="card card--list">
-          <a class="list-item list-item--action list-item--two-line" href="create-profile.html">
+          <a class="list-item list-item--action list-item--two-line" href="catalog.html">
             <span class="list-item__leading"><span class="icon">storefront</span></span>
             <span class="list-item__content">
-              <span class="list-item__headline">Perfil de cobrança</span>
-              <span class="list-item__supporting">Nome, foto e chave PIX da sua loja</span>
+              <span class="list-item__headline">Montar catálogo</span>
+              <span class="list-item__supporting">Publique produtos e receba pedidos no WhatsApp</span>
             </span>
             <span class="list-item__trailing"><span class="icon">chevron_right</span></span>
           </a>
@@ -92,17 +95,7 @@
     </div>
   </main>
 
-  <nav class="app-nav" aria-label="Navegação principal">
-    <a class="app-nav__item" href="index.html" aria-current="page">
-      <span class="app-nav__indicator"><span class="icon">home</span></span>Início
-    </a>
-    <a class="app-nav__item" href="generate-invoice.html">
-      <span class="app-nav__indicator"><span class="icon">qr_code_2</span></span>Cobrar
-    </a>
-    <a class="app-nav__item" href="settings.html">
-      <span class="app-nav__indicator"><span class="icon">settings</span></span>Ajustes
-    </a>
-  </nav>
+  <nav class="app-nav" data-current="home"></nav>
 
   <script src="keys-list.js"></script>
   <script>

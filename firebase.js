@@ -1,38 +1,32 @@
 /* =================================================================
-   firebase.js
-   Inicialização do Firebase + helpers do Firestore.
-   Importado como módulo ES nos scripts que precisam do banco.
+   firebase.js — ADAPTADOR REMOTO (Firebase / Firestore)
+   -----------------------------------------------------------------
+   Implementa a interface esperada por data.js:
+     isUsernameAvailable(username)
+     publishStore({ profile, products, previousUsername })
+     unpublishStore(username)
+     fetchStore(username)
+   Nenhuma outra parte do app importa este arquivo. Para trocar de
+   backend, crie outro adaptador com as mesmas funções.
 
-   NOTA DE SEGURANÇA — apiKey do Firebase:
-   ─────────────────────────────────────────────────────────────────
-   A apiKey abaixo é uma chave PÚBLICA por design. Ela identifica
-   o projeto Firebase para o SDK do lado do cliente, mas NÃO
-   concede acesso administrativo nem bypassa as regras do Firestore.
+   Estrutura no Firestore:
+     stores/{username}                  perfil público + ownerUid
+     stores/{username}/products/{id}    itens do catálogo
 
-   A segurança real é garantida pelas Security Rules do Firestore
-   (console.firebase.google.com → Firestore → Regras), que controlam
-   quem pode ler e escrever cada documento — independente de quem
-   tenha a apiKey.
+   Dono da loja: login anônimo do Firebase Auth (um uid por aparelho).
+   As regras em firestore.rules só deixam o dono alterar a loja.
+   Requer "Anonymous" ativado em Authentication → Sign-in method.
 
-   Referência oficial:
-   https://firebase.google.com/docs/projects/api-keys
-
-   Por isso, esta chave pode estar no código-fonte público sem risco.
-   O alerta do GitHub Secret Scanning pode ser ignorado / dismissado
-   como "used in tests" ou "false positive" no painel de alertas.
+   A apiKey abaixo é pública por design (identifica o projeto); a
+   segurança vem das regras. https://firebase.google.com/docs/projects/api-keys
 ================================================================= */
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  serverTimestamp
+  getFirestore, doc, getDoc, getDocs, collection, writeBatch, serverTimestamp,
 } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-// Configuração pública do projeto Firebase (segura para repositórios públicos).
-// Veja a nota acima sobre por que a apiKey não precisa ser ocultada.
 const firebaseConfig = {
   apiKey:            'AIzaSyBNopSwIW7wAtPbUgNg9cAtrSYWLnH2d3I',
   authDomain:        'alerrandrov-qr-pix.firebaseapp.com',
@@ -40,53 +34,83 @@ const firebaseConfig = {
   storageBucket:     'alerrandrov-qr-pix.firebasestorage.app',
   messagingSenderId: '852959080798',
   appId:             '1:852959080798:web:a9494efad51551bad85fcf',
-  measurementId:     'G-JW026XVVQW'
+  measurementId:     'G-JW026XVVQW',
 };
 
 const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-/**
- * Verifica se um username já está em uso.
- * @param {string} username  — sem @, já normalizado
- * @returns {Promise<boolean>}  true = disponível, false = já usado
- */
-export async function isUsernameAvailable(username) {
-  if (!username) return true;
-  const snap = await getDoc(doc(db, 'profiles', username.toLowerCase()));
-  return !snap.exists();
-}
+const STORES = 'stores';
 
-/**
- * Salva o perfil no Firestore.
- * O documento é indexado pelo username (lower-case).
- * Se não houver username, usa a pixKey como ID do documento
- * (garantindo um perfil único por chave PIX).
- *
- * @param {Object} profile — dados coletados no wizard
- * @returns {Promise<{ok:boolean, error?:string}>}
- */
-export async function saveProfileToFirestore(profile) {
-  const docId = profile.username
-    ? profile.username.toLowerCase()
-    : 'anon_' + btoa(profile.pixKey).replace(/[^a-zA-Z0-9]/g, '').slice(0, 20);
-
+async function ensureOwner() {
+  if (auth.currentUser) return auth.currentUser.uid;
   try {
-    await setDoc(doc(db, 'profiles', docId), {
-      name:          profile.name,
-      city:          profile.city,
-      bank:          profile.bank,
-      keyType:       profile.keyType,
-      pixKey:        profile.pixKey,
-      username:      profile.username || null,
-      avatarDataUrl: profile.avatarDataUrl || null,
-      createdAt:     serverTimestamp()
-    });
-    return { ok: true, docId };
+    const cred = await signInAnonymously(auth);
+    return cred.user.uid;
   } catch (err) {
-    console.error('[Firebase] saveProfile:', err);
-    return { ok: false, error: err.message };
+    // Login anônimo desativado no console: segue sem dono (as regras decidem)
+    console.warn('[firebase] login anônimo indisponível:', err.code || err.message);
+    return null;
   }
 }
 
-export { db };
+export async function isUsernameAvailable(username) {
+  const id = username.toLowerCase();
+  const [store, legacy] = await Promise.all([
+    getDoc(doc(db, STORES, id)),
+    getDoc(doc(db, 'profiles', id)).catch(() => null), // coleção da v1.0
+  ]);
+  if (store.exists()) {
+    const uid = await ensureOwner();
+    return !!uid && store.data().ownerUid === uid;
+  }
+  return !(legacy && legacy.exists());
+}
+
+async function deleteStoreDocs(batch, id) {
+  const snap = await getDocs(collection(db, STORES, id, 'products'));
+  snap.forEach((d) => batch.delete(d.ref));
+  batch.delete(doc(db, STORES, id));
+}
+
+export async function publishStore({ profile, products, previousUsername }) {
+  const id = profile.username;
+  const ownerUid = await ensureOwner();
+  const batch = writeBatch(db);
+
+  if (previousUsername) await deleteStoreDocs(batch, previousUsername);
+
+  batch.set(doc(db, STORES, id), {
+    ...profile,
+    ownerUid,
+    productCount: products.length,
+    updatedAt: serverTimestamp(),
+  });
+
+  const keep = new Set(products.map((p) => p.id));
+  const existing = await getDocs(collection(db, STORES, id, 'products')).catch(() => null);
+  existing && existing.forEach((d) => { if (!keep.has(d.id)) batch.delete(d.ref); });
+  products.forEach((p, order) => batch.set(doc(db, STORES, id, 'products', p.id), { ...p, order, ownerUid }));
+
+  await batch.commit();
+  return { ok: true };
+}
+
+export async function unpublishStore(username) {
+  await ensureOwner();
+  const batch = writeBatch(db);
+  await deleteStoreDocs(batch, username.toLowerCase());
+  await batch.commit();
+  return { ok: true };
+}
+
+export async function fetchStore(username) {
+  const id = username.toLowerCase();
+  const snap = await getDoc(doc(db, STORES, id));
+  if (!snap.exists()) return null;
+  const items = await getDocs(collection(db, STORES, id, 'products'));
+  const products = items.docs.map((d) => d.data()).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const { ownerUid, ...profile } = snap.data();
+  return { profile, products: products.map(({ ownerUid: _o, ...p }) => p) };
+}
