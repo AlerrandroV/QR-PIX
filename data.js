@@ -247,6 +247,48 @@
   const storeUrl = (username) =>
     new URL('store.html?u=' + encodeURIComponent(String(username || '').toLowerCase()), location.href).href;
 
+  // ── Conta (opcional: depende do adaptador) ─────────────────────
+  // Entrar com o Google vincula a conta anônima do aparelho: a loja
+  // publicada continua sua e pode ser recuperada em outro aparelho.
+  const account = {
+    async available() {
+      try { return typeof (await remote()).signInWithGoogle === 'function'; } catch { return false; }
+    },
+    async get() {
+      const api = await remote();
+      return api.getAccount ? api.getAccount() : { kind: 'none' };
+    },
+    async signInWithGoogle() {
+      const res = await (await remote()).signInWithGoogle();
+      emit('account', res);
+      return res;
+    },
+    async signOut() {
+      await (await remote()).signOutAccount();
+      emit('account', {});
+    },
+    // Loja que pertence à conta atual no servidor, ou null
+    async cloudStore() {
+      const api = await remote();
+      return api.fetchMyStore ? api.fetchMyStore() : null;
+    },
+    // Traz a loja da conta para este aparelho (substitui os dados locais)
+    async restore(cloud) {
+      const now = Date.now();
+      const list = (cloud.products || []).map((x) => ({
+        available: true, priceCents: 0, ...x, createdAt: x.createdAt || now, updatedAt: x.updatedAt || now,
+      }));
+      await kvSet('products', list);
+      await kvSet('profile', {
+        ...EMPTY_PROFILE, ...cloud.profile,
+        published: true,
+        publishedUsername: cloud.profile.username,
+        dirty: false, lastSyncAt: now, updatedAt: now,
+      });
+      emit('change', { what: 'all' });
+    },
+  };
+
   // Restauração de backup (substitui os dados locais)
   async function importAll({ profile: p, products: list }) {
     if (p) await kvSet('profile', { ...EMPTY_PROFILE, ...p, dirty: true });
@@ -256,7 +298,7 @@
   }
 
   window.QrData = {
-    importAll,
+    importAll, account,
     profile, products, sync, autoSync, isUsernameAvailable, fetchPublicStore,
     whatsappNumber, whatsappLink, instagramHandle, instagramLink, storeUrl,
     EMPTY_PROFILE,

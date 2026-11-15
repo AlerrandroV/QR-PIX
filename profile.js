@@ -56,6 +56,104 @@
     icon.textContent = ic;
   }
 
+  // ── Conta ─────────────────────────────────────────────────────
+  let cloudStore = null;
+
+  async function renderAccount() {
+    const sec = $('sec-account');
+    let acc;
+    try {
+      if (!(await D.account.available())) { sec.hidden = true; return; }
+      acc = await D.account.get();
+    } catch { sec.hidden = true; return; }
+    sec.hidden = false;
+
+    const google = acc.kind === 'google';
+    $('acc-icon').textContent = google ? 'verified_user' : 'smartphone';
+    $('acc-title').textContent = google ? 'Conectado ao Google' : 'Somente neste aparelho';
+    $('acc-text').textContent = google
+      ? (acc.email || 'Sua loja acompanha você em qualquer aparelho.')
+      : profile?.published
+        ? 'Se você trocar de celular ou limpar o navegador, perde o acesso para editar a loja publicada. Entre com o Google para protegê-la.'
+        : 'Entre com o Google para recuperar sua loja em outro aparelho.';
+    $('acc-action-icon').textContent = google ? 'logout' : 'login';
+    $('acc-action-label').textContent = google ? 'Sair da conta' : 'Entrar com Google';
+
+    // Conta Google sem loja neste aparelho, mas com loja na nuvem: oferece recuperar
+    $('acc-restore').hidden = true;
+    cloudStore = null;
+    if (google && !profile?.name) {
+      try { cloudStore = await D.account.cloudStore(); } catch {}
+      if (cloudStore) {
+        $('acc-restore-text').textContent = cloudStore.profile.name + ' · @' + cloudStore.profile.username;
+        $('acc-restore').hidden = false;
+      }
+    }
+  }
+
+  async function restoreFromCloud(cloud) {
+    await D.account.restore(cloud);
+    UI.snackbar('Loja recuperada: @' + cloud.profile.username);
+  }
+
+  async function afterSignIn(res) {
+    if (!res.switched) {
+      UI.snackbar('Conta conectada. Sua loja está protegida.');
+      return;
+    }
+    // O Google já tinha uma conta (ex.: outro aparelho): passamos a usar ela
+    let cloud = null;
+    try { cloud = await D.account.cloudStore(); } catch {}
+    const local = await D.profile.get();
+
+    if (cloud && !local?.name) return restoreFromCloud(cloud);
+    if (cloud && local?.name) {
+      const choice = await UI.dialog({
+        icon: 'cloud_sync',
+        title: 'Esta conta já tem uma loja',
+        body: `A conta Google já publicou @${cloud.profile.username}. Usar a loja da conta substitui os dados deste aparelho.`,
+        actions: [
+          { label: 'Manter este aparelho', value: 'keep' },
+          { label: 'Usar a da conta', value: 'cloud', variant: 'filled' },
+        ],
+      });
+      if (choice === 'cloud') return restoreFromCloud(cloud);
+      // Mantém o aparelho: a publicação seguinte troca a loja da conta pela daqui
+      await D.profile.save({ publishedUsername: cloud.profile.username });
+      UI.snackbar('Conta conectada. Publicando a loja deste aparelho…');
+      return;
+    }
+    if (local?.published) await D.profile.save({});
+    UI.snackbar('Conta conectada');
+  }
+
+  $('acc-action').addEventListener('click', async () => {
+    const acc = await D.account.get();
+    if (acc.kind === 'google') {
+      const ok = await UI.confirm({
+        icon: 'logout',
+        title: 'Sair da conta Google?',
+        body: 'Sua loja continua no ar, mas só poderá ser editada entrando de novo com esta conta. Este aparelho passa a usar uma conta nova.',
+        confirmLabel: 'Sair',
+        danger: true,
+      });
+      if (!ok) return;
+      await D.account.signOut();
+      UI.snackbar('Você saiu da conta');
+    } else {
+      const res = await D.account.signInWithGoogle();
+      if (res.cancelled) return;
+      if (!res.ok) { UI.snackbar('Não foi possível entrar com o Google. Tente de novo.'); return; }
+      profile = await D.profile.get();
+      await afterSignIn(res);
+    }
+    await render();
+  });
+
+  $('acc-restore').addEventListener('click', async () => {
+    if (cloudStore) { await restoreFromCloud(cloudStore); await render(); }
+  });
+
   async function render(syncState) {
     profile = await D.profile.get();
     const has = !!profile?.name;
@@ -64,6 +162,7 @@
     $('btn-main').setAttribute('href', has ? 'profile-edit.html' : 'create-profile.html');
     $('btn-main-label').textContent = has ? 'Editar perfil' : 'Criar perfil';
     $('btn-main-icon').textContent = has ? 'edit' : 'add';
+    renderAccount();
     if (!has) return;
 
     const p = profile;

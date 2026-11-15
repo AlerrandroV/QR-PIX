@@ -32,14 +32,11 @@ O que vai para o backend é filtrado em `publicProfile()` e `publicProduct()` (`
 ## Situação atual (Firebase)
 
 - Coleção `stores/{username}` com o perfil público e `stores/{username}/products/{id}` com os produtos.
-- Cada aparelho recebe um **login anônimo**. O `uid` é gravado como `ownerUid`, e as regras em `firestore.rules` só deixam o dono alterar a loja.
+- Cada aparelho recebe um **login anônimo**, que pode ser **vinculado ao Google** (Perfil → Conta) sem trocar o `uid`. O `uid` é gravado como `ownerUid`, e as regras em `firestore.rules` só deixam o dono alterar a loja. Uma conta tem no máximo uma loja (`owners/{uid}`).
 - As imagens são JPEG pequenos (avatar 256 px, produto 600 px) gravados como data URL dentro do documento. Isso funciona para catálogos pequenos, mas não escala.
 
 ### Passos para ativar em produção
-1. Firebase console → **Authentication → Sign-in method → Anônimo → Ativar**.
-2. Firebase console → **Firestore → Regras**: colar o conteúdo de `firestore.rules` e publicar.
-   - Sem isso, qualquer pessoa pode sobrescrever qualquer loja (as regras atuais do projeto são desconhecidas para o app).
-   - A coleção antiga `profiles` (v1.0) fica somente leitura.
+Veja `docs/FIREBASE.md` (login anônimo e Google, domínios autorizados, publicar `firestore.rules`, restrição da chave, orçamento). As regras têm testes automatizados em `tests/rules`.
 
 ### Por que não ficar no Firebase a longo prazo
 - **Aprisionamento:** o Firestore é proprietário. Não dá para hospedar por conta própria nem levar as consultas para outro banco.
@@ -117,7 +114,7 @@ create policy "dono escreve" on products for all    using (owner_id = auth.uid()
 
 ## Riscos a resolver antes de escalar
 
-1. **Identidade presa ao aparelho.** Com login anônimo, quem limpar os dados do navegador ou trocar de celular perde o direito de editar a própria loja; os dados locais se salvam pelo backup em Ajustes. **Próximo passo:** vincular uma conta (telefone por SMS/WhatsApp é o mais natural para o público).
+1. **Identidade.** O vendedor que não vincular o Google continua preso ao aparelho: se limpar o navegador ou trocar de celular, perde o direito de editar a loja publicada (os dados locais se salvam pelo backup em Ajustes). O app avisa isso em Perfil → Conta. Login por telefone seria um complemento natural para o público.
 2. **Imagens em base64.** Migrar para armazenamento de objetos com CDN reduz o tamanho das lojas em cerca de 90%.
 3. **Moderação.** Lojas públicas precisam de um canal de denúncia e de um jeito de tirar uma loja do ar (campo `blocked` + regra).
 4. **LGPD.** A loja pública expõe nome, cidade, WhatsApp e chave PIX, o que é intencional, já que é o que o cliente precisa para pagar. Isso deve estar escrito nos Termos de uso e o vendedor precisa poder apagar tudo (o botão "Tirar do ar" já remove os dados do servidor).
