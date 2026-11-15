@@ -889,6 +889,17 @@ md-outlined-select { width: 100%; }
   color: var(--md-sys-color-on-error-container);
 }
 
+.banner--info {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  align-items: center;
+}
+.banner a { color: inherit; font-weight: 500; }
+
+/* Imagem dentro de diálogo */
+.dialog-media { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--shape-lg); }
+.pre-line { white-space: pre-line; }
+
 /* Validação dentro do campo */
 .field__status {
   position: absolute;
@@ -1152,6 +1163,80 @@ md-dialog [slot="content"] { color: var(--md-sys-color-on-surface-variant); }
 }
 .cta .headline { color: var(--md-sys-color-on-primary-container); }
 
+
+/* ---- Miniatura de produto (leading de list-item) ---- */
+.list-item__leading--image {
+  width: 56px; height: 56px;
+  border-radius: var(--shape-md);
+  background: var(--md-sys-color-surface-container-highest);
+  color: var(--md-sys-color-on-surface-variant);
+}
+.list-item.is-unavailable .list-item__leading--image img { filter: grayscale(1); opacity: .6; }
+
+/* ---- Grade de produtos (página pública) ---- */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(156px, 1fr));
+  gap: var(--space-3);
+}
+.product-card {
+  display: flex;
+  flex-direction: column;
+  border: 0;
+  padding: 0;
+  text-align: start;
+  border-radius: var(--shape-lg);
+  background: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface);
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+}
+.product-card::after {
+  content: ""; position: absolute; inset: 0;
+  background: var(--md-sys-color-on-surface); opacity: 0;
+  transition: opacity var(--duration-short);
+}
+.product-card:hover::after { opacity: .08; }
+.product-card:active::after { opacity: .12; }
+.product-card__media {
+  aspect-ratio: 1;
+  background: var(--md-sys-color-surface-container-highest);
+  color: var(--md-sys-color-on-surface-variant);
+  display: grid; place-items: center;
+}
+.product-card__media img { width: 100%; height: 100%; object-fit: cover; }
+.product-card__media .icon { font-size: 40px; }
+.product-card__body { padding: var(--space-3); display: flex; flex-direction: column; gap: 2px; }
+.product-card__name {
+  font-size: 14px; line-height: 20px; font-weight: 500;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.product-card__price { font-size: 16px; line-height: 24px; font-weight: 500; color: var(--md-sys-color-primary); }
+.product-card__price--muted { font-size: 14px; font-weight: 400; color: var(--md-sys-color-on-surface-variant); }
+.product-card.is-unavailable .product-card__media { filter: grayscale(1); opacity: .6; }
+.product-card .badge { position: absolute; top: var(--space-2); left: var(--space-2); z-index: 1; }
+
+/* ---- Imagem grande (edição de produto / detalhe) ---- */
+.media-picker {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--shape-lg);
+  border: 0;
+  background: var(--md-sys-color-surface-container-highest);
+  color: var(--md-sys-color-on-surface-variant);
+  display: grid; place-items: center; align-content: center; gap: var(--space-2);
+  overflow: hidden;
+  cursor: pointer;
+}
+.media-picker img { width: 100%; height: 100%; object-fit: cover; }
+.media-picker .icon { font-size: 40px; }
+
+/* ---- Linha de contatos (WhatsApp / Instagram) ---- */
+.contact-row { display: flex; flex-wrap: wrap; gap: var(--space-2); justify-content: center; }
+
+/* ---- Linha com switch ---- */
+label.list-item md-switch { flex-shrink: 0; }
 
 /* =================================================================
    10. MATERIAL WEB — AJUSTES GLOBAIS

@@ -11,6 +11,15 @@
   if (!t.key) { location.replace('index.html'); return; }
   tx.set(t);
 
+  // Cliente vindo de uma loja pública: "concluir" volta para a loja
+  if (t.store) {
+    const storeHref = 'store.html?u=' + encodeURIComponent(t.store);
+    $('btn-home').setAttribute('href', storeHref);
+    $('btn-home').setAttribute('aria-label', 'Voltar para a loja');
+    $('btn-home').querySelector('md-icon').textContent = 'storefront';
+    document.querySelector('[data-nav="back"]').dataset.fallback = storeHref;
+  }
+
   const payload = window.PixPayload.generatePixPayload({
     keyType: t.keyType,
     key: t.key,

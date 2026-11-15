@@ -127,6 +127,26 @@
     });
   }
 
+  // ── Navegação principal (abas) ─────────────────────────────────
+  // Uso: <nav class="app-nav" data-current="home"></nav>
+  // Para criar uma aba nova, basta adicioná-la aqui.
+  const TABS = [
+    { id: 'home',    href: 'index.html',            icon: 'home',       label: 'Início' },
+    { id: 'charge',  href: 'generate-invoice.html', icon: 'qr_code_2',  label: 'Cobrar' },
+    { id: 'catalog', href: 'catalog.html',          icon: 'storefront', label: 'Catálogo' },
+    { id: 'profile', href: 'profile.html',          icon: 'person',     label: 'Perfil' },
+  ];
+
+  function renderNav() {
+    const nav = document.querySelector('nav.app-nav[data-current]');
+    if (!nav) return;
+    nav.setAttribute('aria-label', 'Navegação principal');
+    nav.innerHTML = TABS.map((t) =>
+      `<a class="app-nav__item" href="${t.href}"${t.id === nav.dataset.current ? ' aria-current="page"' : ''}>` +
+      `<span class="app-nav__indicator"><span class="icon">${t.icon}</span></span>${t.label}</a>`
+    ).join('');
+  }
+
   // ── App bar ganha cor ao rolar o conteúdo ──────────────────────
   function bindScrollElevation() {
     const bar = document.querySelector('.app-bar');
@@ -349,6 +369,7 @@
   // ── Boot ────────────────────────────────────────────────────────
   onReady(() => {
     syncThemeColor();
+    renderNav();
     bindBackButtons();
     bindScrollElevation();
     bindExpanders();

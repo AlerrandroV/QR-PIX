@@ -179,6 +179,8 @@
           bank: qp.get('bank') || '', name: qp.get('name') || '',
           keyType: qp.get('keyType') || '', key: qp.get('key') || '',
           value: parseInt(qp.get('value') || '0', 10) || 0,
+          city: qp.get('city') || '',
+          store: qp.get('store') || '',   // aberto a partir de uma loja pública
         };
       }
       return tx.get();

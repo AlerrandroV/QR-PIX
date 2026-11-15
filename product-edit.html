@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f9ff" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Produto — QR PIX</title>
+  <script src="ui.js"></script>
+  <script src="pix-utils.js"></script>
+  <script src="data.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="qr-pix-icon-192.png" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" />
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="material.js"></script>
+</head>
+<body>
+
+  <header class="app-bar">
+    <md-icon-button data-nav="back" data-fallback="catalog.html" aria-label="Voltar">
+      <md-icon>arrow_back</md-icon>
+    </md-icon-button>
+    <h1 class="app-bar__title" id="title">Novo produto</h1>
+    <div class="app-bar__actions">
+      <md-icon-button id="btn-delete" aria-label="Excluir produto" hidden>
+        <md-icon>delete</md-icon>
+      </md-icon-button>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <div class="page">
+
+      <section class="section" aria-label="Foto">
+        <button class="media-picker" type="button" id="photo" aria-label="Escolher foto">
+          <span class="icon">add_a_photo</span>
+          <span class="label">Adicionar foto</span>
+        </button>
+        <input type="file" id="photo-input" accept="image/*" hidden />
+        <div class="card__actions" id="photo-actions" hidden>
+          <md-text-button id="btn-photo-remove">Remover foto</md-text-button>
+          <md-text-button id="btn-photo-change">Trocar foto</md-text-button>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="h-info">
+        <div class="section__header"><h2 class="section__title" id="h-info">Informações</h2></div>
+        <div class="card form">
+          <md-outlined-text-field id="f-name" label="Nome do produto" maxlength="60" required no-asterisk></md-outlined-text-field>
+          <md-outlined-text-field id="f-price" label="Preço" prefix-text="R$ " inputmode="numeric" placeholder="0,00"
+            supporting-text="Deixe vazio para “preço sob consulta”"></md-outlined-text-field>
+          <md-outlined-text-field id="f-desc" label="Descrição" type="textarea" rows="4" maxlength="400"
+            supporting-text="Tamanho, sabores, variações, prazo…"></md-outlined-text-field>
+        </div>
+      </section>
+
+      <section class="card card--list" aria-label="Disponibilidade">
+        <label class="list-item list-item--action list-item--two-line">
+          <span class="list-item__leading"><span class="icon">inventory</span></span>
+          <span class="list-item__content">
+            <span class="list-item__headline">Disponível</span>
+            <span class="list-item__supporting">Desligue para mostrar como esgotado</span>
+          </span>
+          <md-switch id="f-available" selected aria-label="Disponível"></md-switch>
+        </label>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <md-filled-button id="btn-save">
+      <md-icon slot="icon">check</md-icon>
+      Salvar produto
+    </md-filled-button>
+  </footer>
+
+  <script src="product-edit.js"></script>
+</body>
+</html>

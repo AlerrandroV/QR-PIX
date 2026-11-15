@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f9ff" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Editar perfil — QR PIX</title>
+  <script src="ui.js"></script>
+  <script src="pix-utils.js"></script>
+  <script src="data.js"></script>
+  <script src="key-form.js"></script>
+  <script src="profile-form.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="qr-pix-icon-192.png" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" />
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="material.js"></script>
+</head>
+<body>
+
+  <header class="app-bar">
+    <md-icon-button data-nav="back" data-fallback="profile.html" aria-label="Voltar">
+      <md-icon>arrow_back</md-icon>
+    </md-icon-button>
+    <h1 class="app-bar__title">Editar perfil</h1>
+  </header>
+
+  <main class="app-main">
+    <div class="page">
+
+      <section class="section" aria-labelledby="h-store">
+        <div class="section__header"><h2 class="section__title" id="h-store">Loja</h2></div>
+        <div class="card form">
+          <div class="upload">
+            <span class="upload__preview" id="avatar-preview" role="button" tabindex="0" aria-label="Trocar foto"><span class="icon">add_a_photo</span></span>
+            <span class="upload__content">
+              <span class="title">Foto ou logo</span>
+              <span class="card__actions card__actions--start">
+                <md-filled-tonal-button id="btn-avatar">Trocar</md-filled-tonal-button>
+                <md-text-button id="btn-avatar-remove" hidden>Remover</md-text-button>
+              </span>
+            </span>
+            <input type="file" id="avatar-input" accept="image/*" hidden />
+          </div>
+          <md-outlined-text-field id="f-name" label="Nome da loja ou seu nome" required no-asterisk>
+            <md-icon slot="leading-icon">storefront</md-icon>
+          </md-outlined-text-field>
+          <md-outlined-text-field id="f-bio" label="Descrição" type="textarea" rows="3" maxlength="160"
+            supporting-text="O que você vende, horários, entregas…"></md-outlined-text-field>
+          <md-outlined-text-field id="f-city" label="Cidade" autocomplete="address-level2">
+            <md-icon slot="leading-icon">location_on</md-icon>
+          </md-outlined-text-field>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="h-contact">
+        <div class="section__header"><h2 class="section__title" id="h-contact">Onde o cliente fala com você</h2></div>
+        <div class="card form">
+          <md-outlined-text-field id="f-whatsapp" label="WhatsApp" type="tel" inputmode="tel" placeholder="(00) 00000-0000"
+            supporting-text="Os pedidos do catálogo abrem uma conversa com este número">
+            <md-icon slot="leading-icon">chat</md-icon>
+          </md-outlined-text-field>
+          <md-outlined-text-field id="f-instagram" label="Instagram" prefix-text="@" autocomplete="off">
+            <md-icon slot="leading-icon">photo_camera</md-icon>
+          </md-outlined-text-field>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="h-link" id="username">
+        <div class="section__header"><h2 class="section__title" id="h-link">Link da loja</h2></div>
+        <div class="card form">
+          <div class="field">
+            <md-outlined-text-field id="f-username" label="Nome de usuário" prefix-text="@" maxlength="20" autocomplete="username"></md-outlined-text-field>
+            <span class="field__status" id="username-status" aria-hidden="true"></span>
+          </div>
+        </div>
+        <p class="section__hint" id="link-preview"></p>
+      </section>
+
+      <section class="section" aria-labelledby="h-pix">
+        <div class="section__header"><h2 class="section__title" id="h-pix">Recebimento PIX</h2></div>
+        <div class="card form">
+          <div class="field">
+            <md-outlined-text-field id="f-bank" label="Banco ou instituição" autocomplete="off" required no-asterisk>
+              <md-icon slot="leading-icon">account_balance</md-icon>
+            </md-outlined-text-field>
+          </div>
+          <md-chip-set id="key-types" aria-label="Tipo de chave"></md-chip-set>
+          <div class="field">
+            <md-outlined-text-field id="f-key" label="Chave PIX" autocomplete="off" supporting-text=" ">
+              <md-icon slot="leading-icon">key</md-icon>
+            </md-outlined-text-field>
+            <span class="field__status" id="key-status" aria-hidden="true"></span>
+          </div>
+        </div>
+        <p class="section__hint">Mostrada na loja pública para o cliente pagar com PIX.</p>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <md-filled-button id="btn-save">
+      <md-icon slot="icon">check</md-icon>
+      Salvar
+    </md-filled-button>
+  </footer>
+
+  <script src="profile-edit.js"></script>
+</body>
+</html>

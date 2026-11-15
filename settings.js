@@ -35,15 +35,17 @@
     try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch { return fallback; }
   }
 
-  function exportBackup() {
+  async function exportBackup() {
     const payload = {
       format: 'pixkey-backup',
-      version: 39,
+      version: 40,
       exportedAt: new Date().toISOString(),
       data: {
         settings: readJson(STORAGE.settings, {}),
         qrSettings: readJson(STORAGE.qrSettings, null),
         keys: readJson(STORAGE.keys, []),
+        profile: await window.QrData.profile.get(),
+        products: await window.QrData.products.all(),
       },
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -64,13 +66,16 @@
     if (!parsed || typeof parsed !== 'object') throw new Error('Arquivo inválido');
     const data = parsed.data && typeof parsed.data === 'object' ? parsed.data : parsed;
     const keys = Array.isArray(data.keys) ? data.keys : [];
+    const profile = data.profile && typeof data.profile === 'object' ? data.profile : null;
+    const products = Array.isArray(data.products) ? data.products : null;
     const settings = data.settings && typeof data.settings === 'object' ? data.settings : {};
     const qr = data.qrSettings && typeof data.qrSettings === 'object' ? data.qrSettings : null;
 
     const ok = await UI.confirm({
       icon: 'restore',
       title: 'Restaurar backup?',
-      body: `${keys.length} chave(s) e suas preferências substituirão os dados atuais deste aparelho.`,
+      body: `${keys.length} chave(s)` + (products ? `, ${products.length} produto(s)` : '') +
+        (profile ? ', o perfil da loja' : '') + ' e suas preferências substituirão os dados atuais deste aparelho.',
       confirmLabel: 'Restaurar',
     });
     if (!ok) return;
@@ -78,6 +83,7 @@
     localStorage.setItem(STORAGE.keys, JSON.stringify(keys));
     localStorage.setItem(STORAGE.settings, JSON.stringify(settings));
     qr ? localStorage.setItem(STORAGE.qrSettings, JSON.stringify(qr)) : localStorage.removeItem(STORAGE.qrSettings);
+    if (profile || products) await window.QrData.importAll({ profile, products });
     UI.applyAppearance();
     syncAppearanceUi();
     UI.snackbar('Backup restaurado');

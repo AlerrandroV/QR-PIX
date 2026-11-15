@@ -1,0 +1,134 @@
+rules_version = '2';
+
+// =====================================================================
+// Regras do Firestore — QR PIX
+// Código aberto: a segurança vem destas regras, não de esconder a apiKey.
+// Testes: tests/rules (rodam no emulador). Como publicar: docs/FIREBASE.md
+//
+// Modelo
+//   stores/{username}                  vitrine pública (leitura livre)
+//   stores/{username}/products/{id}    produtos da vitrine
+//   owners/{uid}                       qual @ pertence a cada conta (privado)
+//   profiles/{id}                      legado v1.0 (somente leitura)
+//
+// Garantias
+//   • Só o dono (ownerUid) altera ou apaga a própria loja e produtos.
+//   • Cada conta (uid) tem no máximo UMA loja: evita reservar @ em massa.
+//   • Campos validados em tipo e tamanho; nenhum campo extra é aceito.
+//   • Nomes reservados (admin, qrpix…) não podem ser usados.
+// =====================================================================
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function me() { return request.auth.uid; }
+    function isOwner(data) { return signedIn() && data.ownerUid == me(); }
+
+    function str(v, max) { return v is string && v.size() <= max; }
+    function strOrNull(v, max) { return v == null || str(v, max); }
+
+    // Mantenha esta lista igual à de firebase.js (RESERVED)
+    function reserved(u) {
+      return u in ['admin', 'administrador', 'qrpix', 'qr-pix', 'qr.pix', 'suporte', 'support',
+                   'contato', 'api', 'www', 'app', 'root', 'oficial', 'official', 'loja', 'store'];
+    }
+
+    function validUsername(u) {
+      return u.matches('^[a-z0-9_.]{3,20}$')
+        && !u.matches('^[.].*')
+        && !u.matches('.*[.]$')
+        && !u.matches('.*[.][.].*')
+        && !reserved(u);
+    }
+
+    // ---------- Loja ----------
+    function validStore(d, username) {
+      return d.keys().hasOnly(['name', 'city', 'bio', 'username', 'avatarDataUrl', 'whatsapp',
+                               'instagram', 'bank', 'keyType', 'pixKey', 'ownerUid',
+                               'productCount', 'updatedAt'])
+        && d.keys().hasAll(['name', 'username', 'ownerUid', 'updatedAt'])
+        && d.username == username
+        && d.ownerUid == me()
+        && str(d.name, 60) && d.name.size() > 0
+        && str(d.get('city', ''), 60)
+        && str(d.get('bio', ''), 200)
+        && strOrNull(d.get('avatarDataUrl', null), 120000)
+        && str(d.get('whatsapp', ''), 30)
+        && str(d.get('instagram', ''), 40)
+        && str(d.get('bank', ''), 80)
+        && d.get('keyType', '') in ['', 'cpf', 'cnpj', 'phone', 'email', 'random']
+        && str(d.get('pixKey', ''), 80)
+        && d.get('productCount', 0) is int
+        && d.updatedAt == request.time;
+    }
+
+    match /stores/{username} {
+      allow read: if true;
+
+      // Criar: precisa estar registrado como o @ desta conta (lote com owners/{uid})
+      allow create: if signedIn()
+        && validUsername(username)
+        && validStore(request.resource.data, username)
+        && getAfter(/databases/$(database)/documents/owners/$(me())).data.username == username;
+
+      allow update: if isOwner(resource.data)
+        && validStore(request.resource.data, username);
+
+      allow delete: if isOwner(resource.data);
+
+      // ---------- Produtos ----------
+      function validProduct(d, productId) {
+        return d.keys().hasOnly(['id', 'name', 'description', 'priceCents', 'imageDataUrl',
+                                 'available', 'updatedAt', 'order', 'ownerUid'])
+          && d.keys().hasAll(['id', 'name', 'ownerUid'])
+          && d.id == productId
+          && d.ownerUid == me()
+          && str(d.name, 60) && d.name.size() > 0
+          && str(d.get('description', ''), 500)
+          && d.get('priceCents', 0) is int && d.get('priceCents', 0) >= 0 && d.get('priceCents', 0) <= 1000000000
+          && strOrNull(d.get('imageDataUrl', null), 250000)
+          && d.get('available', true) is bool
+          && d.get('order', 0) is int
+          && d.get('updatedAt', 0) is number;
+      }
+
+      match /products/{productId} {
+        allow read: if true;
+
+        // getAfter: a loja pode ser criada no mesmo lote dos produtos
+        allow create, update: if signedIn()
+          && validProduct(request.resource.data, productId)
+          && getAfter(/databases/$(database)/documents/stores/$(username)).data.ownerUid == me();
+
+        allow delete: if isOwner(resource.data);
+      }
+    }
+
+    // ---------- Quem é dono de qual @ (uma loja por conta) ----------
+    match /owners/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['username'])
+        && request.resource.data.username is string
+        && validUsername(request.resource.data.username);
+
+      // Trocar de @ só depois de apagar a loja antiga (no mesmo lote)
+      allow update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['username'])
+        && request.resource.data.username is string
+        && validUsername(request.resource.data.username)
+        && (request.resource.data.username == resource.data.username
+            || !existsAfter(/databases/$(database)/documents/stores/$(resource.data.username)));
+
+      allow delete: if signedIn() && request.auth.uid == uid
+        && !existsAfter(/databases/$(database)/documents/stores/$(resource.data.username));
+    }
+
+    // ---------- Legado da v1.0 ----------
+    match /profiles/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}
