@@ -38,8 +38,8 @@ const firebaseConfig = {
   projectId:         'alerrandrov-qr-pix',
   storageBucket:     'alerrandrov-qr-pix.firebasestorage.app',
   messagingSenderId: '852959080798',
-  appId:             '1:852959080798:web:a9494efad51551bad85fcf',
-  measurementId:     'G-JW026XVVQW',
+  appId:             '1:852959080798:web:e0536fd215e9009ed85fcf',
+  measurementId:     'G-MYEXWS0XNY',
 };
 
 const app = initializeApp(firebaseConfig);
