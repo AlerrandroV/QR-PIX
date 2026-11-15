@@ -2,90 +2,75 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#006493" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f9ff" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <title>Sobre — QR PIX</title>
   <script src="ui.js"></script>
   <script src="app-version.js"></script>
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/png" href="qr-pix-icon-192.png" />
-  <link rel="stylesheet" href="info-page.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
-  <script type="importmap">{"imports":{"@material/web/":"https://esm.run/@material/web/"}}</script>
-  <script type="module">
-    import "@material/web/all.js";
-    import { styles as typescaleStyles } from "@material/web/typography/md-typescale-styles.js";
-    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
-  </script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" />
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="material.js"></script>
 </head>
 <body>
-  <header class="top-app-bar">
-    <div class="top-app-bar__start">
-      <md-icon-button id="btn-back" aria-label="Voltar">
-        <md-icon>arrow_back</md-icon>
-      </md-icon-button>
-      <span class="app-title">Sobre</span>
-    </div>
+
+  <header class="app-bar">
+    <md-icon-button data-nav="back" data-fallback="settings.html" aria-label="Voltar">
+      <md-icon>arrow_back</md-icon>
+    </md-icon-button>
+    <h1 class="app-bar__title">Sobre</h1>
   </header>
 
-  <main class="info-content">
-    <div class="about-hero">
-      <img class="about-hero__logo" src="qr-pix-icon.svg" alt="Logo QR PIX"
-           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
-      <div class="about-hero__logo-fallback" style="display:none;">
-        <span class="material-symbols-rounded">qr_code_2</span>
-      </div>
-      <div class="about-hero__name">QR PIX</div>
-      <div class="about-hero__version" id="about-version">Versão 1.0.48</div>
-    </div>
+  <main class="app-main">
+    <div class="page">
+      <section class="card card--center hero" aria-label="QR PIX">
+        <img class="hero__logo" src="qr-pix-icon.svg" alt="" width="88" height="88" />
+        <p class="headline">QR PIX</p>
+        <span class="badge" id="about-version">Versão</span>
+        <p class="card__text">Cobranças PIX rápidas para quem vende todos os dias.</p>
+      </section>
 
-    <div class="info-block">
-      <div class="info-block__title">O que é</div>
-      <div class="info-block__body">
-        Gerador de QR Code e código Copia e Cola para pagamentos PIX.
-        Funciona completamente offline após a primeira abertura e pode ser instalado como aplicativo no seu celular.
-      </div>
-    </div>
+      <section class="section" aria-labelledby="how">
+        <div class="section__header"><h2 class="section__title" id="how">Como usar</h2></div>
+        <div class="card card--list">
+          <div class="list-item">
+            <span class="list-item__leading list-item__leading--primary">1</span>
+            <span class="list-item__content"><span class="list-item__headline list-item__headline--wrap">Cadastre sua chave PIX</span></span>
+          </div>
+          <div class="list-item">
+            <span class="list-item__leading list-item__leading--primary">2</span>
+            <span class="list-item__content"><span class="list-item__headline list-item__headline--wrap">Toque em Cobrar e escolha a chave</span></span>
+          </div>
+          <div class="list-item">
+            <span class="list-item__leading list-item__leading--primary">3</span>
+            <span class="list-item__content"><span class="list-item__headline list-item__headline--wrap">Digite o valor (ou deixe livre)</span></span>
+          </div>
+          <div class="list-item">
+            <span class="list-item__leading list-item__leading--primary">4</span>
+            <span class="list-item__content"><span class="list-item__headline list-item__headline--wrap">Mostre o QR Code ou compartilhe o Copia e Cola</span></span>
+          </div>
+        </div>
+      </section>
 
-    <div class="info-block">
-      <div class="info-block__title">Como usar</div>
-      <ol class="info-block__steps">
-        <li><span class="info-block__step-num">1</span>Cadastre uma chave PIX com os dados do beneficiário.</li>
-        <li><span class="info-block__step-num">2</span>Toque na chave salva para gerar o QR Code.</li>
-        <li><span class="info-block__step-num">3</span>Defina um valor (opcional) e confirme.</li>
-        <li><span class="info-block__step-num">4</span>Compartilhe o código ou salve a imagem do QR.</li>
-      </ol>
-    </div>
+      <section class="section" aria-labelledby="priv">
+        <div class="section__header"><h2 class="section__title" id="priv">Privacidade</h2></div>
+        <div class="card"><p class="card__text">Suas chaves e preferências ficam apenas neste aparelho. O app funciona offline depois da primeira abertura e pode ser instalado na tela inicial.</p></div>
+      </section>
 
-    <div class="info-block">
-      <div class="info-block__title">Privacidade</div>
-      <div class="info-block__body">
-        Nenhum dado é enviado a servidores externos. Todas as informações ficam armazenadas apenas no seu dispositivo (localStorage).
-      </div>
-    </div>
-
-    <div class="info-block">
-      <div class="info-block__title">Desenvolvedor</div>
-      <div class="info-block__body">
-        Desenvolvido com fins educacionais. Código aberto e gratuito.
-      </div>
+      <section class="section" aria-labelledby="dev">
+        <div class="section__header"><h2 class="section__title" id="dev">Desenvolvimento</h2></div>
+        <div class="card"><p class="card__text">Projeto de código aberto e gratuito.</p></div>
+      </section>
     </div>
   </main>
 
   <script>
-    document.getElementById('btn-back').addEventListener('click', () => history.back());
-
-    // Lê a versão de APP_VERSION (app-version.js carregado no head) — sem fetch
-    (function () {
-      const el = document.getElementById('about-version');
-      if (el && typeof APP_VERSION !== 'undefined') {
-        el.textContent = 'Versão ' + APP_VERSION;
-      }
-    })();
+    document.getElementById('about-version').textContent =
+      typeof APP_VERSION !== 'undefined' ? 'Versão ' + APP_VERSION : 'Versão desconhecida';
   </script>
 </body>
 </html>

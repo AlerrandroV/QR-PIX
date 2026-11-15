@@ -2,218 +2,195 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#006493" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f9ff" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>Configurações — QR PIX</title>
+  <title>Ajustes — QR PIX</title>
   <script src="ui.js"></script>
   <script src="app-version.js"></script>
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/png" href="qr-pix-icon-192.png" />
-  <link rel="stylesheet" href="settings.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
-  <script type="importmap">
-  {
-    "imports": {
-      "@material/web/": "https://esm.run/@material/web/"
-    }
-  }
-  </script>
-  <script type="module">
-    import "@material/web/all.js";
-    import { styles as typescaleStyles } from "@material/web/typography/md-typescale-styles.js";
-    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
-  </script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" />
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="material.js"></script>
 </head>
 <body>
-  <header class="top-app-bar">
-    <div class="top-app-bar__start">
-      <md-icon-button id="btn-back" aria-label="Voltar">
-        <md-icon>arrow_back</md-icon>
-      </md-icon-button>
-      <span class="app-title md-typescale-title-large">Configurações</span>
-    </div>
+
+  <header class="app-bar">
+    <h1 class="app-bar__title">Ajustes</h1>
   </header>
 
-  <main class="main-content settings-content">
-    <section class="settings-group">
-      <h2 class="settings-group__label">Aparência</h2>
+  <main class="app-main">
+    <div class="page">
 
-      <div class="settings-item" id="item-tema">
-        <div class="settings-item__leading">
-          <span class="material-symbols-rounded settings-item__icon">contrast</span>
-        </div>
-        <div class="settings-item__content">
-          <span class="settings-item__title">Tema</span>
-          <span class="settings-item__subtitle" id="tema-subtitle">Sistema</span>
-        </div>
-        <span class="material-symbols-rounded settings-item__chevron" id="tema-chevron">expand_more</span>
-      </div>
-      <div class="settings-expand-panel" id="panel-tema" aria-hidden="true">
-        <div class="settings-expand-inner">
-          <label class="radio-option">
-            <span class="radio-option__label">Claro</span>
-            <md-radio name="tema" value="light" touch-target="wrapper"></md-radio>
-          </label>
-          <label class="radio-option">
-            <span class="radio-option__label">Escuro</span>
-            <md-radio name="tema" value="dark" touch-target="wrapper"></md-radio>
-          </label>
-          <label class="radio-option">
-            <span class="radio-option__label">Sistema</span>
-            <md-radio name="tema" value="system" touch-target="wrapper"></md-radio>
-          </label>
-        </div>
-      </div>
+      <!-- Aparência -->
+      <section class="section" aria-labelledby="sec-appearance">
+        <div class="section__header"><h2 class="section__title" id="sec-appearance">Aparência</h2></div>
+        <div class="card card--list">
+          <div class="expand">
+            <div class="list-item list-item--action" role="button" tabindex="0">
+              <span class="list-item__leading"><span class="icon">contrast</span></span>
+              <span class="list-item__content">
+                <span class="list-item__headline">Tema</span>
+                <span class="list-item__supporting" id="tema-subtitle">Sistema</span>
+              </span>
+              <span class="list-item__trailing"><span class="icon">expand_more</span></span>
+            </div>
+            <div class="expand__panel"><div role="radiogroup" aria-label="Tema">
+              <label class="list-item list-item--action">
+                <span class="list-item__content"><span class="list-item__headline">Claro</span></span>
+                <md-radio name="tema" value="light"></md-radio>
+              </label>
+              <label class="list-item list-item--action">
+                <span class="list-item__content"><span class="list-item__headline">Escuro</span></span>
+                <md-radio name="tema" value="dark"></md-radio>
+              </label>
+              <label class="list-item list-item--action">
+                <span class="list-item__content"><span class="list-item__headline">Padrão do sistema</span></span>
+                <md-radio name="tema" value="system"></md-radio>
+              </label>
+            </div></div>
+          </div>
 
-      <div class="settings-divider"></div>
+          <div class="expand">
+            <div class="list-item list-item--action" role="button" tabindex="0">
+              <span class="list-item__leading"><span class="icon">eye_tracking</span></span>
+              <span class="list-item__content">
+                <span class="list-item__headline">Proteção ocular</span>
+                <span class="list-item__supporting" id="eyecare-subtitle">Desativada</span>
+              </span>
+              <span class="list-item__trailing"><span class="icon">expand_more</span></span>
+            </div>
+            <div class="expand__panel"><div role="radiogroup" aria-label="Proteção ocular">
+              <label class="list-item list-item--action">
+                <span class="list-item__content"><span class="list-item__headline">Desativada</span></span>
+                <md-radio name="eyecare" value="off"></md-radio>
+              </label>
+              <label class="list-item list-item--action">
+                <span class="list-item__content"><span class="list-item__headline">Sempre ativada</span></span>
+                <md-radio name="eyecare" value="on"></md-radio>
+              </label>
+              <label class="list-item list-item--action">
+                <span class="list-item__content">
+                  <span class="list-item__headline">Somente à noite</span>
+                  <span class="list-item__supporting">Das 18h às 6h</span>
+                </span>
+                <md-radio name="eyecare" value="night"></md-radio>
+              </label>
+            </div></div>
+          </div>
+        </div>
+      </section>
 
-      <div class="settings-item" id="item-eyecare">
-        <div class="settings-item__leading">
-          <span class="material-symbols-rounded settings-item__icon">eye_tracking</span>
+      <!-- Cobrança -->
+      <section class="section" aria-labelledby="sec-charge">
+        <div class="section__header"><h2 class="section__title" id="sec-charge">Cobrança</h2></div>
+        <div class="card card--list">
+          <a class="list-item list-item--action list-item--two-line" href="create-profile.html">
+            <span class="list-item__leading"><span class="icon">storefront</span></span>
+            <span class="list-item__content">
+              <span class="list-item__headline">Perfil de cobrança</span>
+              <span class="list-item__supporting">Nome, foto e chave PIX</span>
+            </span>
+            <span class="list-item__trailing"><span class="icon">chevron_right</span></span>
+          </a>
+          <a class="list-item list-item--action list-item--two-line" href="qr-customize.html">
+            <span class="list-item__leading"><span class="icon">qr_code_2</span></span>
+            <span class="list-item__content">
+              <span class="list-item__headline">Estilo do QR Code</span>
+              <span class="list-item__supporting">Cores, logo e formato</span>
+            </span>
+            <span class="list-item__trailing"><span class="icon">chevron_right</span></span>
+          </a>
         </div>
-        <div class="settings-item__content">
-          <span class="settings-item__title">Proteção ocular</span>
-          <span class="settings-item__subtitle" id="eyecare-subtitle">Desativado</span>
-        </div>
-        <span class="material-symbols-rounded settings-item__chevron" id="eyecare-chevron">expand_more</span>
-      </div>
-      <div class="settings-expand-panel" id="panel-eyecare" aria-hidden="true">
-        <div class="settings-expand-inner">
-          <label class="radio-option">
-            <span class="radio-option__label">Desativado</span>
-            <md-radio name="eyecare" value="off" touch-target="wrapper"></md-radio>
-          </label>
-          <label class="radio-option">
-            <span class="radio-option__label">Ativado</span>
-            <md-radio name="eyecare" value="on" touch-target="wrapper"></md-radio>
-          </label>
-          <label class="radio-option">
-            <span class="radio-option__label">Somente à noite <span class="radio-option__hint">(18h – 6h)</span></span>
-            <md-radio name="eyecare" value="night" touch-target="wrapper"></md-radio>
-          </label>
-        </div>
-      </div>
-    </section>
+      </section>
 
-    <section class="settings-group">
-      <h2 class="settings-group__label">QR Code</h2>
-
-      <div class="settings-item settings-item--nav" id="item-qr">
-        <div class="settings-item__leading">
-          <span class="material-symbols-rounded settings-item__icon">qr_code_2</span>
+      <!-- Backup -->
+      <section class="section" aria-labelledby="sec-backup">
+        <div class="section__header"><h2 class="section__title" id="sec-backup">Backup</h2></div>
+        <div class="card card--list">
+          <button class="list-item list-item--action list-item--two-line" id="item-export" type="button">
+            <span class="list-item__leading"><span class="icon">upload_file</span></span>
+            <span class="list-item__content">
+              <span class="list-item__headline">Exportar dados</span>
+              <span class="list-item__supporting">Chaves, aparência e estilo do QR</span>
+            </span>
+          </button>
+          <button class="list-item list-item--action list-item--two-line" id="item-import" type="button">
+            <span class="list-item__leading"><span class="icon">download</span></span>
+            <span class="list-item__content">
+              <span class="list-item__headline">Importar dados</span>
+              <span class="list-item__supporting">Restaurar de um arquivo .json</span>
+            </span>
+          </button>
+          <input type="file" id="backup-file" accept="application/json,.json" hidden />
         </div>
-        <div class="settings-item__content">
-          <span class="settings-item__title">Personalizar QR Code</span>
-          <span class="settings-item__subtitle">Cores, logo e estilo</span>
-        </div>
-        <span class="material-symbols-rounded settings-item__chevron">chevron_right</span>
-      </div>
-    </section>
+      </section>
 
-    <section class="settings-group">
-      <h2 class="settings-group__label">Backup</h2>
-
-      <div class="settings-item" id="item-export-backup" role="button" tabindex="0" aria-label="Exportar backup">
-        <div class="settings-item__leading">
-          <span class="material-symbols-rounded settings-item__icon">upload_file</span>
+      <!-- Apoio -->
+      <section class="section" aria-labelledby="sec-support">
+        <div class="section__header"><h2 class="section__title" id="sec-support">Apoio</h2></div>
+        <div class="card card--list">
+          <button class="list-item list-item--action list-item--two-line" id="item-donate" type="button">
+            <span class="list-item__leading list-item__leading--primary"><span class="icon icon--filled">volunteer_activism</span></span>
+            <span class="list-item__content">
+              <span class="list-item__headline">Apoiar o desenvolvedor</span>
+              <span class="list-item__supporting">Doação via PIX com valor livre</span>
+            </span>
+            <span class="list-item__trailing"><span class="icon">chevron_right</span></span>
+          </button>
         </div>
-        <div class="settings-item__content">
-          <span class="settings-item__title">Exportar configurações</span>
-          <span class="settings-item__subtitle">Aparência, QR Code e chaves salvas</span>
-        </div>
-        <span class="material-symbols-rounded settings-item__chevron">download</span>
-      </div>
+      </section>
 
-      <div class="settings-divider"></div>
-
-      <div class="settings-item" id="item-import-backup" role="button" tabindex="0" aria-label="Importar backup">
-        <div class="settings-item__leading">
-          <span class="material-symbols-rounded settings-item__icon">download</span>
+      <!-- Sobre -->
+      <section class="section" aria-labelledby="sec-about">
+        <div class="section__header"><h2 class="section__title" id="sec-about">Sobre</h2></div>
+        <div class="card card--list">
+          <button class="list-item list-item--action list-item--two-line" id="item-update" type="button">
+            <span class="list-item__leading"><span class="icon">system_update</span></span>
+            <span class="list-item__content">
+              <span class="list-item__headline">Atualizações</span>
+              <span class="list-item__supporting" id="update-subtitle">Verificando…</span>
+            </span>
+            <span class="list-item__trailing"><span class="icon" id="update-icon">refresh</span></span>
+          </button>
+          <a class="list-item list-item--action" href="termos.html">
+            <span class="list-item__leading"><span class="icon">gavel</span></span>
+            <span class="list-item__content"><span class="list-item__headline">Termos de uso</span></span>
+            <span class="list-item__trailing"><span class="icon">chevron_right</span></span>
+          </a>
+          <a class="list-item list-item--action" href="licencas.html">
+            <span class="list-item__leading"><span class="icon">description</span></span>
+            <span class="list-item__content"><span class="list-item__headline">Licenças</span></span>
+            <span class="list-item__trailing"><span class="icon">chevron_right</span></span>
+          </a>
+          <a class="list-item list-item--action list-item--two-line" href="sobre.html">
+            <span class="list-item__leading"><span class="icon">info</span></span>
+            <span class="list-item__content">
+              <span class="list-item__headline">Sobre o QR PIX</span>
+              <span class="list-item__supporting" id="app-version">Versão</span>
+            </span>
+            <span class="list-item__trailing"><span class="icon">chevron_right</span></span>
+          </a>
         </div>
-        <div class="settings-item__content">
-          <span class="settings-item__title">Importar configurações</span>
-          <span class="settings-item__subtitle">Restaurar backup em arquivo JSON</span>
-        </div>
-        <span class="material-symbols-rounded settings-item__chevron">chevron_right</span>
-      </div>
+      </section>
 
-      <input type="file" id="backup-file-input" accept="application/json,.json" hidden>
-    </section>
-
-    <section class="settings-group">
-      <h2 class="settings-group__label">Apoio</h2>
-
-      <div class="settings-item settings-item--nav" id="item-donate-dev">
-        <div class="settings-item__leading">
-          <span class="material-symbols-rounded settings-item__icon">volunteer_activism</span>
-        </div>
-        <div class="settings-item__content">
-          <span class="settings-item__title">Doar para o desenvolvedor</span>
-          <span class="settings-item__subtitle">Contribua via Pix com valor livre</span>
-        </div>
-        <span class="material-symbols-rounded settings-item__chevron">chevron_right</span>
-      </div>
-    </section>
-
-    <!-- ── Seção App ───────────────────────────────────────────────── -->
-    <section class="settings-group">
-      <h2 class="settings-group__label">App</h2>
-
-      <div class="settings-item" id="item-update" role="button" tabindex="0" aria-label="Verificar atualização">
-        <div class="settings-item__leading">
-          <span class="material-symbols-rounded settings-item__icon">system_update</span>
-        </div>
-        <div class="settings-item__content">
-          <span class="settings-item__title">Verificar atualização</span>
-          <span class="settings-item__subtitle" id="update-subtitle">Verificando…</span>
-        </div>
-        <span class="material-symbols-rounded settings-item__chevron" id="update-chevron">refresh</span>
-      </div>
-    </section>
-
-    <section class="settings-group">
-      <h2 class="settings-group__label">Informações</h2>
-
-      <div class="settings-item settings-item--nav" data-href="termos.html">
-        <div class="settings-item__leading">
-          <span class="material-symbols-rounded settings-item__icon">gavel</span>
-        </div>
-        <div class="settings-item__content">
-          <span class="settings-item__title">Termos de uso</span>
-        </div>
-        <span class="material-symbols-rounded settings-item__chevron">chevron_right</span>
-      </div>
-
-      <div class="settings-divider"></div>
-
-      <div class="settings-item settings-item--nav" data-href="licencas.html">
-        <div class="settings-item__leading">
-          <span class="material-symbols-rounded settings-item__icon">description</span>
-        </div>
-        <div class="settings-item__content">
-          <span class="settings-item__title">Licenças</span>
-        </div>
-        <span class="material-symbols-rounded settings-item__chevron">chevron_right</span>
-      </div>
-
-      <div class="settings-divider"></div>
-
-      <div class="settings-item settings-item--nav" data-href="sobre.html">
-        <div class="settings-item__leading">
-          <span class="material-symbols-rounded settings-item__icon">info</span>
-        </div>
-        <div class="settings-item__content">
-          <span class="settings-item__title">Sobre</span>
-          <span class="settings-item__subtitle" id="app-version">Versão 1.0.0</span>
-        </div>
-        <span class="material-symbols-rounded settings-item__chevron">chevron_right</span>
-      </div>
-    </section>
+    </div>
   </main>
+
+  <nav class="app-nav" aria-label="Navegação principal">
+    <a class="app-nav__item" href="index.html">
+      <span class="app-nav__indicator"><span class="icon">home</span></span>Início
+    </a>
+    <a class="app-nav__item" href="generate-invoice.html">
+      <span class="app-nav__indicator"><span class="icon">qr_code_2</span></span>Cobrar
+    </a>
+    <a class="app-nav__item" href="settings.html" aria-current="page">
+      <span class="app-nav__indicator"><span class="icon">settings</span></span>Ajustes
+    </a>
+  </nav>
 
   <script src="settings.js"></script>
 </body>

@@ -1,309 +1,162 @@
-const TEMA_LABELS = { light: "Claro", dark: "Escuro", system: "Sistema" };
-const EYECARE_LABELS = { off: "Desativado", on: "Ativado", night: "Somente à noite" };
-const BACKUP_STORAGE_KEYS = {
-  keys: "pixkeys",
-  settings: "pixkey_settings",
-  qrSettings: "pixkey_qr_settings",
-};
+/* =================================================================
+   settings.js — tela Ajustes
+================================================================= */
+(function () {
+  'use strict';
+  const UI = window.QrUI;
 
-function setSubtitle(id, map, value) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = map[value] ?? value;
-}
+  const TEMA_LABELS = { light: 'Claro', dark: 'Escuro', system: 'Padrão do sistema' };
+  const EYECARE_LABELS = { off: 'Desativada', on: 'Sempre ativada', night: 'Somente à noite' };
+  const STORAGE = { keys: 'pixkeys', settings: 'pixkey_settings', qrSettings: 'pixkey_qr_settings' };
 
-function setupAccordion(triggerId, panelId, chevronId) {
-  const trigger = document.getElementById(triggerId);
-  const panel = document.getElementById(panelId);
-  const chevron = document.getElementById(chevronId);
-  if (!trigger || !panel) return;
+  const $ = (id) => document.getElementById(id);
 
-  const allPanels = Array.from(document.querySelectorAll('.settings-expand-panel'));
-
-  trigger.addEventListener("click", () => {
-    const opening = !panel.classList.contains("open");
-
-    allPanels.forEach((p) => {
-      const isCurrent = p === panel;
-      p.classList.toggle("open", opening && isCurrent);
-      p.setAttribute("aria-hidden", String(!(opening && isCurrent)));
-    });
-
-    document.querySelectorAll('.settings-item__chevron[id$="-chevron"]').forEach((icon) => {
-      icon.classList.remove("rotated");
-    });
-
-    if (chevron && opening) chevron.classList.add("rotated");
-  });
-}
-
-function setupRadioGroup(groupName, subtitleId, labelMap, keyName) {
-  document.querySelectorAll(`label.radio-option`).forEach((label) => {
-    const radio = label.querySelector(`md-radio[name="${groupName}"]`);
-    if (!radio) return;
-
-    label.addEventListener("click", (e) => {
-      e.preventDefault();
-      const value = radio.value;
-      document.querySelectorAll(`md-radio[name="${groupName}"]`).forEach((r) => {
-        r.checked = r === radio;
-      });
-      setSubtitle(subtitleId, labelMap, value);
-      window.PixKeyUI.updateSettings({ [keyName]: value });
-    });
-  });
-}
-
-function setupNavItems() {
-  document.querySelectorAll(".settings-item--nav[data-href]").forEach((item) => {
-    item.addEventListener("click", () => {
-      window.location.href = item.dataset.href;
-    });
-  });
-
-  document.getElementById("item-qr")?.addEventListener("click", () => {
-    window.location.href = "qr-customize.html";
-  });
-
-  document.getElementById("item-donate-dev")?.addEventListener("click", () => {
-    const params = new URLSearchParams({
-      bank: "Mercado Pago",
-      name: "Victor Alerrandro Tavares",
-      keyType: "email",
-      key: "v.alerrandro.t@hotmail.com",
-      value: "0",
-    });
-    window.location.href = `generate-qr-pix.html?${params.toString()}`;
-  });
-}
-
-function readJsonStorage(key, fallback) {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function createBackupPayload() {
-  return {
-    format: "pixkey-backup",
-    version: 38,
-    exportedAt: new Date().toISOString(),
-    data: {
-      settings: readJsonStorage(BACKUP_STORAGE_KEYS.settings, {}),
-      qrSettings: readJsonStorage(BACKUP_STORAGE_KEYS.qrSettings, null),
-      keys: readJsonStorage(BACKUP_STORAGE_KEYS.keys, []),
-    },
-  };
-}
-
-function downloadBackup() {
-  const payload = createBackupPayload();
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const a = document.createElement("a");
-  const url = URL.createObjectURL(blob);
-  a.href = url;
-  a.download = `pixkey-backup-${stamp}.json`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
-function normalizeImportedBackup(parsed) {
-  if (!parsed || typeof parsed !== "object") throw new Error("Arquivo inválido");
-  const data = parsed.data && typeof parsed.data === "object" ? parsed.data : parsed;
-  return {
-    settings: data.settings && typeof data.settings === "object" ? data.settings : {},
-    qrSettings: data.qrSettings && typeof data.qrSettings === "object" ? data.qrSettings : null,
-    keys: Array.isArray(data.keys) ? data.keys : [],
-  };
-}
-
-function refreshSettingsUi(settings) {
-  const merged = {
-    tema: settings.tema ?? "system",
-    eyecare: settings.eyecare ?? "off",
-  };
-  setSubtitle("tema-subtitle", TEMA_LABELS, merged.tema);
-  setSubtitle("eyecare-subtitle", EYECARE_LABELS, merged.eyecare);
-  customElements.whenDefined("md-radio").then(() => {
-    const temaRadio = document.querySelector(`md-radio[name="tema"][value="${merged.tema}"]`);
-    const eyecareRadio = document.querySelector(`md-radio[name="eyecare"][value="${merged.eyecare}"]`);
-    document.querySelectorAll('md-radio[name="tema"]').forEach((r) => (r.checked = false));
-    document.querySelectorAll('md-radio[name="eyecare"]').forEach((r) => (r.checked = false));
-    if (temaRadio) temaRadio.checked = true;
-    if (eyecareRadio) eyecareRadio.checked = true;
-  });
-}
-
-async function importBackupFile(file) {
-  const text = await file.text();
-  const parsed = JSON.parse(text);
-  const backup = normalizeImportedBackup(parsed);
-
-  localStorage.setItem(BACKUP_STORAGE_KEYS.keys, JSON.stringify(backup.keys));
-  localStorage.setItem(BACKUP_STORAGE_KEYS.settings, JSON.stringify(backup.settings));
-  if (backup.qrSettings) {
-    localStorage.setItem(BACKUP_STORAGE_KEYS.qrSettings, JSON.stringify(backup.qrSettings));
-  } else {
-    localStorage.removeItem(BACKUP_STORAGE_KEYS.qrSettings);
+  // ── Aparência ─────────────────────────────────────────────────
+  function syncAppearanceUi() {
+    const s = UI.loadSettings();
+    $('tema-subtitle').textContent = TEMA_LABELS[s.tema] || s.tema;
+    $('eyecare-subtitle').textContent = EYECARE_LABELS[s.eyecare] || s.eyecare;
+    document.querySelectorAll('md-radio[name="tema"]').forEach((r) => { r.checked = r.value === s.tema; });
+    document.querySelectorAll('md-radio[name="eyecare"]').forEach((r) => { r.checked = r.value === s.eyecare; });
   }
 
-  const applied = {
-    tema: backup.settings.tema ?? "system",
-    eyecare: backup.settings.eyecare ?? "off",
-  };
-
-  if (window.PixKeyTheme) {
-    window.PixKeyTheme.applyTheme(applied.tema);
-    window.PixKeyTheme.applyEyeCare(applied.eyecare);
-  }
-  refreshSettingsUi(applied);
-  window.dispatchEvent(new CustomEvent("pixkey:settings-imported", { detail: applied }));
-  return backup;
-}
-
-function setupBackupActions() {
-  const exportItem = document.getElementById("item-export-backup");
-  const importItem = document.getElementById("item-import-backup");
-  const fileInput = document.getElementById("backup-file-input");
-  if (!exportItem || !importItem || !fileInput) return;
-
-  exportItem.addEventListener("click", downloadBackup);
-  importItem.addEventListener("click", () => fileInput.click());
-
-  [exportItem, importItem].forEach((el, index) => {
-    el.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        if (index === 0) downloadBackup();
-        else fileInput.click();
-      }
-    });
-  });
-
-  fileInput.addEventListener("change", async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      await importBackupFile(file);
-      alert("Backup importado com sucesso.");
-    } catch (error) {
-      console.error(error);
-      alert("Não foi possível importar o backup. Verifique se o arquivo JSON é válido.");
-    } finally {
-      fileInput.value = "";
-    }
-  });
-}
-
-// ── Verificar atualização ────────────────────────────────────────────────────
-function setupUpdateAction() {
-  const item = document.getElementById("item-update");
-  const subtitle = document.getElementById("update-subtitle");
-  const chevron = document.getElementById("update-chevron");
-  if (!item || !subtitle) return;
-
-  // Injeta versão atual no item "Sobre"
-  const versionEl = document.getElementById("app-version");
-  if (versionEl && typeof APP_VERSION !== 'undefined') {
-    versionEl.textContent = 'Versão ' + APP_VERSION;
-  }
-
-  if (!('serviceWorker' in navigator)) {
-    subtitle.textContent = 'Service Worker não suportado';
-    return;
-  }
-
-  // Estado inicial: descobre se há update pendente
-  navigator.serviceWorker.getRegistration().then((reg) => {
-    if (!reg) {
-      subtitle.textContent = 'SW não registrado';
-      return;
-    }
-
-    function setUpToDate() {
-      subtitle.textContent = 'App atualizado';
-      if (chevron) chevron.textContent = 'check_circle';
-    }
-
-    function setUpdateAvailable() {
-      subtitle.textContent = 'Toque para atualizar agora';
-      if (chevron) chevron.textContent = 'system_update_alt';
-    }
-
-    // Verifica se há SW esperando (update já baixado)
-    if (reg.waiting) {
-      setUpdateAvailable();
-    } else {
-      setUpToDate();
-      // Faz check explícito no servidor
-      reg.update().catch(() => {});
-    }
-
-    // Escuta novo SW que pode aparecer durante a permanência na tela
-    reg.addEventListener('updatefound', () => {
-      const newWorker = reg.installing;
-      if (!newWorker) return;
-      newWorker.addEventListener('statechange', () => {
-        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-          setUpdateAvailable();
-        }
+  function bindRadios(name, key) {
+    document.querySelectorAll(`md-radio[name="${name}"]`).forEach((radio) => {
+      radio.addEventListener('change', () => {
+        if (!radio.checked) return;
+        UI.updateSettings({ [key]: radio.value });
+        syncAppearanceUi();
       });
     });
+  }
 
-    // Clique: força a atualização
-    item.addEventListener('click', () => {
-      if (reg.waiting) {
-        // Há SW novo esperando: pede skip waiting e recarrega
-        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-        subtitle.textContent = 'Aplicando atualização…';
-        if (chevron) chevron.textContent = 'refresh';
-        // controllerchange no ui.js vai recarregar a página
-      } else {
-        // Nenhum update pendente: faz verificação manual no servidor
-        subtitle.textContent = 'Verificando…';
-        if (chevron) chevron.textContent = 'refresh';
-        reg.update().then(() => {
-          // Pequeno delay para o updatefound ter chance de disparar
-          setTimeout(() => {
-            if (!reg.waiting && !reg.installing) {
-              setUpToDate();
-            }
-          }, 3000);
-        }).catch(() => {
-          subtitle.textContent = 'Sem conexão';
+  // ── Backup ────────────────────────────────────────────────────
+  function readJson(key, fallback) {
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch { return fallback; }
+  }
+
+  function exportBackup() {
+    const payload = {
+      format: 'pixkey-backup',
+      version: 39,
+      exportedAt: new Date().toISOString(),
+      data: {
+        settings: readJson(STORAGE.settings, {}),
+        qrSettings: readJson(STORAGE.qrSettings, null),
+        keys: readJson(STORAGE.keys, []),
+      },
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement('a'), {
+      href: url,
+      download: `qrpix-backup-${new Date().toISOString().slice(0, 10)}.json`,
+    });
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    UI.snackbar('Backup exportado');
+  }
+
+  async function importBackup(file) {
+    const parsed = JSON.parse(await file.text());
+    if (!parsed || typeof parsed !== 'object') throw new Error('Arquivo inválido');
+    const data = parsed.data && typeof parsed.data === 'object' ? parsed.data : parsed;
+    const keys = Array.isArray(data.keys) ? data.keys : [];
+    const settings = data.settings && typeof data.settings === 'object' ? data.settings : {};
+    const qr = data.qrSettings && typeof data.qrSettings === 'object' ? data.qrSettings : null;
+
+    const ok = await UI.confirm({
+      icon: 'restore',
+      title: 'Restaurar backup?',
+      body: `${keys.length} chave(s) e suas preferências substituirão os dados atuais deste aparelho.`,
+      confirmLabel: 'Restaurar',
+    });
+    if (!ok) return;
+
+    localStorage.setItem(STORAGE.keys, JSON.stringify(keys));
+    localStorage.setItem(STORAGE.settings, JSON.stringify(settings));
+    qr ? localStorage.setItem(STORAGE.qrSettings, JSON.stringify(qr)) : localStorage.removeItem(STORAGE.qrSettings);
+    UI.applyAppearance();
+    syncAppearanceUi();
+    UI.snackbar('Backup restaurado');
+  }
+
+  function bindBackup() {
+    const input = $('backup-file');
+    $('item-export').addEventListener('click', exportBackup);
+    $('item-import').addEventListener('click', () => input.click());
+    input.addEventListener('change', async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      try { await importBackup(file); }
+      catch (err) {
+        console.error(err);
+        UI.snackbar('Não foi possível ler o arquivo. Verifique se é um backup válido.');
+      } finally { input.value = ''; }
+    });
+  }
+
+  // ── Doação ────────────────────────────────────────────────────
+  function bindDonate() {
+    $('item-donate').addEventListener('click', () => {
+      const params = new URLSearchParams({
+        bank: 'Mercado Pago',
+        name: 'Victor Alerrandro Tavares',
+        keyType: 'email',
+        key: 'v.alerrandro.t@hotmail.com',
+        value: '0',
+      });
+      location.href = 'generate-qr-pix.html?' + params;
+    });
+  }
+
+  // ── Atualizações ──────────────────────────────────────────────
+  function bindUpdate() {
+    const item = $('item-update');
+    const sub = $('update-subtitle');
+    const icon = $('update-icon');
+    const version = typeof APP_VERSION !== 'undefined' ? APP_VERSION : '';
+    $('app-version').textContent = version ? 'Versão ' + version : 'Versão desconhecida';
+
+    const set = (text, ic) => { sub.textContent = text; icon.textContent = ic; icon.classList.toggle('spin', ic === 'progress_activity'); };
+
+    if (!('serviceWorker' in navigator)) { set('Indisponível neste navegador', 'block'); return; }
+
+    navigator.serviceWorker.getRegistration().then((reg) => {
+      if (!reg) { set('Versão ' + version, 'check_circle'); return; }
+      const upToDate = () => set('Você está na versão mais recente', 'check_circle');
+      const available = () => set('Nova versão disponível — toque para instalar', 'system_update_alt');
+
+      reg.waiting ? available() : upToDate();
+      reg.addEventListener('updatefound', () => {
+        const nw = reg.installing;
+        nw && nw.addEventListener('statechange', () => {
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) available();
         });
-      }
-    });
+      });
 
-    item.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); item.click(); }
-    });
-  }).catch(() => {
-    subtitle.textContent = 'Erro ao verificar atualização';
-  });
-}
+      item.addEventListener('click', () => {
+        if (reg.waiting) {
+          set('Aplicando atualização…', 'progress_activity');
+          reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+          return;
+        }
+        set('Verificando…', 'progress_activity');
+        reg.update()
+          .then(() => setTimeout(() => { if (!reg.waiting && !reg.installing) upToDate(); }, 2500))
+          .catch(() => set('Sem conexão', 'cloud_off'));
+      });
+    }).catch(() => set('Erro ao verificar', 'error'));
+  }
 
-document.getElementById("btn-back")?.addEventListener("click", () => {
-  history.back();
-});
-
-(function init() {
-  const settings = window.PixKeyUI.loadSettings();
-  refreshSettingsUi({
-    tema: settings.tema ?? "system",
-    eyecare: settings.eyecare ?? "off",
-  });
-
-  setupAccordion("item-tema", "panel-tema", "tema-chevron");
-  setupAccordion("item-eyecare", "panel-eyecare", "eyecare-chevron");
-  setupRadioGroup("tema", "tema-subtitle", TEMA_LABELS, "tema");
-  setupRadioGroup("eyecare", "eyecare-subtitle", EYECARE_LABELS, "eyecare");
-  setupNavItems();
-  setupBackupActions();
-  setupUpdateAction();
+  // ── Init ──────────────────────────────────────────────────────
+  customElements.whenDefined('md-radio').then(syncAppearanceUi);
+  syncAppearanceUi();
+  bindRadios('tema', 'tema');
+  bindRadios('eyecare', 'eyecare');
+  bindBackup();
+  bindDonate();
+  bindUpdate();
 })();

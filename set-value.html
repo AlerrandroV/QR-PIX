@@ -2,105 +2,126 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#006493" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f9ff" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>Definir Valor — QR PIX</title>
+  <title>Valor da cobrança — QR PIX</title>
   <script src="ui.js"></script>
+  <script src="pix-utils.js"></script>
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/png" href="qr-pix-icon-192.png" />
-  <link rel="stylesheet" href="set-value.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
-  <script type="importmap">
-  {
-    "imports": {
-      "@material/web/": "https://esm.run/@material/web/"
-    }
-  }
-  </script>
-  <script type="module">
-    import "@material/web/all.js";
-    import { styles as typescaleStyles } from "@material/web/typography/md-typescale-styles.js";
-    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
-  </script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" />
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="material.js"></script>
 </head>
 <body>
 
-  <header class="top-app-bar">
-    <div class="top-app-bar__start">
-      <md-icon-button id="btn-back" aria-label="Voltar">
-        <md-icon>arrow_back</md-icon>
-      </md-icon-button>
-      <span class="app-title md-typescale-title-large">Definir Valor</span>
-    </div>
+  <header class="app-bar">
+    <md-icon-button data-nav="back" data-fallback="generate-invoice.html" aria-label="Voltar">
+      <md-icon>arrow_back</md-icon>
+    </md-icon-button>
+    <h1 class="app-bar__title">Valor da cobrança</h1>
   </header>
 
-  <div class="value-layout">
+  <main class="app-main">
+    <div class="page page--fill">
 
-    <!-- CARD DE TRANSAÇÃO -->
-    <div class="transaction-card">
-      <div class="transaction-card__row">
-        <span class="material-symbols-rounded tc-icon">account_balance</span>
-        <div class="tc-info">
-          <span class="tc-label">Instituição</span>
-          <span class="tc-value" id="tc-bank">—</span>
+      <section class="card card--list" aria-label="Recebedor">
+        <div class="list-item list-item--two-line">
+          <span class="list-item__leading list-item__leading--primary list-item__leading--avatar" id="tx-initials">?</span>
+          <span class="list-item__content">
+            <span class="list-item__headline" id="tx-name">—</span>
+            <span class="list-item__supporting" id="tx-meta">—</span>
+          </span>
         </div>
-      </div>
-      <div class="tc-divider"></div>
-      <div class="transaction-card__row">
-        <span class="material-symbols-rounded tc-icon">person</span>
-        <div class="tc-info">
-          <span class="tc-label">Beneficiário</span>
-          <span class="tc-value" id="tc-name">—</span>
+      </section>
+
+      <section class="grow amount-area" aria-live="polite">
+        <div class="amount" id="amount">
+          <span class="amount__currency">R$</span>
+          <span class="amount__value" id="amount-value">0,00</span>
         </div>
-      </div>
-      <div class="tc-divider"></div>
-      <div class="transaction-card__row">
-        <span class="material-symbols-rounded tc-icon">key</span>
-        <div class="tc-info">
-          <span class="tc-label">Chave PIX</span>
-          <span class="tc-value tc-value--mono" id="tc-key">—</span>
-        </div>
-      </div>
+        <p class="section__hint center">Deixe R$ 0,00 para o cliente digitar o valor no banco.</p>
+      </section>
+
+      <section class="numpad" aria-label="Teclado numérico">
+        <button class="numpad__key" type="button" data-key="1">1</button>
+        <button class="numpad__key" type="button" data-key="2">2</button>
+        <button class="numpad__key" type="button" data-key="3">3</button>
+        <button class="numpad__key" type="button" data-key="4">4</button>
+        <button class="numpad__key" type="button" data-key="5">5</button>
+        <button class="numpad__key" type="button" data-key="6">6</button>
+        <button class="numpad__key" type="button" data-key="7">7</button>
+        <button class="numpad__key" type="button" data-key="8">8</button>
+        <button class="numpad__key" type="button" data-key="9">9</button>
+        <button class="numpad__key numpad__key--muted" type="button" data-key="00">00</button>
+        <button class="numpad__key" type="button" data-key="0">0</button>
+        <button class="numpad__key numpad__key--muted" type="button" data-key="del" aria-label="Apagar">
+          <span class="icon">backspace</span>
+        </button>
+      </section>
+
     </div>
+  </main>
 
-    <!-- DISPLAY DO VALOR -->
-    <div class="value-display-wrapper">
-      <span class="value-currency">R$</span>
-      <span class="value-display" id="value-display">0,00</span>
-    </div>
+  <footer class="app-footer">
+    <md-filled-button id="btn-confirm" trailing-icon>
+      Gerar QR Code
+      <md-icon slot="icon">qr_code_2</md-icon>
+    </md-filled-button>
+  </footer>
 
-    <!-- TECLADO NUMÉRICO PRÓPRIO -->
-    <div class="numpad">
-      <button class="numpad-key" data-key="1">1</button>
-      <button class="numpad-key" data-key="2">2</button>
-      <button class="numpad-key" data-key="3">3</button>
-      <button class="numpad-key" data-key="4">4</button>
-      <button class="numpad-key" data-key="5">5</button>
-      <button class="numpad-key" data-key="6">6</button>
-      <button class="numpad-key" data-key="7">7</button>
-      <button class="numpad-key" data-key="8">8</button>
-      <button class="numpad-key" data-key="9">9</button>
-      <button class="numpad-key" data-key="00">00</button>
-      <button class="numpad-key" data-key="0">0</button>
-      <button class="numpad-key numpad-key--delete" data-key="del">
-        <span class="material-symbols-rounded">backspace</span>
-      </button>
-    </div>
+  <script>
+    (function () {
+      const { tx, KEY_TYPES, formatCents, initials } = PixUtils;
+      const t = tx.read();
+      if (!t.key) { location.replace('generate-invoice.html'); return; }
 
-    <!-- BOTÃO CONFIRMAR -->
-    <div class="value-bottom-bar">
-      <md-filled-button id="btn-confirm" class="confirm-btn">
-        <md-icon slot="icon">qr_code_2</md-icon>
-        Confirmar valor
-      </md-filled-button>
-    </div>
+      document.getElementById('tx-initials').textContent = initials(t.name);
+      document.getElementById('tx-name').textContent = t.name || 'Recebedor';
+      document.getElementById('tx-meta').textContent =
+        [t.bank, (KEY_TYPES[t.keyType]?.label || '') + ' ' + t.key].filter(Boolean).join(' · ');
 
-  </div>
+      const MAX_DIGITS = 10;
+      let digits = t.value ? String(t.value) : '';
+      const amount = document.getElementById('amount');
+      const amountValue = document.getElementById('amount-value');
 
-  <script src="set-value.js"></script>
+      function render() {
+        const cents = parseInt(digits || '0', 10);
+        amountValue.textContent = formatCents(cents);
+        amount.classList.toggle('is-set', cents > 0);
+      }
+
+      function press(k) {
+        if (k === 'del') digits = digits.slice(0, -1);
+        else if (k === 'clear') digits = '';
+        else if (!digits && (k === '0' || k === '00')) return;
+        else digits = (digits + k).slice(0, MAX_DIGITS);
+        if (navigator.vibrate) navigator.vibrate(8);
+        render();
+      }
+
+      document.querySelectorAll('.numpad__key').forEach((b) => b.addEventListener('click', () => press(b.dataset.key)));
+
+      // Teclado físico
+      document.addEventListener('keydown', (e) => {
+        if (/^[0-9]$/.test(e.key)) press(e.key);
+        else if (e.key === 'Backspace') press('del');
+        else if (e.key === 'Delete' || e.key === 'Escape') press('clear');
+        else if (e.key === 'Enter') confirm();
+      });
+
+      function confirm() {
+        const value = parseInt(digits || '0', 10);
+        tx.set({ ...t, value });
+        location.href = 'generate-qr-pix.html';
+      }
+      document.getElementById('btn-confirm').addEventListener('click', confirm);
+      render();
+    })();
+  </script>
 </body>
 </html>
