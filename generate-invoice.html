@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f9ff" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Cobrar — QR PIX</title>
+  <script src="ui.js"></script>
+  <script src="pix-utils.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="qr-pix-icon-192.png" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" />
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="material.js"></script>
+</head>
+<body>
+
+  <header class="app-bar">
+    <h1 class="app-bar__title">Cobrar</h1>
+  </header>
+
+  <main class="app-main">
+    <div class="page">
+
+      <section class="section" aria-labelledby="keys-title">
+        <div class="section__header">
+          <h2 class="section__title" id="keys-title">Escolha a chave que vai receber</h2>
+        </div>
+        <md-outlined-text-field id="search" type="search" placeholder="Buscar por nome, banco ou chave" aria-label="Buscar chave" hidden>
+          <md-icon slot="leading-icon">search</md-icon>
+        </md-outlined-text-field>
+        <div class="card" id="keys-list"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <md-filled-button href="new-key.html">
+      <md-icon slot="icon">add</md-icon>
+      Nova chave PIX
+    </md-filled-button>
+  </footer>
+
+  <nav class="app-nav" aria-label="Navegação principal">
+    <a class="app-nav__item" href="index.html">
+      <span class="app-nav__indicator"><span class="icon">home</span></span>Início
+    </a>
+    <a class="app-nav__item" href="generate-invoice.html" aria-current="page">
+      <span class="app-nav__indicator"><span class="icon">qr_code_2</span></span>Cobrar
+    </a>
+    <a class="app-nav__item" href="settings.html">
+      <span class="app-nav__indicator"><span class="icon">settings</span></span>Ajustes
+    </a>
+  </nav>
+
+  <script src="keys-list.js"></script>
+  <script>
+    const search = document.getElementById('search');
+    const list = KeysList.mount(document.getElementById('keys-list'), {
+      // A busca só aparece quando há chaves suficientes para precisar dela
+      onRender(total) { search.hidden = total < 4; },
+    });
+    search.addEventListener('input', () => list.search(search.value));
+  </script>
+</body>
+</html>

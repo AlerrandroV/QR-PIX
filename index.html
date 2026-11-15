@@ -2,102 +2,114 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#006493" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f9ff" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>QR PIX</title>
-  <!-- ui.js DEVE ser o primeiro script: aplica tema antes do render para evitar flash -->
   <script src="ui.js"></script>
+  <script src="pix-utils.js"></script>
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/png" href="qr-pix-icon-192.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
-  <script type="importmap">{"imports":{"@material/web/":"https://esm.run/@material/web/"}}</script>
-  <script type="module">
-    import "@material/web/all.js";
-    import { styles as typescaleStyles } from "@material/web/typography/md-typescale-styles.js";
-    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
-  </script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" />
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="material.js"></script>
 </head>
 <body>
-  <header class="top-app-bar">
-    <span class="app-logo" aria-label="QR PIX">
-      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-           fill="currentColor"
-           aria-hidden="true"
-           shape-rendering="crispEdges">
-        <path d="M15.828 4c-.426 0-.852.164-1.174.49l-3.521 3.573h-.002a1.71 1.71 0 0 0 .002 2.38l3.521 3.573a1.65 1.65 0 0 0 2.346 0l3.521-3.573a1.71 1.71 0 0 0 0-2.38L17 4.49A1.64 1.64 0 0 0 15.828 4m0 1.113c.14 0 .279.057.39.17l3.52 3.572a.555.555 0 0 1 0 .795l-3.52 3.57a.536.536 0 0 1-.782 0l-3.52-3.57a.555.555 0 0 1 0-.795l3.52-3.572a.55.55 0 0 1 .392-.17m.008 1.608a.55.55 0 0 0-.39.17l-.97.98-.01.012-.966.98a.555.555 0 0 0 0 .795l.95.965.027.027.95.965c.224.227.56.227.784 0l.977-.992.968-.982a.553.553 0 0 0 0-.793l-.978-.993-.951-.964a.55.55 0 0 0-.391-.17m6.643 3.675a.83.83 0 0 0-.588.247l-1.565 1.586a.856.856 0 0 0 0 1.19l1.565 1.589a.826.826 0 0 0 1.173 0l1.565-1.588a.856.856 0 0 0 0-1.191l-1.565-1.586a.82.82 0 0 0-.585-.247m-13.301.352c-.426 0-.852.162-1.174.488L4.482 14.81l-.002.002a1.71 1.71 0 0 0 .002 2.38l3.522 3.573a1.65 1.65 0 0 0 2.346 0l3.521-3.573a1.71 1.71 0 0 0 0-2.382l-3.521-3.573a1.64 1.64 0 0 0-1.172-.488m13.3.205c.07 0 .14.03.196.086l.39.397.784.793.39.398a.276.276 0 0 1 0 .396l-.39.397-.784.795-.39.396a.27.27 0 0 1-.393 0l-.39-.396-.784-.795-.39-.397a.276.276 0 0 1 0-.396l.39-.398.784-.793.39-.397a.28.28 0 0 1 .198-.086m-.027.795a.28.28 0 0 0-.17.084l-.39.397-.391.398a.276.276 0 0 0 0 .396l.39.397.391.396a.27.27 0 0 0 .393 0l.39-.396.391-.397a.276.276 0 0 0 0-.396l-.39-.398-.391-.397a.27.27 0 0 0-.223-.084m-13.273.113c.14 0 .279.057.39.17l3.52 3.573a.553.553 0 0 1 0 .792l-3.52 3.573a.536.536 0 0 1-.783 0l-3.52-3.573a.553.553 0 0 1 0-.792l3.52-3.573a.55.55 0 0 1 .393-.17m.008 1.608a.55.55 0 0 0-.391.17l-.969.98-.01.012-.966.98a.555.555 0 0 0 0 .795l.949.963.027.03.951.962c.224.227.56.227.784 0l.976-.992.969-.98a.555.555 0 0 0 0-.795l-.979-.992-.95-.963a.55.55 0 0 0-.391-.17m10.162.103a.82.82 0 0 0-.586.244l-1.565 1.588a.856.856 0 0 0 0 1.192l1.565 1.588a.826.826 0 0 0 1.174 0l1.564-1.588a.856.856 0 0 0 0-1.192l-1.564-1.588a.82.82 0 0 0-.588-.244m6.26 0a.82.82 0 0 0-.588.244l-1.565 1.588a.856.856 0 0 0 0 1.192l1.565 1.588a.826.826 0 0 0 1.173 0l1.565-1.588a.856.856 0 0 0 0-1.192l-1.565-1.588a.82.82 0 0 0-.586-.244m-6.26.557c.07 0 .14.03.195.086l.393.396.78.793.391.397a.28.28 0 0 1 0 .398l-.39.397-.781.793-.393.396a.267.267 0 0 1-.39 0l-.391-.396-.783-.793-.391-.397a.28.28 0 0 1 0-.398l.39-.397.784-.793.39-.396a.27.27 0 0 1 .196-.086m6.26 0c.07 0 .139.03.195.086l.39.396.784.793.39.397a.28.28 0 0 1 0 .398l-.39.397-.784.793-.39.396a.267.267 0 0 1-.39 0l-.393-.396-.782-.793-.39-.397a.28.28 0 0 1 0-.398l.39-.397.782-.793.392-.396a.27.27 0 0 1 .195-.086m-6.26.793c-.07 0-.14.03-.196.086l-.39.396-.393.397a.28.28 0 0 0 0 .398l.393.397.39.396a.267.267 0 0 0 .391 0l.393-.396.39-.397a.28.28 0 0 0 0-.398l-.39-.397-.393-.396a.27.27 0 0 0-.195-.086m6.26 0c-.07 0-.14.03-.196.086l-.392.396-.391.397a.28.28 0 0 0 0 .398l.39.397.393.396a.267.267 0 0 0 .39 0l.391-.396.393-.397a.28.28 0 0 0 0-.398l-.393-.397-.39-.396a.27.27 0 0 0-.196-.086m-3.131 1.78a.7.7 0 0 0-.506.212l-.157.158a.74.74 0 0 0-.002 1.032l.157.158a.717.717 0 0 0 1.017 0l.157-.158a.74.74 0 0 0-.002-1.032l-.157-.158a.71.71 0 0 0-.507-.213m-.014.556a.16.16 0 0 1 .133.05l.156.159a.164.164 0 0 1 0 .238l-.156.16a.16.16 0 0 1-.237 0l-.156-.16a.164.164 0 0 1 0-.238l.156-.158a.17.17 0 0 1 .104-.051m-6.635.236c-.426 0-.852.164-1.174.49l-3.521 3.573-.002.002a1.71 1.71 0 0 0 .002 2.378l3.521 3.573a1.65 1.65 0 0 0 2.346 0l3.521-3.573a1.71 1.71 0 0 0 0-2.38L17 17.984a1.64 1.64 0 0 0-1.172-.49m5.084.606a.282.282 0 0 0-.195.48c.108.11.282.11.39 0a.282.282 0 0 0-.195-.48m3.131.19c-.185-.001-.37.069-.51.21l-.156.158a.744.744 0 0 0 0 1.033l.156.159a.717.717 0 0 0 1.018 0l.156-.159a.74.74 0 0 0 0-1.03l-.156-.159a.71.71 0 0 0-.508-.213m-8.215.317c.14 0 .279.059.39.172l3.52 3.57a.555.555 0 0 1 0 .796l-3.52 3.572a.536.536 0 0 1-.782 0l-3.52-3.572a.555.555 0 0 1 0-.795l3.52-3.57a.55.55 0 0 1 .392-.173m8.2.239a.16.16 0 0 1 .132.05l.156.16a.164.164 0 0 1 0 .239l-.156.158a.16.16 0 0 1-.234 0l-.156-.158a.164.164 0 0 1 0-.238l.156-.16a.17.17 0 0 1 .101-.051m-3.897.049a.27.27 0 0 0-.195.082.28.28 0 0 0 0 .396c.108.11.282.11.39 0a.28.28 0 0 0 0-.396.27.27 0 0 0-.195-.082m.781 0a.27.27 0 0 0-.195.082.28.28 0 0 0 0 .396c.108.11.282.11.39 0a.28.28 0 0 0 0-.396.27.27 0 0 0-.195-.082m.783 0a.27.27 0 0 0-.195.082.28.28 0 0 0 0 .396c.108.11.282.11.39 0a.28.28 0 0 0 0-.396.27.27 0 0 0-.195-.082m-.783.793a.282.282 0 0 0-.195.48c.108.11.282.11.39 0a.282.282 0 0 0-.195-.48m1.567.189c-.185 0-.371.07-.51.21l-.157.16a.744.744 0 0 0 0 1.032l.157.159a.717.717 0 0 0 1.017 0l.157-.159a.744.744 0 0 0 0-1.033l-.157-.158a.7.7 0 0 0-.507-.211m-6.643.338a.55.55 0 0 0-.39.17l-.97.982-.01.01-.966.982a.553.553 0 0 0 0 .793l.95.965.027.028.95.964c.224.227.56.227.784 0l.977-.992.968-.98a.555.555 0 0 0 0-.795l-.978-.992-.951-.965a.55.55 0 0 0-.391-.17m6.627.219a.16.16 0 0 1 .133.05l.156.16a.164.164 0 0 1 0 .239l-.156.158a.16.16 0 0 1-.237 0l-.156-.158a.164.164 0 0 1 0-.238l.156-.16a.17.17 0 0 1 .104-.051" />
-      </svg>
-      <span class="app-logo__name">QR-PIX</span>
-    </span>
-    <div class="top-app-bar__actions">
-      <button id="btn-install" class="install-topbar-btn" style="display:none;" aria-label="Instalar App">
-        <span class="material-symbols-rounded">download</span>
-        <span class="install-topbar-btn__label">Baixar App</span>
-      </button>
-      <md-icon-button id="btn-settings" aria-label="Configurações">
-        <md-icon>settings</md-icon>
-      </md-icon-button>
+
+  <header class="app-bar">
+    <a class="brand" href="index.html" aria-label="QR PIX — início">
+      <span class="brand__mark" aria-hidden="true"></span>
+      <span class="brand__name">QR-PIX</span>
+    </a>
+    <div class="app-bar__actions">
+      <md-filled-tonal-button data-install hidden>
+        <md-icon slot="icon">download</md-icon>
+        Instalar
+      </md-filled-tonal-button>
     </div>
   </header>
 
-  <main class="home-content" role="main">
-    <p class="home-section-label">O que deseja fazer?</p>
+  <main class="app-main">
+    <div class="page">
 
-    <!-- Card 1: Estilizar QR Code -->
-    <a href="qr-customize.html" class="action-card" aria-label="Estilizar QR Code">
-      <div class="action-card__icon-wrap">
-        <span class="material-symbols-rounded">style</span>
-      </div>
-      <div class="action-card__text">
-        <span class="action-card__title">Estilizar QR Code</span>
-        <span class="action-card__desc">Personalize cores, formato e logo do seu QR PIX</span>
-      </div>
-      <div class="action-card__arrow" aria-hidden="true">
-        <span class="material-symbols-rounded">chevron_right</span>
-      </div>
-    </a>
+      <!-- Ação principal -->
+      <section class="card card--primary cta" aria-labelledby="cta-title">
+        <span class="cta__icon"><span class="icon icon--filled">qr_code_2</span></span>
+        <div>
+          <h1 class="headline" id="cta-title">Receba com PIX em segundos</h1>
+          <p class="card__text">Escolha a chave, digite o valor e mostre o QR Code para o cliente.</p>
+        </div>
+        <md-filled-button href="generate-invoice.html">
+          <md-icon slot="icon">add</md-icon>
+          Nova cobrança
+        </md-filled-button>
+      </section>
 
-    <!-- Card 2: Criar perfil de cobrança -->
-    <a href="create-profile.html" class="action-card" aria-label="Criar perfil de cobrança">
-      <div class="action-card__icon-wrap">
-        <span class="material-symbols-rounded">account_circle</span>
-      </div>
-      <div class="action-card__text">
-        <span class="action-card__title">Criar perfil de cobrança</span>
-        <span class="action-card__desc">Configure seu nome, logo e chave PIX para cobranças</span>
-      </div>
-      <div class="action-card__arrow" aria-hidden="true">
-        <span class="material-symbols-rounded">chevron_right</span>
-      </div>
-    </a>
+      <!-- Chaves recentes -->
+      <section class="section" aria-labelledby="recent-title">
+        <div class="section__header">
+          <h2 class="section__title" id="recent-title">Chaves recentes</h2>
+          <md-text-button href="generate-invoice.html" id="recent-all" hidden>Ver todas</md-text-button>
+        </div>
+        <div class="card card--list" id="recent-list"></div>
+      </section>
 
-    <!-- Card 3: Gerar cobrança -->
-    <a href="generate-invoice.html" class="action-card" aria-label="Gerar cobrança">
-      <div class="action-card__icon-wrap">
-        <span class="material-symbols-rounded">receipt_long</span>
-      </div>
-      <div class="action-card__text">
-        <span class="action-card__title">Gerar cobrança</span>
-        <span class="action-card__desc">Crie um link de pagamento PIX para compartilhar</span>
-      </div>
-      <div class="action-card__arrow" aria-hidden="true">
-        <span class="material-symbols-rounded">chevron_right</span>
-      </div>
-    </a>
+      <!-- Ferramentas -->
+      <section class="section" aria-labelledby="tools-title">
+        <div class="section__header">
+          <h2 class="section__title" id="tools-title">Ferramentas</h2>
+        </div>
+        <div class="card card--list">
+          <a class="list-item list-item--action list-item--two-line" href="create-profile.html">
+            <span class="list-item__leading"><span class="icon">storefront</span></span>
+            <span class="list-item__content">
+              <span class="list-item__headline">Perfil de cobrança</span>
+              <span class="list-item__supporting">Nome, foto e chave PIX da sua loja</span>
+            </span>
+            <span class="list-item__trailing"><span class="icon">chevron_right</span></span>
+          </a>
+          <a class="list-item list-item--action list-item--two-line" href="qr-customize.html">
+            <span class="list-item__leading"><span class="icon">palette</span></span>
+            <span class="list-item__content">
+              <span class="list-item__headline">Estilizar QR Code</span>
+              <span class="list-item__supporting">Cores, formato e logo</span>
+            </span>
+            <span class="list-item__trailing"><span class="icon">chevron_right</span></span>
+          </a>
+          <a class="list-item list-item--action list-item--two-line" href="new-key.html">
+            <span class="list-item__leading"><span class="icon">key</span></span>
+            <span class="list-item__content">
+              <span class="list-item__headline">Cadastrar chave PIX</span>
+              <span class="list-item__supporting">CPF, CNPJ, telefone, e-mail ou aleatória</span>
+            </span>
+            <span class="list-item__trailing"><span class="icon">chevron_right</span></span>
+          </a>
+        </div>
+      </section>
+
+    </div>
   </main>
 
+  <nav class="app-nav" aria-label="Navegação principal">
+    <a class="app-nav__item" href="index.html" aria-current="page">
+      <span class="app-nav__indicator"><span class="icon">home</span></span>Início
+    </a>
+    <a class="app-nav__item" href="generate-invoice.html">
+      <span class="app-nav__indicator"><span class="icon">qr_code_2</span></span>Cobrar
+    </a>
+    <a class="app-nav__item" href="settings.html">
+      <span class="app-nav__indicator"><span class="icon">settings</span></span>Ajustes
+    </a>
+  </nav>
+
+  <script src="keys-list.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var btnSettings = document.getElementById('btn-settings');
-      if (btnSettings) {
-        btnSettings.addEventListener('click', function () {
-          window.location.href = 'settings.html';
-        });
-      }
+    KeysList.mount(document.getElementById('recent-list'), {
+      limit: 3,
+      compact: true,
+      onRender(total) { document.getElementById('recent-all').hidden = total <= 3; },
     });
   </script>
 </body>

@@ -1,622 +1,1206 @@
 /* =================================================================
-   QR-PIX — style.css
-   Estilos compartilhados por todas as telas do app.
-   Organização:
-     1. Tokens (variáveis CSS: temas, geometria)
-     2. Reset & Base
-     3. Top App Bar + Logo
-     4. Botão Instalar
-     5. Diálogo genérico
-     6. Botões de rodapé (compartilhados)
-     7. Material Symbols
-     8. Supressão de overlays
-     9. Home (index.html): layout e cards
+   QR-PIX — Design System (style.css)
+   -----------------------------------------------------------------
+   ÚNICO arquivo de estilos do app. Toda tela segue a mesma regra:
+
+     <body>
+       <header class="app-bar">      barra superior (sempre)
+       <div    class="stepper">      opcional (fluxos em etapas)
+       <main   class="app-main">     área rolável (sempre)
+         <div  class="page">         coluna de conteúdo (sempre)
+           <section class="section"> blocos de conteúdo
+       <footer class="app-footer">   ações principais (opcional)
+       <nav    class="app-nav">      navegação principal (telas raiz)
+     </body>
+
+   Regras gerais:
+     • Conteúdo sempre numa coluna de no máx. --content-max,
+       com a mesma margem lateral em barra, conteúdo e rodapé.
+     • Blocos = .section (título opcional + .card). Espaço entre
+       seções = --space-6; dentro de card = --space-4.
+     • Linhas clicáveis/informativas = .list-item (mesma altura,
+       ícone, tipografia e divisor em todas as telas).
+     • Ação principal da tela fica SEMPRE no .app-footer.
+     • Cores só por tokens --md-sys-color-*; nada de hex solto.
+
+   Índice:
+     1. Tokens (cor, tipografia, forma, espaço, movimento)
+     2. Base
+     3. Shell (app-bar, app-main, page, app-footer, app-nav)
+     4. Tipografia utilitária
+     5. Section & Card
+     6. List
+     7. Formulários (fields, chips, sugestões, upload, validação)
+     8. Feedback (empty state, snackbar, dialog, badge, banner)
+     9. Componentes de domínio (stepper, valor, teclado, QR, código)
+    10. Material Web — ajustes globais
 ================================================================= */
 
 
 /* =================================================================
    1. TOKENS
-   Como o ui.js aplica os temas:
-     - tema "light" → removeAttribute("data-theme")  (sem atributo no <html>)
-     - tema "dark"  → setAttribute("data-theme", "dark")
-     - tema "system"→ igual dark ou nenhum atributo, dependendo do SO
-
-   Portanto precisamos de 4 camadas de especificidade:
-     a) :root                          → tokens claros (base)
-     b) [data-theme="light"]           → tokens claros explícitos (override final)
-     c) [data-theme="dark"]            → tokens escuros explícitos
-     d) @media dark + :root:not([data-theme]) → sistema em dark sem toggle manual
-
-   A camada (b) garante que, mesmo que (d) tenha alta especificidade,
-   um [data-theme="light"] no <html> sempre vence.
 ================================================================= */
 
-/* ---- a) Tokens claros base ---- */
 :root {
-  --app-height: 100dvh;
-  --topbar-height: 64px;
-  --bottombar-height: 77px;
+  color-scheme: light;
 
-  /* Material You — Tema Azul (Light) */
-  --md-sys-color-primary:                  #006493;
-  --md-sys-color-on-primary:               #ffffff;
-  --md-sys-color-primary-container:        #cde5ff;
-  --md-sys-color-on-primary-container:     #001e30;
-  --md-sys-color-secondary:                #4f616e;
-  --md-sys-color-on-secondary:             #ffffff;
-  --md-sys-color-secondary-container:      #d2e5f5;
-  --md-sys-color-on-secondary-container:   #0b1d28;
-  --md-sys-color-tertiary:                 #62597c;
-  --md-sys-color-on-tertiary:              #ffffff;
-  --md-sys-color-tertiary-container:       #e8deff;
-  --md-sys-color-on-tertiary-container:    #1e1635;
-  --md-sys-color-error:                    #ba1a1a;
-  --md-sys-color-on-error:                 #ffffff;
-  --md-sys-color-error-container:          #ffdad6;
-  --md-sys-color-on-error-container:       #410002;
-  --md-sys-color-background:               #f6fafe;
-  --md-sys-color-on-background:            #181c20;
-  --md-sys-color-surface:                  #f6fafe;
-  --md-sys-color-on-surface:               #181c20;
-  --md-sys-color-on-surface-variant:       #40484d;
-  --md-sys-color-surface-variant:          #dce4e9;
-  --md-sys-color-outline:                  #70787d;
-  --md-sys-color-outline-variant:          #c0c8cd;
-  --md-sys-color-surface-container-lowest: #f0f4f8;
-  --md-sys-color-surface-container-low:    #eaeff3;
-  --md-sys-color-surface-container:        #e4e9ed;
-  --md-sys-color-surface-container-high:   #dee3e7;
-  --md-sys-color-surface-container-highest:#d9dee2;
+  /* ---- Cor: tema claro (seed #006493) ---- */
+  --md-sys-color-primary:                   #006493;
+  --md-sys-color-on-primary:                #ffffff;
+  --md-sys-color-primary-container:         #cae6ff;
+  --md-sys-color-on-primary-container:      #001e30;
+  --md-sys-color-secondary:                 #50606e;
+  --md-sys-color-on-secondary:              #ffffff;
+  --md-sys-color-secondary-container:       #d3e5f5;
+  --md-sys-color-on-secondary-container:    #0c1d29;
+  --md-sys-color-tertiary:                  #65587b;
+  --md-sys-color-on-tertiary:               #ffffff;
+  --md-sys-color-tertiary-container:        #ebddff;
+  --md-sys-color-on-tertiary-container:     #201634;
+  --md-sys-color-error:                     #ba1a1a;
+  --md-sys-color-on-error:                  #ffffff;
+  --md-sys-color-error-container:           #ffdad6;
+  --md-sys-color-on-error-container:        #410002;
+  --md-sys-color-success:                   #1b6d3c;
+  --md-sys-color-success-container:         #a4f4b7;
+  --md-sys-color-on-success-container:      #00210c;
+  --md-sys-color-background:                #f7f9ff;
+  --md-sys-color-on-background:             #181c20;
+  --md-sys-color-surface:                   #f7f9ff;
+  --md-sys-color-surface-bright:            #f7f9ff;
+  --md-sys-color-surface-dim:               #d7dadf;
+  --md-sys-color-on-surface:                #181c20;
+  --md-sys-color-surface-variant:           #dde3ea;
+  --md-sys-color-on-surface-variant:        #41474d;
+  --md-sys-color-surface-container-lowest:  #ffffff;
+  --md-sys-color-surface-container-low:     #f1f4f9;
+  --md-sys-color-surface-container:         #ebeef3;
+  --md-sys-color-surface-container-high:    #e5e8ed;
+  --md-sys-color-surface-container-highest: #e0e3e8;
+  --md-sys-color-outline:                   #71787e;
+  --md-sys-color-outline-variant:           #c1c7ce;
+  --md-sys-color-inverse-surface:           #2d3135;
+  --md-sys-color-inverse-on-surface:        #eef1f6;
+  --md-sys-color-inverse-primary:           #8dcdff;
+  --md-sys-color-shadow:                    #000000;
+  --md-sys-color-scrim:                     #000000;
 
-  /* Geometria */
-  --radius-sm:   4px;
-  --radius-md:   8px;
-  --radius-lg:   12px;
-  --radius-xl:   16px;
-  --radius-full: 9999px;
+  /* ---- Tipografia ---- */
+  --font-brand: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono:  "Roboto Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --md-ref-typeface-brand: var(--font-brand);
+  --md-ref-typeface-plain: var(--font-brand);
+  --md-icon-font: "Material Symbols Rounded";
+
+  /* ---- Forma (raios) ---- */
+  --shape-xs:   4px;
+  --shape-sm:   8px;
+  --shape-md:   12px;
+  --shape-lg:   16px;
+  --shape-xl:   28px;
+  --shape-full: 9999px;
+
+  /* ---- Espaço (escala de 4) ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* ---- Layout ---- */
+  --content-max: 640px;
+  --gutter: var(--space-4);
+  --app-bar-height: 64px;
+  --nav-height: 80px;
+  --touch-target: 48px;
+  --list-item-min-height: 56px;
+  --inline: max(var(--gutter), calc((100% - var(--content-max)) / 2));
+
+  /* ---- Elevação ---- */
+  --elevation-1: 0 1px 2px rgb(0 0 0 / .18), 0 1px 3px 1px rgb(0 0 0 / .08);
+  --elevation-3: 0 4px 8px 3px rgb(0 0 0 / .10), 0 1px 3px rgb(0 0 0 / .20);
+
+  /* ---- Movimento ---- */
+  --motion-standard: cubic-bezier(.2, 0, 0, 1);
+  --motion-emphasized: cubic-bezier(.05, .7, .1, 1);
+  --duration-short: 150ms;
+  --duration-medium: 250ms;
 }
 
-/* ---- b) Tokens claros explícitos (MAIOR especificidade que @media dark) ---- */
-/* Necessário porque ui.js usa removeAttribute() para o tema light,            */
-/* mas o seletor de atributo [data-theme="light"] ainda pode ser injetado        */
-/* por scripts externos ou futuras versões do ui.js.                           */
-/* Também serve de "escudo" contra o @media dark abaixo.                       */
-[data-theme="light"] {
-  --md-sys-color-primary:                  #006493;
-  --md-sys-color-on-primary:               #ffffff;
-  --md-sys-color-primary-container:        #cde5ff;
-  --md-sys-color-on-primary-container:     #001e30;
-  --md-sys-color-secondary:                #4f616e;
-  --md-sys-color-on-secondary:             #ffffff;
-  --md-sys-color-secondary-container:      #d2e5f5;
-  --md-sys-color-on-secondary-container:   #0b1d28;
-  --md-sys-color-error:                    #ba1a1a;
-  --md-sys-color-on-error:                 #ffffff;
-  --md-sys-color-error-container:          #ffdad6;
-  --md-sys-color-on-error-container:       #410002;
-  --md-sys-color-background:               #f6fafe;
-  --md-sys-color-on-background:            #181c20;
-  --md-sys-color-surface:                  #f6fafe;
-  --md-sys-color-on-surface:               #181c20;
-  --md-sys-color-on-surface-variant:       #40484d;
-  --md-sys-color-surface-variant:          #dce4e9;
-  --md-sys-color-outline:                  #70787d;
-  --md-sys-color-outline-variant:          #c0c8cd;
-  --md-sys-color-surface-container-lowest: #f0f4f8;
-  --md-sys-color-surface-container-low:    #eaeff3;
-  --md-sys-color-surface-container:        #e4e9ed;
-  --md-sys-color-surface-container-high:   #dee3e7;
-  --md-sys-color-surface-container-highest:#d9dee2;
+/* ---- Cor: tema escuro ---- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --md-sys-color-primary:                   #8dcdff;
+  --md-sys-color-on-primary:                #00344d;
+  --md-sys-color-primary-container:         #004c6d;
+  --md-sys-color-on-primary-container:      #cae6ff;
+  --md-sys-color-secondary:                 #b7c9d9;
+  --md-sys-color-on-secondary:              #22323f;
+  --md-sys-color-secondary-container:       #384956;
+  --md-sys-color-on-secondary-container:    #d3e5f5;
+  --md-sys-color-tertiary:                  #cfc0e8;
+  --md-sys-color-on-tertiary:               #352a4a;
+  --md-sys-color-tertiary-container:        #4d4162;
+  --md-sys-color-on-tertiary-container:     #ebddff;
+  --md-sys-color-error:                     #ffb4ab;
+  --md-sys-color-on-error:                  #690005;
+  --md-sys-color-error-container:           #93000a;
+  --md-sys-color-on-error-container:        #ffdad6;
+  --md-sys-color-success:                   #88d79c;
+  --md-sys-color-success-container:         #005228;
+  --md-sys-color-on-success-container:      #a4f4b7;
+  --md-sys-color-background:                #101418;
+  --md-sys-color-on-background:             #e0e3e8;
+  --md-sys-color-surface:                   #101418;
+  --md-sys-color-surface-bright:            #36393e;
+  --md-sys-color-surface-dim:               #101418;
+  --md-sys-color-on-surface:                #e0e3e8;
+  --md-sys-color-surface-variant:           #41474d;
+  --md-sys-color-on-surface-variant:        #c1c7ce;
+  --md-sys-color-surface-container-lowest:  #0b0f12;
+  --md-sys-color-surface-container-low:     #181c20;
+  --md-sys-color-surface-container:         #1c2024;
+  --md-sys-color-surface-container-high:    #272a2e;
+  --md-sys-color-surface-container-highest: #313539;
+  --md-sys-color-outline:                   #8b9198;
+  --md-sys-color-outline-variant:           #41474d;
+  --md-sys-color-inverse-surface:           #e0e3e8;
+  --md-sys-color-inverse-on-surface:        #2d3135;
+  --md-sys-color-inverse-primary:           #006493;
 }
 
-/* ---- c) Tokens escuros explícitos ---- */
-[data-theme="dark"] {
-  --md-sys-color-primary:                  #90caf9;
-  --md-sys-color-on-primary:               #003353;
-  --md-sys-color-primary-container:        #004b76;
-  --md-sys-color-on-primary-container:     #cde5ff;
-  --md-sys-color-secondary:                #b6c9d8;
-  --md-sys-color-on-secondary:             #21323f;
-  --md-sys-color-secondary-container:      #374956;
-  --md-sys-color-on-secondary-container:   #d2e5f5;
-  --md-sys-color-background:               #101518;
-  --md-sys-color-on-background:            #e0e4e8;
-  --md-sys-color-surface:                  #101518;
-  --md-sys-color-on-surface:               #e0e4e8;
-  --md-sys-color-on-surface-variant:       #c0c8cd;
-  --md-sys-color-surface-variant:          #40484d;
-  --md-sys-color-outline:                  #8a9297;
-  --md-sys-color-outline-variant:          #40484d;
-  --md-sys-color-surface-container-lowest: #0b1014;
-  --md-sys-color-surface-container-low:    #181c20;
-  --md-sys-color-surface-container:        #1c2024;
-  --md-sys-color-surface-container-high:   #262a2e;
-  --md-sys-color-surface-container-highest:#303438;
-}
-
-/* ---- d) Preferência do sistema para dark (sem toggle manual) ---- */
-/* Só aplica quando <html> não tem nenhum data-theme (tema = "system" no ui.js) */
+/* Antes do JS aplicar o tema (ou sem JS): segue o sistema */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
-    --md-sys-color-primary:                  #90caf9;
-    --md-sys-color-on-primary:               #003353;
-    --md-sys-color-primary-container:        #004b76;
-    --md-sys-color-on-primary-container:     #cde5ff;
-    --md-sys-color-secondary:                #b6c9d8;
-    --md-sys-color-on-secondary:             #21323f;
-    --md-sys-color-secondary-container:      #374956;
-    --md-sys-color-on-secondary-container:   #d2e5f5;
-    --md-sys-color-background:               #101518;
-    --md-sys-color-on-background:            #e0e4e8;
-    --md-sys-color-surface:                  #101518;
-    --md-sys-color-on-surface:               #e0e4e8;
-    --md-sys-color-on-surface-variant:       #c0c8cd;
-    --md-sys-color-surface-variant:          #40484d;
-    --md-sys-color-outline:                  #8a9297;
-    --md-sys-color-outline-variant:          #40484d;
-    --md-sys-color-surface-container-lowest: #0b1014;
-    --md-sys-color-surface-container-low:    #181c20;
-    --md-sys-color-surface-container:        #1c2024;
-    --md-sys-color-surface-container-high:   #262a2e;
-    --md-sys-color-surface-container-highest:#303438;
+    color-scheme: dark;
+    --md-sys-color-primary:                   #8dcdff;
+    --md-sys-color-on-primary:                #00344d;
+    --md-sys-color-primary-container:         #004c6d;
+    --md-sys-color-on-primary-container:      #cae6ff;
+    --md-sys-color-secondary-container:       #384956;
+    --md-sys-color-on-secondary-container:    #d3e5f5;
+    --md-sys-color-background:                #101418;
+    --md-sys-color-surface:                   #101418;
+    --md-sys-color-on-surface:                #e0e3e8;
+    --md-sys-color-on-surface-variant:        #c1c7ce;
+    --md-sys-color-surface-container-low:     #181c20;
+    --md-sys-color-surface-container:         #1c2024;
+    --md-sys-color-surface-container-high:    #272a2e;
+    --md-sys-color-outline-variant:           #41474d;
   }
 }
 
-/* Eye Care — Modo quente / noturno (Light) */
-[data-eyecare="on"],
-[data-eyecare="night"] {
-  --md-sys-color-primary:                  #8b5000;
-  --md-sys-color-on-primary:               #ffffff;
-  --md-sys-color-primary-container:        #ffddb8;
-  --md-sys-color-on-primary-container:     #2c1600;
-  --md-sys-color-secondary:                #6e5b3e;
-  --md-sys-color-on-secondary:             #ffffff;
-  --md-sys-color-secondary-container:      #f9deb9;
-  --md-sys-color-on-secondary-container:   #261a05;
-  --md-sys-color-background:               #fff8f0;
-  --md-sys-color-on-background:            #201b13;
-  --md-sys-color-surface:                  #fff8f0;
-  --md-sys-color-on-surface:               #201b13;
-  --md-sys-color-on-surface-variant:       #504535;
-  --md-sys-color-surface-variant:          #eee0cb;
-  --md-sys-color-surface-container-lowest: #fffbf5;
-  --md-sys-color-surface-container-low:    #f8f0e3;
-  --md-sys-color-surface-container:        #f2e9da;
-  --md-sys-color-surface-container-high:   #ece2d2;
-  --md-sys-color-surface-container-highest:#e6dcc9;
-  --md-sys-color-outline:                  #8a7360;
-  --md-sys-color-outline-variant:          #d4c4ad;
+/* ---- Proteção ocular (tons quentes) — claro ---- */
+:root[data-eyecare] {
+  --md-sys-color-primary:                   #8b5000;
+  --md-sys-color-on-primary:                #ffffff;
+  --md-sys-color-primary-container:         #ffdcbe;
+  --md-sys-color-on-primary-container:      #2c1600;
+  --md-sys-color-secondary:                 #725a42;
+  --md-sys-color-secondary-container:       #fedcbe;
+  --md-sys-color-on-secondary-container:    #291806;
+  --md-sys-color-background:                #fff8f4;
+  --md-sys-color-on-background:             #211a14;
+  --md-sys-color-surface:                   #fff8f4;
+  --md-sys-color-on-surface:                #211a14;
+  --md-sys-color-surface-variant:           #f2dfd1;
+  --md-sys-color-on-surface-variant:        #51443a;
+  --md-sys-color-surface-container-lowest:  #ffffff;
+  --md-sys-color-surface-container-low:     #fff1e7;
+  --md-sys-color-surface-container:         #fceadc;
+  --md-sys-color-surface-container-high:    #f6e5d7;
+  --md-sys-color-surface-container-highest: #f0dfd1;
+  --md-sys-color-outline:                   #847469;
+  --md-sys-color-outline-variant:           #d6c3b6;
+  --md-sys-color-inverse-surface:           #372f28;
+  --md-sys-color-inverse-on-surface:        #fdeee3;
+  --md-sys-color-inverse-primary:           #ffb871;
 }
 
-/* Eye Care — Modo quente / noturno (Dark) */
-[data-theme="dark"][data-eyecare="on"],
-[data-theme="dark"][data-eyecare="night"] {
-  --md-sys-color-primary:                  #ffb868;
-  --md-sys-color-on-primary:               #4a2800;
-  --md-sys-color-primary-container:        #6a3c00;
-  --md-sys-color-on-primary-container:     #ffddb8;
-  --md-sys-color-secondary:                #dbc3a0;
-  --md-sys-color-on-secondary:             #3d2e16;
-  --md-sys-color-secondary-container:      #55442a;
-  --md-sys-color-on-secondary-container:   #f9deb9;
-  --md-sys-color-background:               #191208;
-  --md-sys-color-on-background:            #ede0cf;
-  --md-sys-color-surface:                  #191208;
-  --md-sys-color-on-surface:               #ede0cf;
-  --md-sys-color-on-surface-variant:       #d0bfa8;
-  --md-sys-color-surface-variant:          #4e3e2a;
-  --md-sys-color-surface-container-lowest: #120d04;
-  --md-sys-color-surface-container-low:    #201810;
-  --md-sys-color-surface-container:        #271f15;
-  --md-sys-color-surface-container-high:   #31261a;
-  --md-sys-color-surface-container-highest:#3c2f20;
-  --md-sys-color-outline:                  #9e8870;
-  --md-sys-color-outline-variant:          #4e3e2a;
+/* ---- Proteção ocular — escuro ---- */
+:root[data-theme="dark"][data-eyecare] {
+  --md-sys-color-primary:                   #ffb871;
+  --md-sys-color-on-primary:                #4a2800;
+  --md-sys-color-primary-container:         #6a3c00;
+  --md-sys-color-on-primary-container:      #ffdcbe;
+  --md-sys-color-secondary:                 #e1c1a4;
+  --md-sys-color-secondary-container:       #59432d;
+  --md-sys-color-on-secondary-container:    #fedcbe;
+  --md-sys-color-background:                #19120c;
+  --md-sys-color-on-background:             #efe0d5;
+  --md-sys-color-surface:                   #19120c;
+  --md-sys-color-on-surface:                #efe0d5;
+  --md-sys-color-surface-variant:           #51443a;
+  --md-sys-color-on-surface-variant:        #d6c3b6;
+  --md-sys-color-surface-container-lowest:  #130d07;
+  --md-sys-color-surface-container-low:     #211a14;
+  --md-sys-color-surface-container:         #261e18;
+  --md-sys-color-surface-container-high:    #312822;
+  --md-sys-color-surface-container-highest: #3c332c;
+  --md-sys-color-outline:                   #9f8d81;
+  --md-sys-color-outline-variant:           #51443a;
+  --md-sys-color-inverse-surface:           #efe0d5;
+  --md-sys-color-inverse-on-surface:        #372f28;
+  --md-sys-color-inverse-primary:           #8b5000;
 }
 
 
 /* =================================================================
-   2. RESET & BASE
+   2. BASE
 ================================================================= */
 
-*, *::before, *::after {
-  box-sizing: border-box;
+*, *::before, *::after { box-sizing: border-box; }
+/* Reset só em elementos nativos: estilos de documento venceriam os :host
+   dos componentes Material Web e o ::slotted de quem vai em slot. */
+:where(html, body, div, span, p, h1, h2, h3, h4, h5, h6, ul, ol, li, section,
+       header, footer, main, nav, form, a, button, label, img, input, figure):where(:not([slot])) {
   margin: 0;
   padding: 0;
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
 }
 
-*:focus,
-*:focus-visible {
-  outline: none !important;
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html, body {
   height: 100%;
-  overflow: hidden;
-  background-color: var(--md-sys-color-background);
+  background: var(--md-sys-color-surface);
   color: var(--md-sys-color-on-surface);
-  font-family: "Roboto", sans-serif;
+  font-family: var(--font-brand);
+  font-size: 14px;
+  line-height: 20px;
   -webkit-font-smoothing: antialiased;
 }
 
-
-/* =================================================================
-   3. TOP APP BAR + LOGO
-================================================================= */
-
-.top-app-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: var(--topbar-height, 64px);
-  padding: 0 4px 0 16px;
-  background-color: var(--md-sys-color-background);
-  border-bottom: 1px solid var(--md-sys-color-outline-variant);
-  flex-shrink: 0;
-  position: relative;
-  z-index: 20;
-}
-
-.top-app-bar__start {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.top-app-bar__actions {
-  display: flex;
-  align-items: center;
-}
-
-.app-logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 32px;
-  pointer-events: none;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.app-logo svg {
-  height: 32px;
-  width: auto;
-  flex-shrink: 0;
-  pointer-events: none;
-  -webkit-user-drag: none;
-}
-
-.app-logo__name {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: var(--md-sys-color-on-surface);
-  line-height: 1;
-  pointer-events: none;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-
-/* =================================================================
-   4. BOTÃO INSTALAR (top app bar)
-================================================================= */
-
-.install-topbar-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 14px;
-  height: 36px;
-  border-radius: var(--radius-full);
-  background-color: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-on-secondary-container);
-  border: none;
-  cursor: pointer;
-  font-family: "Roboto", sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-  transition: background-color 150ms;
-  margin-right: 4px;
-}
-
-.install-topbar-btn:active {
-  background-color: color-mix(
-    in srgb,
-    var(--md-sys-color-primary-container) 85%,
-    var(--md-sys-color-on-secondary-container)
-  );
-}
-
-.install-topbar-btn .material-symbols-rounded {
-  font-size: 18px;
-}
-
-.install-topbar-btn__label {
-  font-size: 13px;
-  font-weight: 500;
-}
-
-
-/* =================================================================
-   5. DIÁLOGO GENÉRICO (compartilhado por todas as telas)
-================================================================= */
-
-.dialog-scrim {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  z-index: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 200ms ease;
-}
-
-.dialog-scrim.open {
-  opacity: 1;
-  pointer-events: all;
-}
-
-.dialog-container {
-  background: var(--md-sys-color-surface-container-high);
-  border-radius: var(--radius-xl);
-  padding: 24px;
-  width: 100%;
-  max-width: 380px;
+body {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.24);
-  transform: scale(0.92);
-  transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  height: var(--app-height, 100dvh);
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
-.dialog-scrim.open .dialog-container {
-  transform: scale(1);
+/* Interface não é selecionável (sensação de app); dados sim. */
+body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+input, textarea, .selectable, .mono { -webkit-user-select: text; user-select: text; }
+
+a { color: var(--md-sys-color-primary); }
+img, svg { display: block; max-width: 100%; }
+button { font: inherit; color: inherit; }
+button, a, [role="button"], .list-item { touch-action: manipulation; }
+
+:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
 }
 
-.dialog-title {
-  font-size: 20px;
-  font-weight: 500;
-  color: var(--md-sys-color-on-surface);
-  line-height: 1.3;
+[hidden] { display: none !important; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
 }
 
-.dialog-body {
-  font-size: 14px;
-  color: var(--md-sys-color-on-surface-variant);
-  line-height: 1.5;
-}
-
-.dialog-key-preview {
-  font-family: "Roboto Mono", monospace;
-  font-size: 13px;
-  color: var(--md-sys-color-on-surface);
-  word-break: break-all;
-}
-
-.dialog-actions {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: nowrap;
-}
-
-.dialog-actions md-text-button,
-.dialog-actions md-filled-button {
-  flex-shrink: 0;
-  white-space: nowrap;
-  --md-filled-button-container-height: 40px;
-  --md-text-button-container-height: 40px;
-}
-
-.delete-confirm-btn {
-  --md-filled-button-container-color: var(--md-sys-color-error, #b3261e);
-  --md-filled-button-label-text-color: #fff;
-}
-
-
-/* =================================================================
-   6. BOTÕES DE RODAPÉ (compartilhados entre telas)
-================================================================= */
-
-.save-btn,
-.confirm-btn,
-.home-btn {
-  width: 100%;
-  overflow: visible;
-  --md-filled-button-container-height: 48px;
-  --md-filled-button-icon-size: 20px;
-  --md-filled-button-container-shape: var(--radius-lg);
-}
-
-md-filled-button md-icon,
-md-filled-tonal-button md-icon {
-  font-size: 20px !important;
-  width: 20px;
-  height: 20px;
-  overflow: visible;
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
-}
-
-
-/* =================================================================
-   7. MATERIAL SYMBOLS (fonte de ícones)
-================================================================= */
-
-.material-symbols-rounded,
-md-icon {
-  font-family: "Material Symbols Rounded" !important;
-  font-weight: 400;
+/* Ícones (Material Symbols Rounded)
+   .icon = ícone em HTML comum. <md-icon> é dimensionado pelo próprio
+   Material Web (via --md-icon-font), então não recebe estas regras. */
+md-icon { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+.icon {
+  font-family: "Material Symbols Rounded";
+  font-weight: normal;
   font-style: normal;
   font-size: 24px;
   line-height: 1;
   letter-spacing: normal;
   text-transform: none;
-  display: inline-block;
   white-space: nowrap;
-  word-wrap: normal;
   direction: ltr;
+  display: inline-block;
+  flex-shrink: 0;
   -webkit-font-feature-settings: "liga";
   font-feature-settings: "liga";
-  -webkit-font-smoothing: antialiased;
   font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
 }
+.icon--filled { font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24; }
+.icon--sm { font-size: 20px; }
 
 
 /* =================================================================
-   8. SUPRESSÃO DE OVERLAYS / BARRAS DE PROGRESSO
-   (elementos legados que não devem mais aparecer)
+   3. SHELL
 ================================================================= */
 
-#eyecare-overlay,
-.eyecare-overlay,
-.top-loading-bar,
-.loading-line,
-.page-loader,
-progress,
-md-linear-progress {
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
-
-/* =================================================================
-   9. HOME (index.html)
-================================================================= */
-
-/* --- Layout principal --- */
-.home-content {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 20px 16px 32px;
-  max-width: 600px;
-  margin: 0 auto;
-  width: 100%;
-  height: calc(var(--app-height, 100dvh) - var(--topbar-height, 64px));
-  overflow-y: auto;
-  overflow-x: hidden;
-  box-sizing: border-box;
-}
-
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-  .home-content {
-    padding-bottom: calc(32px + env(safe-area-inset-bottom));
-  }
-}
-
-/* --- Label de seção --- */
-.home-section-label {
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--md-sys-color-primary);
-  padding: 8px 4px 0;
-}
-
-/* --- Cards de ação --- */
-.action-card {
+/* ---- Top app bar ---- */
+.app-bar {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 18px 16px;
-  border-radius: 24px;
-  background-color: var(--md-sys-color-surface-container-low);
-  border: 1px solid color-mix(in srgb, var(--md-sys-color-outline-variant) 62%, transparent);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  cursor: pointer;
-  text-decoration: none;
-  color: inherit;
-  transition: background-color 150ms ease, box-shadow 150ms ease;
-  -webkit-tap-highlight-color: transparent;
+  gap: var(--space-1);
+  min-height: var(--app-bar-height);
+  padding-top: env(safe-area-inset-top);
+  padding-inline: calc(var(--inline) - var(--space-1));
+  background: var(--md-sys-color-surface);
+  transition: background-color var(--duration-medium) var(--motion-standard);
 }
 
-.action-card:active {
-  background-color: var(--md-sys-color-surface-container);
-  box-shadow: none;
-}
+/* Quando o conteúdo rola, a barra ganha "tonal elevation" */
+.app-bar.is-scrolled { background: var(--md-sys-color-surface-container); }
 
-.action-card__icon-wrap {
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  background-color: var(--md-sys-color-primary-container);
-  color: var(--md-sys-color-on-primary-container);
+.app-bar__title {
+  flex: 1;
+  min-width: 0;
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 400;
+  color: var(--md-sys-color-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-inline: var(--space-3) 0;
+}
+/* Com botão de voltar antes do título, o espaçamento é menor */
+md-icon-button + .app-bar__title { padding-inline-start: var(--space-1); }
+
+.app-bar__actions {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: var(--space-1);
   flex-shrink: 0;
 }
 
-.action-card__icon-wrap .material-symbols-rounded {
-  font-size: 26px;
-  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+/* Marca (somente telas raiz) */
+.brand {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-inline-start: var(--space-3);
+  color: var(--md-sys-color-on-surface);
+  text-decoration: none;
+  min-width: 0;
+}
+.brand__mark {
+  width: 32px; height: 32px;
+  flex-shrink: 0;
+  background: var(--md-sys-color-primary);
+  -webkit-mask: url("logo.svg") center / contain no-repeat;
+          mask: url("logo.svg") center / contain no-repeat;
+}
+.brand__name {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: .02em;
 }
 
-.action-card__text {
+/* ---- Área rolável ---- */
+.app-main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* ---- Coluna de conteúdo ---- */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-2) var(--inline) var(--space-8);
+}
+
+/* Telas sem rodapé/nav: respeita a área segura inferior */
+body:not(:has(.app-footer, .app-nav)) .page {
+  padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom));
+}
+
+/* Página que ocupa a altura toda (ex.: teclado numérico) */
+.page--fill { min-height: 100%; }
+.page--fill > .grow { flex: 1; }
+
+/* ---- Rodapé de ações ---- */
+.app-footer {
+  flex-shrink: 0;
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--inline);
+  padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
+  background: var(--md-sys-color-surface-container);
+}
+.app-footer > * { flex: 1; min-width: 0; }
+.app-footer > .app-footer__secondary { flex: 0 0 auto; }
+
+/* Rodapé acima da navegação não precisa da área segura */
+.app-footer:has(+ .app-nav) { padding-bottom: var(--space-3); }
+
+/* ---- Navigation bar (telas raiz) ---- */
+.app-nav {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  height: calc(var(--nav-height) + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-inline: var(--inline);
+  background: var(--md-sys-color-surface-container);
+}
+
+.app-nav__item {
+  flex: 1;
+  max-width: 168px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding-block: var(--space-3) var(--space-4);
+  text-decoration: none;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: .5px;
+  position: relative;
+}
+
+.app-nav__indicator {
+  width: 64px;
+  height: 32px;
+  border-radius: var(--shape-full);
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+  transition: background-color var(--duration-short) var(--motion-standard);
+}
+.app-nav__indicator::before {
+  content: ""; position: absolute; inset: 0;
+  background: currentColor; opacity: 0;
+  transition: opacity var(--duration-short);
+}
+.app-nav__item:hover .app-nav__indicator::before { opacity: .08; }
+.app-nav__item:active .app-nav__indicator::before { opacity: .12; }
+
+.app-nav__item[aria-current="page"] {
+  color: var(--md-sys-color-on-surface);
+  font-weight: 700;
+}
+.app-nav__item[aria-current="page"] .app-nav__indicator {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+.app-nav__item[aria-current="page"] .icon {
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+
+/* =================================================================
+   4. TIPOGRAFIA UTILITÁRIA (escala M3)
+================================================================= */
+
+.display  { font-size: 45px; line-height: 52px; font-weight: 400; }
+.headline { font-size: 24px; line-height: 32px; font-weight: 400; }
+.title-lg { font-size: 22px; line-height: 28px; font-weight: 400; }
+.title    { font-size: 16px; line-height: 24px; font-weight: 500; letter-spacing: .15px; }
+.body-lg  { font-size: 16px; line-height: 24px; }
+.body     { font-size: 14px; line-height: 20px; letter-spacing: .25px; }
+.label    { font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: .5px; }
+.muted    { color: var(--md-sys-color-on-surface-variant); }
+.mono     { font-family: var(--font-mono); word-break: break-all; }
+.center   { text-align: center; }
+
+
+/* =================================================================
+   5. SECTION & CARD
+================================================================= */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: 32px;
+  padding-inline: var(--space-1);
+}
+
+.section__title {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: .1px;
+  color: var(--md-sys-color-primary);
+}
+
+.section__hint {
+  padding-inline: var(--space-1);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+/* Card padrão: superfície "container", sem borda, raio grande */
+.card {
+  background: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface);
+  border-radius: var(--shape-xl);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Cards de formulário não cortam menus/sugestões flutuantes */
+.card:has(.field) { overflow: visible; }
+
+/* Card que contém apenas uma lista: sem padding interno */
+.card--list { padding: var(--space-2) 0; gap: 0; }
+
+/* Destaque (CTA principal da home, resumo de valor etc.) */
+.card--primary {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+
+.card--outlined {
+  background: transparent;
+  border: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.card--center { align-items: center; text-align: center; }
+
+.card__title { font-size: 16px; line-height: 24px; font-weight: 500; }
+.card__text  { font-size: 14px; line-height: 20px; color: var(--md-sys-color-on-surface-variant); }
+.card--primary .card__text { color: inherit; opacity: .85; }
+.card__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); justify-content: flex-end; }
+.card__actions--start { justify-content: flex-start; }
+
+
+/* =================================================================
+   6. LIST
+   <a|button|label|div class="list-item">
+     <span class="list-item__leading"><span class="icon">…</span></span>
+     <span class="list-item__content">
+       <span class="list-item__headline">Título</span>
+       <span class="list-item__supporting">Texto de apoio</span>
+     </span>
+     <span class="list-item__trailing">…</span>
+   </…>
+================================================================= */
+
+.list { display: flex; flex-direction: column; }
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  min-height: var(--list-item-min-height);
+  padding: var(--space-2) var(--space-6) var(--space-2) var(--space-4);
+  background: none;
+  border: 0;
+  text-align: start;
+  text-decoration: none;
+  color: var(--md-sys-color-on-surface);
+  position: relative;
+}
+.list-item--two-line { min-height: 72px; }
+
+/* Divisor inset entre itens */
+.list-item + .list-item::before,
+.list-item + .expand > .list-item::before,
+.expand + .list-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 72px;
+  right: var(--space-4);
+  height: 1px;
+  background: var(--md-sys-color-outline-variant);
+  opacity: .6;
+}
+
+/* Estado interativo (state layer M3) */
+.list-item--action { cursor: pointer; }
+.list-item--action::after {
+  content: ""; position: absolute; inset: 0;
+  background: var(--md-sys-color-on-surface);
+  opacity: 0;
+  transition: opacity var(--duration-short) var(--motion-standard);
+  pointer-events: none;
+}
+.list-item--action:hover::after { opacity: .08; }
+.list-item--action:active::after { opacity: .12; }
+
+.list-item__leading {
+  width: 40px; height: 40px;
+  border-radius: var(--shape-md);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  overflow: hidden;
+  font-weight: 500;
+  font-size: 16px;
+}
+.list-item__leading--primary {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+.list-item__leading--plain {
+  background: none;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.list-item__leading--avatar { border-radius: var(--shape-full); }
+.list-item__leading img { width: 100%; height: 100%; object-fit: cover; }
+
+.list-item__content {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
-.action-card__title {
-  font-size: 16px;
+.list-item__overline {
+  font-size: 12px;
+  line-height: 16px;
   font-weight: 500;
-  color: var(--md-sys-color-on-surface);
-  line-height: 1.25;
-}
-
-.action-card__desc {
-  font-size: 13px;
+  letter-spacing: .5px;
   color: var(--md-sys-color-on-surface-variant);
-  line-height: 1.4;
 }
 
-.action-card__arrow {
+.list-item__headline {
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: .15px;
+  color: var(--md-sys-color-on-surface);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.list-item__headline--wrap { white-space: normal; overflow-wrap: anywhere; }
+
+.list-item__supporting {
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: .25px;
+  color: var(--md-sys-color-on-surface-variant);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.list-item__supporting--wrap { white-space: normal; overflow-wrap: anywhere; }
+
+.list-item__trailing {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+}
+/* Com icon-button no fim, compensa o padding */
+.list-item:has(.list-item__trailing > md-icon-button) { padding-inline-end: var(--space-2); }
+
+/* Painel expansível dentro de lista (ex.: escolha de tema) */
+.expand > .list-item .list-item__trailing .icon { transition: transform var(--duration-medium) var(--motion-standard); }
+.expand.is-open > .list-item .list-item__trailing .icon { transform: rotate(180deg); }
+.expand__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--duration-medium) var(--motion-standard);
+}
+.expand.is-open .expand__panel { grid-template-rows: 1fr; }
+.expand__panel > div { overflow: hidden; }
+.expand__panel .list-item { padding-inline-start: 72px; min-height: 48px; }
+.expand__panel .list-item::before { display: none; }
+
+
+/* =================================================================
+   7. FORMULÁRIOS
+================================================================= */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Campo com posicionamento para sugestões / ícone de validação */
+.field { position: relative; width: 100%; }
+
+md-outlined-text-field,
+md-filled-text-field,
+md-outlined-select { width: 100%; }
+
+.field-label {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: calc(var(--space-2) * -1);
+}
+
+.field-help {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--md-sys-color-on-surface-variant);
+  padding-inline: var(--space-4);
+}
+
+/* Grupo de chips com rolagem horizontal quando não cabe */
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.chips--scroll {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-inline: calc(var(--space-4) * -1);
+  padding-inline: var(--space-4);
+}
+.chips--scroll::-webkit-scrollbar { display: none; }
+
+/* Lista de sugestões (bancos, provedores de e-mail) */
+.suggestions {
+  position: absolute;
+  left: 0; right: 0;
+  top: calc(100% + var(--space-1));
+  z-index: 30;
+  list-style: none;
+  padding: var(--space-2) 0;
+  border-radius: var(--shape-sm);
+  background: var(--md-sys-color-surface-container);
+  box-shadow: var(--elevation-3);
+  max-height: 280px;
+  overflow-y: auto;
+}
+.suggestions .list-item { min-height: 48px; padding-block: var(--space-1); }
+.suggestions .list-item::before { display: none; }
+
+/* Upload de imagem (avatar, logo) */
+.upload {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.upload__preview {
+  width: 64px; height: 64px;
+  border-radius: var(--shape-full);
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.upload__preview--square { border-radius: var(--shape-lg); }
+.upload__preview img { width: 100%; height: 100%; object-fit: cover; }
+.upload__preview .icon { font-size: 32px; }
+.upload__content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-start; }
+
+/* Linha de checkbox / termos */
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  margin-inline-start: calc(var(--space-3) * -1);
+}
+
+/* Seletor de cor como trailing de list-item */
+.swatch {
+  position: relative;
+  width: 40px; height: 40px;
+  border-radius: var(--shape-full);
+  border: 1px solid var(--md-sys-color-outline);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.swatch input[type="color"] {
+  position: absolute; inset: -8px;
+  width: calc(100% + 16px); height: calc(100% + 16px);
+  border: 0; padding: 0; cursor: pointer; background: none;
+}
+
+/* Slider dentro de list-item: cabeçalho (rótulo + valor) e trilho */
+.slider-row__head { display: flex; justify-content: space-between; align-items: center; gap: var(--space-2); }
+.list-item__content md-slider { width: calc(100% + 16px); margin-inline: -8px; }
+
+
+/* =================================================================
+   8. FEEDBACK
+================================================================= */
+
+/* Estado vazio */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
+}
+.empty__icon {
+  width: 72px; height: 72px;
+  border-radius: var(--shape-full);
+  display: grid; place-items: center;
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+.empty__icon .icon { font-size: 36px; }
+.empty__title { font-size: 16px; line-height: 24px; font-weight: 500; }
+.empty__text  { color: var(--md-sys-color-on-surface-variant); max-width: 320px; }
+
+/* Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 24px;
+  padding: 0 var(--space-2);
+  border-radius: var(--shape-sm);
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  font-size: 12px; line-height: 16px; font-weight: 500;
+  white-space: nowrap;
+}
+.badge--primary { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+
+/* Banner de erro inline */
+.banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--shape-lg);
+  background: var(--md-sys-color-error-container);
+  color: var(--md-sys-color-on-error-container);
+}
+
+/* Validação dentro do campo */
+.field__status {
+  position: absolute;
+  right: var(--space-3);
+  top: 16px;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+}
+.field__status.is-valid   { color: var(--md-sys-color-success); }
+.field__status.is-invalid { color: var(--md-sys-color-error); }
+.field:has(.field__status:not(:empty)) md-outlined-text-field { --md-outlined-text-field-trailing-space: 48px; }
+
+/* Snackbar (criado pelo ui.js: QrUI.snackbar) */
+.snackbar {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--snackbar-offset, var(--space-4)) + env(safe-area-inset-bottom));
+  z-index: 1000;
+  width: min(calc(100% - 2 * var(--gutter)), 560px);
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2) var(--space-1) var(--space-4);
+  border-radius: var(--shape-xs);
+  background: var(--md-sys-color-inverse-surface);
+  color: var(--md-sys-color-inverse-on-surface);
+  box-shadow: var(--elevation-3);
+  font-size: 14px; line-height: 20px;
+  opacity: 0;
+  transform: translate(-50%, 16px);
+  transition: opacity var(--duration-medium) var(--motion-standard),
+              transform var(--duration-medium) var(--motion-emphasized);
+  pointer-events: none;
+}
+.snackbar.is-visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.snackbar__text { flex: 1; padding-block: var(--space-3); }
+.snackbar__action {
+  background: none; border: 0; cursor: pointer;
+  color: var(--md-sys-color-inverse-primary);
+  font-weight: 500; font-size: 14px;
+  padding: 10px 12px; border-radius: var(--shape-full);
+}
+.snackbar__action:hover { background: color-mix(in srgb, var(--md-sys-color-inverse-primary) 8%, transparent); }
+.snackbar__close {
+  background: none; border: 0; cursor: pointer;
+  width: 40px; height: 40px; border-radius: var(--shape-full);
+  color: inherit; display: grid; place-items: center;
+}
+body:has(.app-footer) { --snackbar-offset: 96px; }
+body:has(.app-nav)    { --snackbar-offset: 96px; }
+body:has(.app-footer + .app-nav) { --snackbar-offset: 168px; }
+
+/* Dialog (md-dialog) */
+md-dialog { max-width: min(560px, calc(100vw - 48px)); }
+md-dialog [slot="content"] { color: var(--md-sys-color-on-surface-variant); }
+
+/* Spinner simples */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin .9s linear infinite; }
+
+
+/* =================================================================
+   9. COMPONENTES DE DOMÍNIO
+================================================================= */
+
+/* ---- Stepper (fluxos em etapas) ---- */
+.stepper {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  padding: var(--space-2) var(--inline) var(--space-3);
+  background: var(--md-sys-color-surface);
+}
+.stepper__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  width: 72px;
   flex-shrink: 0;
   color: var(--md-sys-color-on-surface-variant);
-  opacity: 0.5;
+}
+.stepper__dot {
+  width: 28px; height: 28px;
+  border-radius: var(--shape-full);
+  display: grid; place-items: center;
+  border: 2px solid var(--md-sys-color-outline-variant);
+  font-size: 13px; font-weight: 500;
+  transition: all var(--duration-medium) var(--motion-standard);
+}
+.stepper__dot .icon { font-size: 16px; }
+.stepper__label { font-size: 12px; line-height: 16px; font-weight: 500; text-align: center; }
+.stepper__line {
+  flex: 1;
+  height: 2px;
+  margin-top: 13px;
+  background: var(--md-sys-color-outline-variant);
+  border-radius: 1px;
+  transition: background var(--duration-medium);
+}
+.stepper__item.is-active { color: var(--md-sys-color-primary); }
+.stepper__item.is-active .stepper__dot {
+  background: var(--md-sys-color-primary);
+  border-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+.stepper__item.is-done .stepper__dot {
+  background: var(--md-sys-color-primary-container);
+  border-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+.stepper__line.is-done { background: var(--md-sys-color-primary); }
+
+.step { display: contents; }
+.step[hidden] { display: none !important; }
+
+/* ---- Valor monetário ---- */
+.amount {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--space-2);
+  color: var(--md-sys-color-on-surface-variant);
+  font-variant-numeric: tabular-nums;
+}
+.amount__currency { font-size: 24px; line-height: 32px; font-weight: 400; }
+.amount__value { font-size: 45px; line-height: 52px; font-weight: 400; transition: color var(--duration-short); }
+.amount.is-set { color: var(--md-sys-color-on-surface); }
+.amount.is-set .amount__value { color: var(--md-sys-color-primary); }
+
+.amount-area {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 112px;
 }
 
-.action-card__arrow .material-symbols-rounded {
-  font-size: 22px;
+/* ---- Teclado numérico ---- */
+.numpad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+.numpad__key {
+  height: 60px;
+  border: 0;
+  border-radius: var(--shape-lg);
+  background: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface);
+  font-size: 24px;
+  line-height: 32px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  display: grid; place-items: center;
+  font-variant-numeric: tabular-nums;
+  transition: border-radius var(--duration-short) var(--motion-standard);
+}
+.numpad__key::after {
+  content: ""; position: absolute; inset: 0;
+  background: var(--md-sys-color-on-surface); opacity: 0;
+  transition: opacity var(--duration-short);
+}
+.numpad__key:hover::after { opacity: .08; }
+.numpad__key:active { border-radius: var(--shape-xl); }
+.numpad__key:active::after { opacity: .12; }
+.numpad__key--muted { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+@media (max-height: 680px) { .numpad__key { height: 52px; } }
+
+/* ---- Moldura do QR Code ---- */
+.qr-frame {
+  align-self: center;
+  width: min(100%, var(--qr-size, 280px));
+  aspect-ratio: 1;
+  padding: var(--space-3);
+  border-radius: var(--shape-xl);
+  background: #ffffff;               /* QR sempre sobre branco p/ leitura */
+  box-shadow: var(--elevation-1);
+  display: grid;
+  place-items: center;
+}
+.qr-frame > div, .qr-frame svg, .qr-frame canvas { width: 100% !important; height: 100% !important; }
+
+/* Preview fixo no topo (personalização) */
+.sticky-preview {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--md-sys-color-surface);
+  padding-block: var(--space-2) var(--space-4);
+  margin-top: calc(var(--space-2) * -1);
+  display: flex;
+  justify-content: center;
+}
+.sticky-preview .qr-frame { --qr-size: 168px; }
+
+/* ---- Bloco de código (Pix Copia e Cola) ---- */
+.code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--md-sys-color-on-surface-variant);
+  background: var(--md-sys-color-surface-container-lowest);
+  border-radius: var(--shape-md);
+  padding: var(--space-3);
+  word-break: break-all;
+  max-height: 96px;
+  overflow-y: auto;
+  -webkit-user-select: all;
+  user-select: all;
 }
 
-@media (max-width: 420px) {
-  .home-content {
-    padding: 16px 12px 28px;
-    gap: 10px;
-  }
-
-  .action-card {
-    padding: 16px 14px;
-    border-radius: 20px;
-    gap: 14px;
-  }
-
-  .action-card__icon-wrap {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-  }
-
-  .action-card__title {
-    font-size: 15px;
-  }
+/* ---- Hero (Sobre / perfil) ---- */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-4);
 }
+.hero__logo {
+  width: 88px; height: 88px;
+  border-radius: var(--shape-xl);
+  box-shadow: var(--elevation-1);
+  margin-bottom: var(--space-2);
+}
+.hero__avatar {
+  width: 88px; height: 88px;
+  border-radius: var(--shape-full);
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  display: grid; place-items: center;
+  overflow: hidden;
+  margin-bottom: var(--space-2);
+}
+.hero__avatar img { width: 100%; height: 100%; object-fit: cover; }
+.hero__avatar .icon { font-size: 48px; }
+
+/* ---- Texto corrido (termos, sobre) ---- */
+.prose { display: flex; flex-direction: column; gap: var(--space-3); color: var(--md-sys-color-on-surface-variant); line-height: 22px; }
+.prose h3 { font-size: 16px; line-height: 24px; font-weight: 500; color: var(--md-sys-color-on-surface); }
+.prose ol, .prose ul { padding-left: var(--space-5); display: flex; flex-direction: column; gap: var(--space-2); }
+
+/* ---- Hero da home ---- */
+.cta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-5) var(--space-5);
+}
+.cta__icon {
+  width: 48px; height: 48px;
+  border-radius: var(--shape-lg);
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  display: grid; place-items: center;
+}
+.cta .headline { color: var(--md-sys-color-on-primary-container); }
+
+
+/* =================================================================
+   10. MATERIAL WEB — AJUSTES GLOBAIS
+   Mesma forma e altura para todo componente, em toda tela.
+================================================================= */
+
+:root {
+  --md-outlined-text-field-container-shape: var(--shape-sm);
+  --md-filled-button-container-height: 48px;
+  --md-outlined-button-container-height: 48px;
+  --md-filled-tonal-button-container-height: 40px;
+  --md-text-button-container-height: 40px;
+  --md-filled-button-label-text-size: 15px;
+  --md-outlined-button-label-text-size: 15px;
+  --md-dialog-container-shape: var(--shape-xl);
+  --md-filter-chip-container-shape: var(--shape-sm);
+  --md-assist-chip-container-shape: var(--shape-sm);
+}
+
+/* Botões compactos dentro de cards */
+.card md-filled-button,
+.card md-outlined-button,
+.card md-text-button,
+.upload md-filled-tonal-button,
+.upload md-text-button {
+  --md-filled-button-container-height: 40px;
+  --md-outlined-button-container-height: 40px;
+  --md-filled-button-label-text-size: 14px;
+  --md-outlined-button-label-text-size: 14px;
+}
+.cta md-filled-button { --md-filled-button-container-height: 48px; align-self: flex-start; }
+
+/* Botões do rodapé ocupam a largura */
+.app-footer md-filled-button,
+.app-footer md-outlined-button,
+.app-footer md-filled-tonal-button { width: 100%; }
+.app-footer > .app-footer__secondary { width: auto; min-width: 112px; }
+
+/* Erro destrutivo */
+.btn-danger {
+  --md-filled-button-container-color: var(--md-sys-color-error);
+  --md-filled-button-label-text-color: var(--md-sys-color-on-error);
+  --md-text-button-label-text-color: var(--md-sys-color-error);
+}
+
+/* Evita "pulo" visual antes dos web components carregarem */
+:is(md-filled-button, md-outlined-button, md-text-button, md-filled-tonal-button,
+    md-icon-button, md-outlined-text-field, md-filter-chip, md-chip-set,
+    md-radio, md-checkbox, md-slider, md-switch, md-dialog):not(:defined) {
+  visibility: hidden;
+}
+md-dialog:not(:defined) { display: none; }

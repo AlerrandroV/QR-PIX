@@ -2,213 +2,160 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#006493" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f9ff" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>Criar Perfil — QR-PIX</title>
+  <title>Perfil de cobrança — QR PIX</title>
   <script src="ui.js"></script>
-  <link rel="manifest" href="./manifest.json" />
-  <link rel="stylesheet" href="./style.css" />
-  <link rel="stylesheet" href="./create-profile.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
-  <script type="importmap">
-    { "imports": { "@material/web/": "https://esm.run/@material/web/" } }
-  </script>
-  <script type="module">
-    import "@material/web/all.js";
-    import { styles as typescaleStyles } from "@material/web/typography/md-typescale-styles.js";
-    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
-  </script>
+  <script src="pix-utils.js"></script>
+  <script src="key-form.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="qr-pix-icon-192.png" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" />
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="material.js"></script>
 </head>
 <body>
 
-  <!-- TOP APP BAR -->
-  <header class="top-app-bar">
-    <div class="top-app-bar__start">
-      <md-icon-button id="btn-back" aria-label="Voltar">
-        <md-icon>arrow_back</md-icon>
-      </md-icon-button>
-      <span class="top-app-bar__title">Criar Perfil</span>
-    </div>
+  <header class="app-bar">
+    <md-icon-button data-nav="back" data-fallback="index.html" aria-label="Voltar">
+      <md-icon>arrow_back</md-icon>
+    </md-icon-button>
+    <h1 class="app-bar__title">Perfil de cobrança</h1>
   </header>
 
-  <!-- STEPPER -->
-  <nav class="stepper" aria-label="Progresso">
-    <div class="stepper__item" id="step-ind-1">
-      <div class="stepper__circle"><span>1</span></div>
-      <span class="stepper__label">Dados PIX</span>
+  <nav class="stepper" aria-label="Etapas">
+    <div class="stepper__item" data-step-ind="1">
+      <span class="stepper__dot">1</span><span class="stepper__label">Dados PIX</span>
     </div>
-    <div class="stepper__line"></div>
-    <div class="stepper__item" id="step-ind-2">
-      <div class="stepper__circle"><span>2</span></div>
-      <span class="stepper__label">Perfil</span>
+    <span class="stepper__line"></span>
+    <div class="stepper__item" data-step-ind="2">
+      <span class="stepper__dot">2</span><span class="stepper__label">Perfil</span>
     </div>
-    <div class="stepper__line"></div>
-    <div class="stepper__item" id="step-ind-3">
-      <div class="stepper__circle"><span>3</span></div>
-      <span class="stepper__label">Confirmar</span>
+    <span class="stepper__line"></span>
+    <div class="stepper__item" data-step-ind="3">
+      <span class="stepper__dot">3</span><span class="stepper__label">Revisão</span>
     </div>
   </nav>
 
-  <main class="cp-content">
+  <main class="app-main">
+    <div class="page">
 
-    <!-- ====== ETAPA 1: DADOS PIX ====== -->
-    <section class="cp-step" id="step-1" aria-label="Etapa 1: Dados PIX">
-
-      <div class="form-group">
-        <span class="form-group__label">Titular</span>
-        <md-outlined-text-field
-          id="field-name"
-          label="Nome completo"
-          autocomplete="name"
-          required>
-        </md-outlined-text-field>
-        <md-outlined-text-field
-          id="field-city"
-          label="Cidade"
-          autocomplete="address-level2"
-          required>
-        </md-outlined-text-field>
-      </div>
-
-      <div class="form-group">
-        <span class="form-group__label">Instituição Financeira</span>
-        <div class="field-wrapper">
-          <ul class="bank-suggestions" id="bank-suggestions" role="listbox" aria-label="Sugestões de banco" hidden></ul>
-          <md-outlined-text-field
-            id="field-bank"
-            label="Banco / Fintech"
-            autocomplete="off"
-            required>
-          </md-outlined-text-field>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <span class="form-group__label">Chave PIX</span>
-        <div class="key-type-section">
-          <p class="field-sublabel">Tipo de chave</p>
-          <div class="key-type-group" id="key-type-group" role="group" aria-label="Tipo de chave PIX">
-            <button class="key-type-chip" data-type="cpf"    aria-pressed="false">CPF</button>
-            <button class="key-type-chip" data-type="cnpj"   aria-pressed="false">CNPJ</button>
-            <button class="key-type-chip" data-type="phone"  aria-pressed="false">Telefone</button>
-            <button class="key-type-chip" data-type="email"  aria-pressed="false">E-mail</button>
-            <button class="key-type-chip" data-type="random" aria-pressed="false">Aleatória</button>
+      <!-- ===== Etapa 1: Dados PIX ===== -->
+      <div class="step" data-step="1">
+        <section class="section" aria-labelledby="s1-owner">
+          <div class="section__header"><h2 class="section__title" id="s1-owner">Titular</h2></div>
+          <div class="card form">
+            <md-outlined-text-field id="field-name" label="Nome completo ou da loja" autocomplete="name" required no-asterisk>
+              <md-icon slot="leading-icon">person</md-icon>
+            </md-outlined-text-field>
+            <md-outlined-text-field id="field-city" label="Cidade" autocomplete="address-level2" required no-asterisk>
+              <md-icon slot="leading-icon">location_on</md-icon>
+            </md-outlined-text-field>
+            <div class="field">
+              <md-outlined-text-field id="field-bank" label="Banco ou instituição" autocomplete="off" required no-asterisk>
+                <md-icon slot="leading-icon">account_balance</md-icon>
+              </md-outlined-text-field>
+            </div>
           </div>
-        </div>
-        <div class="field-wrapper">
-          <ul class="bank-suggestions email-suggestions" id="email-suggestions"
-              role="listbox" aria-label="Provedores de e-mail" hidden></ul>
-          <md-outlined-text-field
-            id="field-pix-key"
-            label="Selecione o tipo acima"
-            autocomplete="off"
-            supporting-text=" "
-            inputmode="text">
-          </md-outlined-text-field>
-          <div class="key-validation-icon" id="key-val-icon" aria-hidden="true"></div>
-        </div>
-        <p class="field-hint">A pontuação é inserida automaticamente conforme você digita.</p>
-      </div>
+        </section>
 
-    </section>
-
-    <!-- ====== ETAPA 2: PERFIL ====== -->
-    <section class="cp-step cp-step--hidden" id="step-2" aria-label="Etapa 2: Perfil público">
-
-      <div class="form-group">
-        <span class="form-group__label">Perfil público <span style="font-size:10px;font-weight:400;opacity:.7;text-transform:none">(opcional)</span></span>
-
-        <div class="avatar-upload" id="avatar-upload" role="button" tabindex="0"
-             aria-label="Escolher foto de perfil">
-          <div class="avatar-preview" id="avatar-preview">
-            <span class="material-symbols-rounded avatar-placeholder-icon">account_circle</span>
+        <section class="section" aria-labelledby="s1-key">
+          <div class="section__header"><h2 class="section__title" id="s1-key">Chave PIX</h2></div>
+          <div class="card form">
+            <md-chip-set id="key-types" aria-label="Tipo de chave"></md-chip-set>
+            <div class="field">
+              <md-outlined-text-field id="field-key" label="Escolha o tipo acima" disabled autocomplete="off" supporting-text=" ">
+                <md-icon slot="leading-icon">key</md-icon>
+              </md-outlined-text-field>
+              <span class="field__status" id="key-status" aria-hidden="true"></span>
+            </div>
           </div>
-          <div class="avatar-upload__info">
-            <span class="avatar-upload__title">Foto de perfil</span>
-            <span class="avatar-upload__sub">PNG, JPG ou WebP • máx. 2 MB</span>
+          <p class="section__hint">A pontuação é inserida automaticamente enquanto você digita.</p>
+        </section>
+      </div>
+
+      <!-- ===== Etapa 2: Perfil público ===== -->
+      <div class="step" data-step="2" hidden>
+        <section class="section" aria-labelledby="s2-photo">
+          <div class="section__header">
+            <h2 class="section__title" id="s2-photo">Perfil público</h2>
+            <span class="badge">Opcional</span>
           </div>
-          <input type="file" id="avatar-input" accept="image/*" hidden aria-hidden="true" />
-        </div>
-
-        <div class="field-wrapper username-wrapper">
-          <md-outlined-text-field
-            id="field-username"
-            label="Username (@)"
-            autocomplete="username"
-            maxlength="30"
-            supporting-text="3-30 caracteres: letras, números e _">
-          </md-outlined-text-field>
-          <div class="key-validation-icon" id="username-val-icon" aria-hidden="true"></div>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- ====== ETAPA 3: CONFIRMAR ====== -->
-    <section class="cp-step cp-step--hidden" id="step-3" aria-label="Etapa 3: Confirmar">
-
-      <div class="profile-preview-card">
-        <div class="profile-preview-card__avatar" id="preview-avatar">
-          <span class="material-symbols-rounded" style="font-size:40px;color:var(--md-sys-color-primary)">account_circle</span>
-        </div>
-        <div class="profile-preview-card__info">
-          <span class="profile-preview-card__name" id="preview-name"></span>
-          <span class="profile-preview-card__username" id="preview-username"></span>
-          <span class="profile-preview-card__bank" id="preview-bank"></span>
-          <span class="profile-preview-card__city" id="preview-city"></span>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <span class="form-group__label">Chave PIX</span>
-        <div class="review-row">
-          <span class="material-symbols-rounded review-row__icon">tag</span>
-          <div>
-            <p class="review-row__label">Tipo</p>
-            <p class="review-row__value" id="preview-key-type"></p>
+          <div class="card form">
+            <div class="upload">
+              <span class="upload__preview" id="avatar-preview"><span class="icon">add_a_photo</span></span>
+              <span class="upload__content">
+                <span class="title">Foto ou logo da loja</span>
+                <span class="label muted">PNG, JPG ou WebP · até 2 MB</span>
+                <md-filled-tonal-button id="btn-avatar">
+                  <md-icon slot="icon">upload</md-icon>
+                  Escolher imagem
+                </md-filled-tonal-button>
+              </span>
+              <input type="file" id="avatar-input" accept="image/*" hidden />
+            </div>
+            <div class="field">
+              <md-outlined-text-field id="field-username" label="Nome de usuário" prefix-text="@" maxlength="20"
+                autocomplete="username" supporting-text="3 a 20 caracteres: letras, números, ponto e _">
+              </md-outlined-text-field>
+              <span class="field__status" id="username-status" aria-hidden="true"></span>
+            </div>
           </div>
-        </div>
-        <div class="review-row">
-          <span class="material-symbols-rounded review-row__icon">key</span>
-          <div>
-            <p class="review-row__label">Chave</p>
-            <p class="review-row__value" id="preview-key"></p>
+          <p class="section__hint">Com um nome de usuário, seus clientes poderão encontrar sua loja no futuro catálogo do QR PIX.</p>
+        </section>
+      </div>
+
+      <!-- ===== Etapa 3: Revisão ===== -->
+      <div class="step" data-step="3" hidden>
+        <section class="card card--center hero" aria-label="Pré-visualização do perfil">
+          <span class="hero__avatar" id="review-avatar"><span class="icon">storefront</span></span>
+          <p class="headline" id="review-name"></p>
+          <p class="body muted" id="review-username"></p>
+          <span class="badge" id="review-place"></span>
+        </section>
+
+        <section class="section" aria-labelledby="s3-key">
+          <div class="section__header"><h2 class="section__title" id="s3-key">Chave PIX</h2></div>
+          <div class="card card--list">
+            <div class="list-item">
+              <span class="list-item__leading list-item__leading--plain"><span class="icon">key</span></span>
+              <span class="list-item__content">
+                <span class="list-item__overline" id="review-key-type"></span>
+                <span class="list-item__headline list-item__headline--wrap" id="review-key"></span>
+              </span>
+            </div>
           </div>
-        </div>
+        </section>
+
+        <section class="section" aria-labelledby="s3-terms">
+          <div class="section__header"><h2 class="section__title" id="s3-terms">Termos de uso</h2></div>
+          <div class="card">
+            <p class="card__text">
+              Ao criar o perfil você confirma que os dados são verdadeiros, de sua titularidade, e concorda com os
+              <a href="termos.html">Termos de uso</a>.
+            </p>
+            <label class="check-row">
+              <md-checkbox id="chk-terms" touch-target="wrapper"></md-checkbox>
+              <span class="body-lg">Li e aceito os termos</span>
+            </label>
+          </div>
+        </section>
       </div>
 
-      <div class="form-group terms-group">
-        <span class="form-group__label">Termos de Uso</span>
-        <p class="terms-text">
-          Ao criar seu perfil você concorda com os nossos
-          <a class="terms-link" href="termos.html" target="_blank" rel="noopener">Termos de Uso</a>
-          e confirma que os dados informados são verdadeiros e de sua titularidade.
-        </p>
-        <label class="terms-check-row">
-          <md-checkbox id="chk-terms" touch-target="wrapper"></md-checkbox>
-          <span class="terms-check-label">Li e aceito os Termos de Uso</span>
-        </label>
-      </div>
-
-    </section>
-
+    </div>
   </main>
 
-  <!-- BARRA DE NAVEGAÇÃO -->
-  <div class="bottom-bar">
-    <md-outlined-button class="nav-btn--prev" id="btn-prev" style="display:none">
-      Anterior
-    </md-outlined-button>
-    <md-filled-button class="nav-btn--next" id="btn-next">
-      Próximo
-      <span class="material-symbols-rounded" slot="trailing-icon">arrow_forward</span>
+  <footer class="app-footer">
+    <md-outlined-button id="btn-prev" class="app-footer__secondary" hidden>Voltar</md-outlined-button>
+    <md-filled-button id="btn-next" trailing-icon>
+      <span id="btn-next-label">Continuar</span>
+      <md-icon slot="icon" id="btn-next-icon">arrow_forward</md-icon>
     </md-filled-button>
-  </div>
+  </footer>
 
-  <!-- create-profile.js carregado como módulo ES (necessário para import do firebase.js) -->
-  <script type="module" src="./create-profile.js"></script>
+  <script type="module" src="create-profile.js"></script>
 </body>
 </html>

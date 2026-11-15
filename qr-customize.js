@@ -1,316 +1,156 @@
-// ===== ESTADO =====
-const QR_SETTINGS_KEY = "pixkey_qr_settings";
+/* =================================================================
+   qr-customize.js — tela Estilo do QR Code
+   Controles declarativos: [data-option="chave"] em chips, cores e
+   sliders; a chave corresponde a PixUtils.QR_DEFAULTS.
+================================================================= */
+(function () {
+  'use strict';
+  const { qrSettings, buildQrOptions, QR_DEFAULTS } = window.PixUtils;
+  const UI = window.QrUI;
+  const $ = (id) => document.getElementById(id);
 
-const defaultQrOptions = {
-  dotsType: "square",
-  dotsColor: "#000000",
-  cornerSqType: "",
-  cornerSqColor: "#000000",
-  cornerDotType: "",
-  cornerDotColor: "#000000",
-  bgColor: "#ffffff",
-  logoSize: 0.3,
-  logoMargin: 5,
-  margin: 10,
-  logoDataUrl: null,
-  eccLevel: 0,
-};
+  let saved = qrSettings.load();
+  let current = { ...saved };
 
-let savedOptions = loadQrSettings();
-let currentOptions = { ...savedOptions };
-let isDirty = false;
-let pendingNavTarget = null;
+  const ECC = [
+    { title: 'Baixa (L)', pct: '7%' },
+    { title: 'Média (M)', pct: '15%' },
+    { title: 'Quartil (Q)', pct: '25%' },
+    { title: 'Alta (H)', pct: '30%' },
+  ];
+  const FORMAT = {
+    margin: (v) => v + ' px',
+    logoMargin: (v) => v + ' px',
+    logoSize: (v) => Math.round(v * 100) + '%',
+  };
 
-function loadQrSettings() {
-  try {
-    const stored = JSON.parse(localStorage.getItem(QR_SETTINGS_KEY));
-    return stored ? { ...defaultQrOptions, ...stored } : { ...defaultQrOptions };
-  } catch {
-    return { ...defaultQrOptions };
+  const isDirty = () => JSON.stringify(current) !== JSON.stringify(saved);
+
+  // ── Preview ───────────────────────────────────────────────────
+  const preview = new QRCodeStyling(buildQrOptions(current, { data: 'https://qrpix.site', size: 336, type: 'canvas' }));
+  preview.append($('qr-canvas'));
+
+  function refresh() {
+    preview.update(buildQrOptions(current, { data: 'https://qrpix.site', size: 336, type: 'canvas' }));
+    $('btn-save').disabled = !isDirty();
   }
-}
 
-function saveQrSettings(opts) {
-  // logoDataUrl pode ser grande; clonar sem ela para medir, mas salvar com
-  localStorage.setItem(QR_SETTINGS_KEY, JSON.stringify(opts));
-}
+  // ── Sincroniza controles com o estado ─────────────────────────
+  function syncControls() {
+    document.querySelectorAll('md-chip-set[data-option]').forEach((set) => {
+      const val = String(current[set.dataset.option] ?? '');
+      set.querySelectorAll('md-filter-chip').forEach((c) => { c.selected = c.dataset.value === val; });
+    });
+    document.querySelectorAll('input[type="color"][data-option]').forEach((inp) => {
+      inp.value = current[inp.dataset.option];
+      inp.closest('.swatch').style.background = inp.value;
+    });
+    document.querySelectorAll('md-slider[data-option]').forEach((s) => { s.value = current[s.dataset.option]; });
+    document.querySelectorAll('[data-display]').forEach((el) => {
+      const k = el.dataset.display;
+      el.textContent = FORMAT[k] ? FORMAT[k](current[k]) : current[k];
+    });
+    const e = ECC[current.eccLevel] || ECC[0];
+    $('ecc-title').textContent = e.title;
+    $('ecc-badge').textContent = e.pct + ' de recuperação';
 
-function markDirty() { isDirty = true; }
-function markClean() { isDirty = false; savedOptions = { ...currentOptions }; }
-
-
-const ECC_LEVELS = ["L", "M", "Q", "H"];
-const ECC_DESCS = [
-  "Baixa — 7% de recuperação",
-  "Média — 15% de recuperação",
-  "Quartil — 25% de recuperação",
-  "Alta — 30% de recuperação",
-];
-
-// ===== QR CODE (SVG) =====
-const qrCode = new QRCodeStyling({
-  width: 200,
-  height: 200,
-  type: "svg",
-  data: "QrCode PIX",
-  qrOptions: { errorCorrectionLevel: ECC_LEVELS[currentOptions.eccLevel] },
-  margin: currentOptions.margin,
-  dotsOptions: {
-    type: currentOptions.dotsType,
-    color: currentOptions.dotsColor,
-  },
-  cornersSquareOptions: {
-    type: currentOptions.cornerSqType || undefined,
-    color: currentOptions.cornerSqColor,
-  },
-  cornersDotOptions: {
-    type: currentOptions.cornerDotType || undefined,
-    color: currentOptions.cornerDotColor,
-  },
-  backgroundOptions: {
-    color: currentOptions.bgColor,
-  },
-  image: currentOptions.logoDataUrl || undefined,
-  imageOptions: {
-    crossOrigin: "anonymous",
-    imageSize: currentOptions.logoSize,
-    margin: currentOptions.logoMargin,
-    hideBackgroundDots: true,
-  },
-});
-
-qrCode.append(document.getElementById("qr-canvas"));
-
-function updateQr() {
-  qrCode.update({
-    type: "svg",
-    data: "QrCode PIX",
-    qrOptions: { errorCorrectionLevel: ECC_LEVELS[currentOptions.eccLevel] },
-    margin: currentOptions.margin,
-    dotsOptions: {
-      type: currentOptions.dotsType,
-      color: currentOptions.dotsColor,
-    },
-    cornersSquareOptions: {
-      type: currentOptions.cornerSqType || undefined,
-      color: currentOptions.cornerSqColor,
-    },
-    cornersDotOptions: {
-      type: currentOptions.cornerDotType || undefined,
-      color: currentOptions.cornerDotColor,
-    },
-    backgroundOptions: {
-      color: currentOptions.bgColor,
-    },
-    image: currentOptions.logoDataUrl || undefined,
-    imageOptions: {
-      crossOrigin: "anonymous",
-      imageSize: currentOptions.logoSize,
-      margin: currentOptions.logoMargin,
-      hideBackgroundDots: true,
-    },
-  });
-}
-
-// ===== DIALOG =====
-const scrim = document.getElementById("dialog-scrim");
-
-function openDialog() {
-  scrim.classList.add("open");
-  scrim.setAttribute("aria-hidden", "false");
-}
-
-function closeDialog() {
-  scrim.classList.remove("open");
-  scrim.setAttribute("aria-hidden", "true");
-}
-
-// Fechar ao clicar no scrim (fora do container)
-scrim.addEventListener("click", (e) => {
-  if (e.target === scrim) closeDialog();
-});
-
-document.getElementById("dialog-discard").addEventListener("click", () => {
-  closeDialog();
-  if (pendingNavTarget) window.location.replace(pendingNavTarget);
-});
-
-document.getElementById("dialog-save-exit").addEventListener("click", () => {
-  doSave();
-  closeDialog();
-  if (pendingNavTarget) window.location.replace(pendingNavTarget);
-});
-
-// ===== NAVEGAÇÃO SEGURA =====
-function tryNavigate(target) {
-  if (isDirty) {
-    pendingNavTarget = target;
-    openDialog();
-  } else {
-    history.back();
+    const hasLogo = !!current.logoDataUrl;
+    $('btn-clear-logo').hidden = !hasLogo;
+    document.querySelectorAll('[data-logo-only]').forEach((el) => { el.hidden = !hasLogo; });
+    $('logo-preview').innerHTML = hasLogo ? `<img src="${current.logoDataUrl}" alt="" />` : '<span class="icon">image</span>';
+    if (!hasLogo) $('logo-name').textContent = 'Nenhuma imagem';
+    else if ($('logo-name').textContent === 'Nenhuma imagem') $('logo-name').textContent = 'Logo salvo';
   }
-}
 
-document.getElementById("btn-back").addEventListener("click", () => {
-  if (isDirty) {
-    pendingNavTarget = "settings.html";
-    openDialog();
-  } else {
-    // Volta pelo histórico real, sem criar entrada fantasma
-    history.back();
+  function set(key, value) {
+    current[key] = value;
+    syncControls();
+    refresh();
   }
-});
 
-// Marca o estado atual como "qr-customize" sem empilhar nada extra
-history.replaceState({ page: "qr-customize" }, "");
-
-window.addEventListener("popstate", (e) => {
-  // O usuário acionou o botão físico/gesto de voltar
-  if (isDirty) {
-    // Reempurra para impedir a navegação enquanto o dialog está aberto
-    history.pushState({ page: "qr-customize" }, "");
-    pendingNavTarget = "settings.html";
-    openDialog();
-  }
-  // Se não há alterações, a navegação natural do browser segue sem intervenção
-});
-
-// ===== SALVAR =====
-function doSave() {
-  saveQrSettings(currentOptions);
-  markClean();
-}
-
-document.getElementById("btn-save").addEventListener("click", doSave);
-
-// ===== CHIP GROUPS =====
-function setupChipGroup(groupId, key) {
-  const group = document.getElementById(groupId);
-  if (!group) return;
-  group.querySelectorAll(".chip").forEach((chip) => {
-    chip.classList.toggle("chip--active", chip.dataset.value === String(currentOptions[key]));
-    chip.addEventListener("click", () => {
-      group.querySelectorAll(".chip").forEach((c) => c.classList.remove("chip--active"));
-      chip.classList.add("chip--active");
-      currentOptions[key] = chip.dataset.value;
-      markDirty();
-      updateQr();
+  // ── Bind controles ────────────────────────────────────────────
+  document.querySelectorAll('md-chip-set[data-option]').forEach((setEl) => {
+    setEl.querySelectorAll('md-filter-chip').forEach((chip) => {
+      chip.addEventListener('click', () => set(setEl.dataset.option, chip.dataset.value));
     });
   });
-}
 
-// ===== COLOR =====
-function setupColor(inputId, previewId, key) {
-  const input = document.getElementById(inputId);
-  const preview = document.getElementById(previewId);
-  if (!input) return;
-  input.value = currentOptions[key];
-  preview.style.background = currentOptions[key];
-  input.addEventListener("input", (e) => {
-    currentOptions[key] = e.target.value;
-    preview.style.background = e.target.value;
-    markDirty();
-    updateQr();
+  document.querySelectorAll('input[type="color"][data-option]').forEach((inp) => {
+    inp.addEventListener('input', () => set(inp.dataset.option, inp.value));
   });
-}
 
-// ===== SLIDERS =====
-function setupSlider(inputId, valueId, key, fmt) {
-  const input = document.getElementById(inputId);
-  const display = document.getElementById(valueId);
-  if (!input) return;
-  input.value = currentOptions[key];
-  display.textContent = fmt(currentOptions[key]);
-  input.addEventListener("input", (e) => {
-    const val = parseFloat(e.target.value);
-    currentOptions[key] = val;
-    display.textContent = fmt(val);
-    markDirty();
-    updateQr();
+  document.querySelectorAll('md-slider[data-option]').forEach((s) => {
+    s.addEventListener('input', () => set(s.dataset.option, Number(s.value)));
   });
-}
 
-// ===== LOGO =====
-function setupLogoUpload() {
-  const btn = document.getElementById("btn-upload-logo");
-  const fileInput = document.getElementById("logo-input");
-  const clearRow = document.getElementById("logo-clear-row");
-  const fileLabel = document.getElementById("logo-filename");
-  const clearBtn = document.getElementById("btn-clear-logo");
-
-  if (currentOptions.logoDataUrl) {
-    clearRow.style.display = "flex";
-    fileLabel.textContent = "logo salvo";
-  }
-
-  btn.addEventListener("click", () => fileInput.click());
-
-  fileInput.addEventListener("change", (e) => {
-    const file = e.target.files[0];
+  // ── Logo ──────────────────────────────────────────────────────
+  const logoInput = $('logo-input');
+  $('btn-upload-logo').addEventListener('click', () => logoInput.click());
+  logoInput.addEventListener('change', () => {
+    const file = logoInput.files?.[0];
     if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { UI.snackbar('A imagem deve ter no máximo 2 MB'); return; }
     const reader = new FileReader();
     reader.onload = (ev) => {
-      currentOptions.logoDataUrl = ev.target.result;
-      fileLabel.textContent = file.name;
-      clearRow.style.display = "flex";
-      markDirty();
-      updateQr();
+      $('logo-name').textContent = file.name;
+      // Logos maiores pedem correção de erro mais alta
+      if (current.eccLevel < 2) current.eccLevel = 2;
+      set('logoDataUrl', ev.target.result);
     };
     reader.readAsDataURL(file);
+    logoInput.value = '';
   });
+  $('btn-clear-logo').addEventListener('click', () => set('logoDataUrl', null));
 
-  clearBtn.addEventListener("click", () => {
-    currentOptions.logoDataUrl = null;
-    fileInput.value = "";
-    fileLabel.textContent = "nenhum arquivo";
-    clearRow.style.display = "none";
-    markDirty();
-    updateQr();
-  });
-}
-
-
-// ===== ECC =====
-function setupEcc() {
-  const input = document.getElementById("ecc-level");
-  const badge = document.getElementById("ecc-badge");
-  const desc  = document.getElementById("ecc-desc");
-  const ticks = document.querySelectorAll(".ecc-tick");
-
-  function syncEcc(val) {
-    badge.textContent = ECC_LEVELS[val];
-    desc.textContent  = ECC_DESCS[val];
-    ticks.forEach((t, i) => t.setAttribute("data-active", String(i === val)));
+  // ── Salvar / restaurar ────────────────────────────────────────
+  function save() {
+    try {
+      qrSettings.save(current);
+      saved = { ...current };
+      refresh();
+      UI.snackbar('Estilo salvo');
+      return true;
+    } catch {
+      UI.snackbar('Não foi possível salvar. Tente uma imagem de logo menor.');
+      return false;
+    }
   }
+  $('btn-save').addEventListener('click', save);
 
-  input.value = currentOptions.eccLevel;
-  syncEcc(currentOptions.eccLevel);
-
-  input.addEventListener("input", (e) => {
-    const val = parseInt(e.target.value, 10);
-    currentOptions.eccLevel = val;
-    syncEcc(val);
-    markDirty();
-    updateQr();
+  $('btn-reset').addEventListener('click', async () => {
+    const ok = await UI.confirm({
+      icon: 'restart_alt',
+      title: 'Restaurar estilo padrão?',
+      body: 'Cores, formatos e logo voltam ao QR Code preto e branco tradicional.',
+      confirmLabel: 'Restaurar',
+    });
+    if (!ok) return;
+    current = { ...QR_DEFAULTS };
+    syncControls();
+    refresh();
   });
-}
 
-// ===== INIT =====
-(function init() {
-  setupChipGroup("dots-type-group",     "dotsType");
-  setupChipGroup("corner-sq-type-group","cornerSqType");
-  setupChipGroup("corner-dot-type-group","cornerDotType");
+  // ── Sair sem salvar ───────────────────────────────────────────
+  UI.setBeforeBack(async () => {
+    if (!isDirty()) return true;
+    const choice = await UI.dialog({
+      icon: 'edit_note',
+      title: 'Salvar alterações?',
+      body: 'Você alterou o estilo do QR Code e ainda não salvou.',
+      actions: [
+        { label: 'Descartar', value: 'discard' },
+        { label: 'Salvar', value: 'save', variant: 'filled' },
+      ],
+    });
+    if (choice === 'save') return save();
+    if (choice === 'discard') { current = { ...saved }; return true; }
+    return false;
+  });
+  window.addEventListener('beforeunload', (e) => { if (isDirty()) { e.preventDefault(); e.returnValue = ''; } });
 
-  setupColor("dots-color",       "dots-color-preview",       "dotsColor");
-  setupColor("corner-sq-color",  "corner-sq-color-preview",  "cornerSqColor");
-  setupColor("corner-dot-color", "corner-dot-color-preview", "cornerDotColor");
-  setupColor("bg-color",         "bg-color-preview",         "bgColor");
-
-  setupSlider("logo-size",   "logo-size-value",   "logoSize",   (v) => Math.round(v * 100) + "%");
-  setupSlider("logo-margin", "logo-margin-value", "logoMargin", (v) => v + "px");
-  setupSlider("qr-margin",   "qr-margin-value",   "margin",     (v) => v + "px");
-
-  setupLogoUpload();
-  setupEcc();
-  updateQr();
+  // ── Init (após os web components existirem) ───────────────────
+  Promise.all(['md-filter-chip', 'md-slider'].map((t) => customElements.whenDefined(t)))
+    .then(syncControls);
+  syncControls();
+  refresh();
 })();
